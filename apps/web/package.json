@@ -41,7 +41,8 @@
     "class-variance-authority": "^0.7.x",
     "clsx": "^2.x",
     "tailwind-merge": "^2.x",
-    "lucide-react": "^0.263.x"
+    "lucide-react": "^0.263.x",
+    "framer-motion": "^10.x"
   },
   "devDependencies": {
     "typescript": "^5",
