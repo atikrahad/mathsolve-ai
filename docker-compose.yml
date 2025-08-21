@@ -1,0 +1,101 @@
+version: '3.8'
+
+services:
+  # Next.js Web App
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: ../../docker/Dockerfile.web
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://api:5000/api
+      - NEXT_PUBLIC_WS_URL=ws://mcp:5001
+    depends_on:
+      - api
+      - mcp
+    volumes:
+      - ./apps/web:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - mathsolve-network
+
+  # Express.js API
+  api:
+    build:
+      context: ./apps/backend
+      dockerfile: ../../docker/Dockerfile.api
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=file:./dev.db
+      - JWT_SECRET=dev-jwt-secret-change-in-production
+      - JWT_REFRESH_SECRET=dev-refresh-secret-change-in-production
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+    volumes:
+      - ./apps/backend:/app
+      - /app/node_modules
+      - ./data/backend:/app/data
+    networks:
+      - mathsolve-network
+
+  # MCP Server
+  mcp:
+    build:
+      context: ./apps/mcp-server
+      dockerfile: ../../docker/Dockerfile.mcp
+    ports:
+      - "5001:5001"
+    environment:
+      - NODE_ENV=development
+      - MCP_PORT=5001
+      - DATABASE_URL=file:../backend/dev.db
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - api
+      - redis
+    volumes:
+      - ./apps/mcp-server:/app
+      - /app/node_modules
+      - ./data/mcp:/app/data
+    networks:
+      - mathsolve-network
+
+  # Redis Cache (Optional)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - mathsolve-network
+    command: redis-server --appendonly yes
+
+  # PostgreSQL (Production Alternative)
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=mathsolve
+      - POSTGRES_USER=mathsolve
+      - POSTGRES_PASSWORD=mathsolve_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - mathsolve-network
+    profiles:
+      - production
+
+volumes:
+  redis_data:
+  postgres_data:
+
+networks:
+  mathsolve-network:
+    driver: bridge

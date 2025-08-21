@@ -1,0 +1,42 @@
+[
+  {
+    "username": "mathwiz",
+    "email": "mathwiz@example.com", 
+    "bio": "Passionate about algebra and calculus. Love helping students understand complex mathematical concepts.",
+    "rankPoints": 2500,
+    "currentRank": "Silver",
+    "streakCount": 15
+  },
+  {
+    "username": "calculusking",
+    "email": "calculusking@example.com",
+    "bio": "PhD in Mathematics with a focus on calculus and differential equations. Here to share knowledge!",
+    "rankPoints": 8750,
+    "currentRank": "Gold", 
+    "streakCount": 42
+  },
+  {
+    "username": "geometryguru",
+    "email": "geometryguru@example.com",
+    "bio": "Geometry teacher with 10 years experience. Making shapes and angles fun!",
+    "rankPoints": 15500,
+    "currentRank": "Platinum",
+    "streakCount": 28
+  },
+  {
+    "username": "algebrastudent",
+    "email": "algebrastudent@example.com", 
+    "bio": "High school student learning algebra. Always eager to practice more problems!",
+    "rankPoints": 750,
+    "currentRank": "Bronze",
+    "streakCount": 5
+  },
+  {
+    "username": "statsmaster",
+    "email": "statsmaster@example.com",
+    "bio": "Statistics professor and data science enthusiast. Love probability problems!",
+    "rankPoints": 12000,
+    "currentRank": "Gold",
+    "streakCount": 33
+  }
+]

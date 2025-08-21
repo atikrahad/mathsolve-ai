@@ -1,0 +1,56 @@
+FROM node:20-alpine AS base
+
+# Install dependencies only when needed
+FROM base AS deps
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+COPY package.json package-lock.json* ./
+RUN npm ci --only=production
+
+# Development dependencies
+FROM base AS dev-deps
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm ci
+
+# Build the source code
+FROM base AS builder
+WORKDIR /app
+COPY --from=dev-deps /app/node_modules ./node_modules
+COPY . .
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Build the application
+RUN npm run build
+
+# Production image
+FROM base AS runner
+WORKDIR /app
+
+ENV NODE_ENV production
+
+# Create app user
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 api
+
+# Copy built application
+COPY --from=builder --chown=api:nodejs /app/dist ./dist
+COPY --from=builder --chown=api:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=api:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=api:nodejs /app/package.json ./package.json
+
+# Create necessary directories
+RUN mkdir -p logs uploads data
+RUN chown -R api:nodejs logs uploads data
+
+USER api
+
+EXPOSE 5000
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:5000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+
+CMD ["npm", "start"]

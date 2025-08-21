@@ -1,0 +1,201 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  username      String    @unique
+  email         String    @unique
+  passwordHash  String    @map("password_hash")
+  profileImage  String?   @map("profile_image")
+  bio           String?
+  rankPoints    Int       @default(0) @map("rank_points")
+  currentRank   String    @default("Bronze") @map("current_rank")
+  streakCount   Int       @default(0) @map("streak_count")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  lastActiveAt  DateTime? @map("last_active_at")
+
+  // Relations
+  problems      Problem[]
+  solutions     Solution[]
+  resources     Resource[]
+  comments      Comment[]
+  achievements  Achievement[]
+  ratings       ProblemRating[]
+  bookmarks     Bookmark[]
+  followers     UserFollow[] @relation("UserFollowers")
+  following     UserFollow[] @relation("UserFollowing")
+
+  @@map("users")
+}
+
+model Problem {
+  id           String   @id @default(cuid())
+  creatorId    String   @map("creator_id")
+  title        String
+  description  String
+  difficulty   Difficulty
+  category     String
+  tags         Json     // Array of strings
+  solution     String?
+  qualityScore Float    @default(0) @map("quality_score")
+  viewCount    Int      @default(0) @map("view_count")
+  attemptCount Int      @default(0) @map("attempt_count")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  creator      User      @relation(fields: [creatorId], references: [id])
+  solutions    Solution[]
+  comments     Comment[]
+  ratings      ProblemRating[]
+  bookmarks    Bookmark[]
+
+  @@index([category])
+  @@index([difficulty])
+  @@index([creatorId])
+  @@map("problems")
+}
+
+model Solution {
+  id          String   @id @default(cuid())
+  problemId   String   @map("problem_id")
+  userId      String   @map("user_id")
+  answer      String
+  isCorrect   Boolean  @default(false) @map("is_correct")
+  pointsEarned Int     @default(0) @map("points_earned")
+  timeSpent   Int?     @map("time_spent") // in seconds
+  hintsUsed   Int      @default(0) @map("hints_used")
+  submittedAt DateTime @default(now()) @map("submitted_at")
+
+  // Relations
+  problem     Problem  @relation(fields: [problemId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@unique([problemId, userId])
+  @@index([userId])
+  @@index([problemId])
+  @@map("solutions")
+}
+
+model Resource {
+  id         String       @id @default(cuid())
+  title      String
+  content    String
+  type       ResourceType
+  category   String
+  difficulty String?
+  authorId   String       @map("author_id")
+  viewCount  Int          @default(0) @map("view_count")
+  rating     Float        @default(0)
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+
+  // Relations
+  author     User         @relation(fields: [authorId], references: [id])
+  bookmarks  Bookmark[]
+
+  @@index([category])
+  @@index([authorId])
+  @@map("resources")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  problemId String   @map("problem_id")
+  userId    String   @map("user_id")
+  content   String
+  parentId  String?  @map("parent_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  problem   Problem  @relation(fields: [problemId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  parent    Comment? @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   Comment[] @relation("CommentReplies")
+
+  @@index([problemId])
+  @@index([userId])
+  @@map("comments")
+}
+
+model Achievement {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  type        String
+  name        String
+  description String?
+  earnedAt    DateTime @default(now()) @map("earned_at")
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("achievements")
+}
+
+model UserFollow {
+  followerId  String   @map("follower_id")
+  followingId String   @map("following_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  follower    User     @relation("UserFollowers", fields: [followerId], references: [id])
+  following   User     @relation("UserFollowing", fields: [followingId], references: [id])
+
+  @@id([followerId, followingId])
+  @@map("user_follows")
+}
+
+model ProblemRating {
+  problemId String   @map("problem_id")
+  userId    String   @map("user_id")
+  rating    Int      // 1-5
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  problem   Problem  @relation(fields: [problemId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@id([problemId, userId])
+  @@map("problem_ratings")
+}
+
+model Bookmark {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  problemId  String?  @map("problem_id")
+  resourceId String?  @map("resource_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user       User      @relation(fields: [userId], references: [id])
+  problem    Problem?  @relation(fields: [problemId], references: [id])
+  resource   Resource? @relation(fields: [resourceId], references: [id])
+
+  @@index([userId])
+  @@map("bookmarks")
+}
+
+// Enums
+enum Difficulty {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum ResourceType {
+  TUTORIAL
+  GUIDE
+  REFERENCE
+}

@@ -1,0 +1,37 @@
+[
+  {
+    "title": "Introduction to Algebra",
+    "content": "# Introduction to Algebra\n\nAlgebra is a branch of mathematics that deals with variables, constants, and the operations between them. In this tutorial, we'll cover the basics of algebraic expressions and equations.\n\n## Variables and Constants\nA variable is a symbol (usually a letter) that represents an unknown value. Constants are fixed values that don't change.\n\n## Basic Operations\n- Addition: a + b\n- Subtraction: a - b  \n- Multiplication: a × b or ab\n- Division: a ÷ b or a/b\n\n## Solving Linear Equations\nTo solve ax + b = c:\n1. Subtract b from both sides\n2. Divide by a\n\nExample: 2x + 5 = 11\n1. 2x = 6\n2. x = 3",
+    "type": "TUTORIAL",
+    "category": "Algebra",
+    "difficulty": "LOW"
+  },
+  {
+    "title": "Calculus Fundamentals: Limits",
+    "content": "# Understanding Limits\n\nLimits are fundamental to calculus. They describe the behavior of a function as the input approaches a certain value.\n\n## Definition\nThe limit of f(x) as x approaches a is L, written as:\nlim(x→a) f(x) = L\n\n## Key Properties\n1. Limit of a constant is the constant\n2. Limit of x as x→a is a\n3. Sum rule: lim[f(x) + g(x)] = lim f(x) + lim g(x)\n4. Product rule: lim[f(x) × g(x)] = lim f(x) × lim g(x)\n\n## Common Limits\n- lim(x→0) (sin x)/x = 1\n- lim(x→∞) 1/x = 0\n- lim(x→0) (e^x - 1)/x = 1",
+    "type": "TUTORIAL", 
+    "category": "Calculus",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "title": "Geometry Formulas Reference",
+    "content": "# Essential Geometry Formulas\n\n## Area Formulas\n- **Rectangle**: A = length × width\n- **Triangle**: A = (1/2) × base × height\n- **Circle**: A = πr²\n- **Trapezoid**: A = (1/2)(b₁ + b₂)h\n\n## Perimeter/Circumference\n- **Rectangle**: P = 2(length + width)\n- **Triangle**: P = a + b + c\n- **Circle**: C = 2πr = πd\n\n## Volume Formulas\n- **Cube**: V = s³\n- **Rectangular Prism**: V = length × width × height\n- **Cylinder**: V = πr²h\n- **Sphere**: V = (4/3)πr³\n- **Cone**: V = (1/3)πr²h\n\n## Pythagorean Theorem\nFor a right triangle: a² + b² = c²",
+    "type": "REFERENCE",
+    "category": "Geometry", 
+    "difficulty": null
+  },
+  {
+    "title": "Statistics: Measures of Central Tendency",
+    "content": "# Measures of Central Tendency\n\nThese statistics describe the center or typical value of a dataset.\n\n## Mean (Average)\nSum of all values divided by the number of values:\nMean = Σx / n\n\n## Median\nThe middle value when data is arranged in order:\n- Odd number of values: middle value\n- Even number of values: average of two middle values\n\n## Mode\nThe value that appears most frequently in the dataset.\n\n## When to Use Each\n- **Mean**: Best for normal distributions, affected by outliers\n- **Median**: Best for skewed distributions, not affected by outliers  \n- **Mode**: Best for categorical data or finding most common value\n\n## Example\nData: [2, 3, 3, 5, 7, 8, 9]\n- Mean = (2+3+3+5+7+8+9)/7 = 37/7 ≈ 5.29\n- Median = 5 (middle value)\n- Mode = 3 (appears twice)",
+    "type": "GUIDE",
+    "category": "Statistics",
+    "difficulty": "LOW"
+  },
+  {
+    "title": "Advanced Integration Techniques",
+    "content": "# Advanced Integration Techniques\n\n## Integration by Parts\nFor ∫ u dv = uv - ∫ v du\n\n**LIATE Rule for choosing u:**\n- L: Logarithmic functions\n- I: Inverse trigonometric functions  \n- A: Algebraic functions\n- T: Trigonometric functions\n- E: Exponential functions\n\n## Trigonometric Substitution\n- For √(a² - x²): use x = a sin θ\n- For √(a² + x²): use x = a tan θ\n- For √(x² - a²): use x = a sec θ\n\n## Partial Fractions\nDecompose rational functions:\nP(x)/Q(x) = A/(x-a) + B/(x-b) + ...\n\n## Integration by Substitution\nIf u = g(x), then du = g'(x)dx\n∫ f(g(x))g'(x)dx = ∫ f(u)du",
+    "type": "GUIDE",
+    "category": "Calculus",
+    "difficulty": "HIGH"
+  }
+]

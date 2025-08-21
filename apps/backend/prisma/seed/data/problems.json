@@ -1,0 +1,66 @@
+[
+  {
+    "title": "Quadratic Equation Solutions",
+    "description": "Find all real solutions to the quadratic equation: x² - 5x + 6 = 0",
+    "difficulty": "LOW",
+    "category": "Algebra",
+    "tags": ["quadratic", "factoring", "basic"],
+    "solution": "To solve x² - 5x + 6 = 0, we can factor: (x - 2)(x - 3) = 0. Therefore x = 2 or x = 3."
+  },
+  {
+    "title": "Derivative of Polynomial",
+    "description": "Find the derivative of f(x) = 3x⁴ - 2x³ + 5x² - 7x + 1",
+    "difficulty": "MEDIUM", 
+    "category": "Calculus",
+    "tags": ["derivative", "polynomial", "power rule"],
+    "solution": "Using the power rule: f'(x) = 12x³ - 6x² + 10x - 7"
+  },
+  {
+    "title": "Triangle Area Calculation",
+    "description": "A triangle has sides of length 5, 12, and 13. Calculate its area using Heron's formula.",
+    "difficulty": "MEDIUM",
+    "category": "Geometry", 
+    "tags": ["triangle", "area", "heron's formula"],
+    "solution": "First check if it's a right triangle: 5² + 12² = 25 + 144 = 169 = 13². Yes! So area = (1/2) × 5 × 12 = 30."
+  },
+  {
+    "title": "Probability of Two Dice",
+    "description": "What is the probability of rolling two dice and getting a sum of 7?",
+    "difficulty": "LOW",
+    "category": "Statistics",
+    "tags": ["probability", "dice", "combinations"],
+    "solution": "There are 6 ways to get sum 7: (1,6), (2,5), (3,4), (4,3), (5,2), (6,1). Total outcomes = 36. Probability = 6/36 = 1/6."
+  },
+  {
+    "title": "Integration by Parts", 
+    "description": "Evaluate the integral: ∫ x·e^x dx",
+    "difficulty": "HIGH",
+    "category": "Calculus",
+    "tags": ["integration", "by parts", "exponential"],
+    "solution": "Using integration by parts with u = x, dv = e^x dx: ∫ x·e^x dx = x·e^x - ∫ e^x dx = x·e^x - e^x + C = e^x(x - 1) + C"
+  },
+  {
+    "title": "System of Linear Equations",
+    "description": "Solve the system: 2x + 3y = 12, x - y = 1",
+    "difficulty": "MEDIUM",
+    "category": "Algebra", 
+    "tags": ["system", "linear", "substitution"],
+    "solution": "From equation 2: x = y + 1. Substitute: 2(y + 1) + 3y = 12, so 5y + 2 = 12, y = 2. Then x = 3. Solution: (3, 2)."
+  },
+  {
+    "title": "Circle Circumference",
+    "description": "A circle has radius 7 cm. What is its circumference?",
+    "difficulty": "LOW", 
+    "category": "Geometry",
+    "tags": ["circle", "circumference", "basic"],
+    "solution": "Circumference = 2πr = 2π(7) = 14π cm ≈ 43.98 cm"
+  },
+  {
+    "title": "Limit Evaluation",
+    "description": "Find the limit: lim(x→0) (sin x)/x",
+    "difficulty": "HIGH",
+    "category": "Calculus",
+    "tags": ["limit", "trigonometric", "standard"],
+    "solution": "This is a standard limit. Using L'Hôpital's rule or geometric proof: lim(x→0) (sin x)/x = 1"
+  }
+]

@@ -1,0 +1,90 @@
+// Authentication constants
+export const AUTH_CONSTANTS = {
+  JWT_EXPIRE: process.env.JWT_EXPIRE || '15m',
+  JWT_REFRESH_EXPIRE: process.env.JWT_REFRESH_EXPIRE || '7d',
+  BCRYPT_SALT_ROUNDS: 12,
+  PASSWORD_MIN_LENGTH: 8,
+  MAX_LOGIN_ATTEMPTS: 5,
+  ACCOUNT_LOCK_TIME: 2 * 60 * 60 * 1000, // 2 hours in milliseconds
+} as const;
+
+// Rate limiting constants
+export const RATE_LIMIT_CONSTANTS = {
+  WINDOW_MS: parseInt(process.env.RATE_LIMIT_WINDOW || '900000'), // 15 minutes
+  MAX_REQUESTS: parseInt(process.env.RATE_LIMIT_MAX || '100'),
+  SKIP_SUCCESSFUL_REQUESTS: false,
+  SKIP_FAILED_REQUESTS: false,
+} as const;
+
+// Database constants
+export const DB_CONSTANTS = {
+  DEFAULT_PAGE_SIZE: 20,
+  MAX_PAGE_SIZE: 100,
+  SEARCH_MIN_LENGTH: 3,
+} as const;
+
+// Problem constants
+export const PROBLEM_CONSTANTS = {
+  TITLE_MAX_LENGTH: 200,
+  DESCRIPTION_MAX_LENGTH: 5000,
+  SOLUTION_MAX_LENGTH: 10000,
+  MAX_TAGS: 10,
+  TAG_MAX_LENGTH: 50,
+} as const;
+
+// Gamification constants
+export const GAMIFICATION_CONSTANTS = {
+  XP_POINTS: {
+    LOW_DIFFICULTY: 10,
+    MEDIUM_DIFFICULTY: 25,
+    HIGH_DIFFICULTY: 50,
+    STREAK_BONUS: 5,
+    FIRST_SOLVE_BONUS: 10,
+    PROBLEM_CREATION: 20,
+    QUALITY_BONUS: 15,
+  },
+  RANK_THRESHOLDS: {
+    BRONZE: 0,
+    SILVER: 1000,
+    GOLD: 5000,
+    PLATINUM: 15000,
+    DIAMOND: 30000,
+    MASTER: 50000,
+  },
+  STREAK_REQUIREMENTS: {
+    MIN_DAILY_PROBLEMS: 1,
+    MAX_HOURS_BETWEEN: 48,
+  },
+} as const;
+
+// File upload constants
+export const UPLOAD_CONSTANTS = {
+  MAX_FILE_SIZE: 5 * 1024 * 1024, // 5MB
+  ALLOWED_IMAGE_TYPES: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+  ALLOWED_DOCUMENT_TYPES: ['application/pdf', 'text/plain'],
+  UPLOAD_PATH: process.env.UPLOAD_PATH || './uploads',
+} as const;
+
+// AI Service constants
+export const AI_CONSTANTS = {
+  MAX_RETRIES: 3,
+  TIMEOUT_MS: 30000, // 30 seconds
+  MAX_INPUT_LENGTH: 2000,
+  MAX_OUTPUT_LENGTH: 5000,
+} as const;
+
+// Cache constants
+export const CACHE_CONSTANTS = {
+  DEFAULT_TTL: 3600, // 1 hour in seconds
+  RANKINGS_TTL: 1800, // 30 minutes
+  PROBLEMS_TTL: 7200, // 2 hours
+  USER_PROFILE_TTL: 3600, // 1 hour
+} as const;
+
+// Email constants
+export const EMAIL_CONSTANTS = {
+  FROM_ADDRESS: process.env.EMAIL_FROM || 'noreply@mathsolve-ai.com',
+  SUPPORT_ADDRESS: process.env.SUPPORT_EMAIL || 'support@mathsolve-ai.com',
+  VERIFICATION_EXPIRE: 24 * 60 * 60 * 1000, // 24 hours
+  RESET_PASSWORD_EXPIRE: 60 * 60 * 1000, // 1 hour
+} as const;
