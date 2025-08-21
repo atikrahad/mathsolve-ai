@@ -1,0 +1,68 @@
+{
+  "name": "mathsolve-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI-powered mathematics learning and problem-solving platform",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mathsolveai/mathsolve-ai.git"
+  },
+  "keywords": [
+    "mathematics",
+    "ai",
+    "education",
+    "learning",
+    "problem-solving",
+    "nextjs",
+    "express",
+    "prisma",
+    "websocket"
+  ],
+  "author": "MathSolve AI Team",
+  "license": "MIT",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently --prefix-colors \"cyan,magenta,yellow\" --names \"WEB,API,MCP\" \"npm run dev:web\" \"npm run dev:api\" \"npm run dev:mcp\"",
+    "dev:web": "cd apps/web && npm run dev",
+    "dev:api": "cd apps/backend && npm run dev",
+    "dev:mcp": "cd apps/mcp-server && npm run dev",
+    "build": "npm run build:web && npm run build:api && npm run build:mcp",
+    "build:web": "cd apps/web && npm run build",
+    "build:api": "cd apps/backend && npm run build",
+    "build:mcp": "cd apps/mcp-server && npm run build",
+    "start": "concurrently --prefix-colors \"cyan,magenta,yellow\" --names \"WEB,API,MCP\" \"npm run start:web\" \"npm run start:api\" \"npm run start:mcp\"",
+    "start:web": "cd apps/web && npm run start",
+    "start:api": "cd apps/backend && npm run start",
+    "start:mcp": "cd apps/mcp-server && npm run start",
+    "test": "npm run test:web && npm run test:api && npm run test:mcp",
+    "test:web": "cd apps/web && npm run test",
+    "test:api": "cd apps/backend && npm run test",
+    "test:mcp": "cd apps/mcp-server && npm run test",
+    "lint": "npm run lint:web && npm run lint:api && npm run lint:mcp",
+    "lint:web": "cd apps/web && npm run lint",
+    "lint:api": "cd apps/backend && npm run lint",
+    "lint:mcp": "cd apps/mcp-server && npm run lint",
+    "db:migrate": "cd apps/backend && npm run db:migrate",
+    "db:seed": "cd apps/backend && npm run db:seed",
+    "db:studio": "cd apps/backend && npm run db:studio",
+    "db:generate": "cd apps/backend && npm run db:generate",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "setup": "node scripts/setup.js",
+    "clean": "rm -rf apps/*/node_modules apps/*/dist apps/*/.next apps/*/.turbo node_modules",
+    "postinstall": "echo 'Run npm run setup to initialize the development environment'"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "turbo": "^1.11.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}

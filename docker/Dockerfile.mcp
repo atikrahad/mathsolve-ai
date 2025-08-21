@@ -1,0 +1,52 @@
+FROM node:20-alpine AS base
+
+# Install dependencies only when needed
+FROM base AS deps
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+COPY package.json package-lock.json* ./
+RUN npm ci --only=production
+
+# Development dependencies
+FROM base AS dev-deps
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm ci
+
+# Build the source code
+FROM base AS builder
+WORKDIR /app
+COPY --from=dev-deps /app/node_modules ./node_modules
+COPY . .
+
+# Build the application
+RUN npm run build
+
+# Production image
+FROM base AS runner
+WORKDIR /app
+
+ENV NODE_ENV production
+
+# Create app user
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 mcp
+
+# Copy built application
+COPY --from=builder --chown=mcp:nodejs /app/dist ./dist
+COPY --from=builder --chown=mcp:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=mcp:nodejs /app/package.json ./package.json
+
+# Create necessary directories
+RUN mkdir -p logs data vectors embeddings
+RUN chown -R mcp:nodejs logs data vectors embeddings
+
+USER mcp
+
+EXPOSE 5001
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD node -e "const ws = require('ws'); const client = new ws.WebSocket('ws://localhost:5001'); client.on('open', () => { client.close(); process.exit(0); }); client.on('error', () => process.exit(1));"
+
+CMD ["npm", "start"]
