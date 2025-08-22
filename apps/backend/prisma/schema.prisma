@@ -14,12 +14,15 @@ model User {
   id            String    @id @default(cuid())
   username      String    @unique
   email         String    @unique
-  passwordHash  String    @map("password_hash")
+  passwordHash  String?   @map("password_hash") // Optional for OAuth users
   profileImage  String?   @map("profile_image")
   bio           String?
   rankPoints    Int       @default(0) @map("rank_points")
   currentRank   String    @default("Bronze") @map("current_rank")
   streakCount   Int       @default(0) @map("streak_count")
+  emailVerified Boolean   @default(false) @map("email_verified")
+  provider      String?   // "local", "google", etc.
+  providerId    String?   @map("provider_id") // OAuth provider user ID
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
   lastActiveAt  DateTime? @map("last_active_at")
@@ -43,9 +46,9 @@ model Problem {
   creatorId    String   @map("creator_id")
   title        String
   description  String
-  difficulty   Difficulty
+  difficulty   String   // "LOW", "MEDIUM", "HIGH"
   category     String
-  tags         Json     // Array of strings
+  tags         String   // JSON string for SQLite compatibility
   solution     String?
   qualityScore Float    @default(0) @map("quality_score")
   viewCount    Int      @default(0) @map("view_count")
@@ -91,7 +94,7 @@ model Resource {
   id         String       @id @default(cuid())
   title      String
   content    String
-  type       ResourceType
+  type       String       // "TUTORIAL", "GUIDE", "REFERENCE"
   category   String
   difficulty String?
   authorId   String       @map("author_id")
@@ -187,15 +190,4 @@ model Bookmark {
   @@map("bookmarks")
 }
 
-// Enums
-enum Difficulty {
-  LOW
-  MEDIUM
-  HIGH
-}
-
-enum ResourceType {
-  TUTORIAL
-  GUIDE
-  REFERENCE
-}
+// Note: SQLite doesn't support enums, so we use String fields with comments indicating valid values

@@ -77,6 +77,7 @@ export class AuthService {
           username: input.username,
           email: input.email,
           passwordHash,
+          provider: 'local',
           bio: input.bio || null,
           lastActiveAt: new Date()
         }
@@ -112,6 +113,11 @@ export class AuthService {
 
       if (!user) {
         throw new ApiError(401, 'Invalid email or password');
+      }
+
+      // Check if user is OAuth-only (no password set)
+      if (!user.passwordHash) {
+        throw new ApiError(401, 'This account was created with Google. Please sign in with Google.');
       }
 
       // Verify password

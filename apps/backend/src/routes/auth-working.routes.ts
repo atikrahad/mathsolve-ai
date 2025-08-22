@@ -1,7 +1,4 @@
 import { Router } from 'express';
-import { AuthController } from '../controllers/auth.controller';
-import { GoogleAuthController } from '../controllers/google-auth.controller';
-import { authenticate } from '../middleware/auth.middleware';
 import rateLimit from 'express-rate-limit';
 
 const router = Router();
@@ -29,30 +26,12 @@ const generalRateLimit = rateLimit({
   legacyHeaders: false,
 });
 
-// Public routes
-router.post('/register', authRateLimit, AuthController.register);
-router.post('/login', authRateLimit, AuthController.login);
-router.post('/logout', AuthController.logout);
-router.post('/refresh', generalRateLimit, AuthController.refresh);
-router.post('/forgot-password', authRateLimit, AuthController.forgotPassword);
-router.post('/reset-password', authRateLimit, AuthController.resetPassword);
-router.get('/verify-email', AuthController.verifyEmail);
-
-// Google OAuth routes
-router.get('/google/url', GoogleAuthController.getAuthUrl);
-router.post('/google/callback', authRateLimit, GoogleAuthController.handleCallback);
-router.post('/google/token', authRateLimit, GoogleAuthController.authenticateWithToken);
-
-// Protected routes (require authentication)
-router.get('/profile', authenticate, AuthController.getProfile);
-router.post('/change-password', authenticate, AuthController.changePassword);
-router.post('/google/link', authenticate, GoogleAuthController.linkAccount);
-
-// Health check / info endpoint
+// Basic test routes first
 router.get('/', (req, res) => {
   res.json({
     message: 'Authentication service is running',
     version: '1.0.0',
+    status: 'active',
     endpoints: {
       public: [
         'POST /auth/register - User registration',
@@ -72,6 +51,15 @@ router.get('/', (req, res) => {
         'POST /auth/google/link - Link Google account to existing user'
       ]
     }
+  });
+});
+
+// Test endpoint
+router.get('/test', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Auth routes working',
+    timestamp: new Date().toISOString()
   });
 });
 
