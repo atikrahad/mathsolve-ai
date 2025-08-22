@@ -42,7 +42,11 @@
     "clsx": "^2.x",
     "tailwind-merge": "^2.x",
     "lucide-react": "^0.263.x",
-    "framer-motion": "^10.x"
+    "framer-motion": "^10.x",
+    "three": "^0.158.0",
+    "@react-three/fiber": "^8.15.11",
+    "@react-three/drei": "^9.88.13",
+    "@react-three/postprocessing": "^2.15.11"
   },
   "devDependencies": {
     "typescript": "^5",
@@ -53,6 +57,7 @@
     "eslint-config-next": "^14.x",
     "postcss": "^8",
     "autoprefixer": "^10",
-    "tailwindcss-animate": "^1.x"
+    "tailwindcss-animate": "^1.x",
+    "@types/three": "^0.158.0"
   }
 }
