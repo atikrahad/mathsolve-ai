@@ -22,7 +22,7 @@ app.use(helmet({
 
 // CORS - Allow frontend communication
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: process.env.FRONTEND_URL || 'http://localhost:3002',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -248,11 +248,12 @@ app.post('/api/auth/google/token', async (req, res) => {
   }
 });
 
-// Basic registration endpoint (for comparison)
+// User registration endpoint
 app.post('/api/auth/register', async (req, res) => {
   try {
     const { username, email, password } = req.body;
     
+    // Validation
     if (!username || !email || !password) {
       return res.status(400).json({
         success: false,
@@ -260,22 +261,85 @@ app.post('/api/auth/register', async (req, res) => {
       });
     }
     
-    // Mock implementation
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid email format'
+      });
+    }
+    
+    // Username validation
+    if (username.length < 3 || username.length > 30) {
+      return res.status(400).json({
+        success: false,
+        message: 'Username must be between 3 and 30 characters'
+      });
+    }
+    
+    if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Username can only contain letters, numbers, hyphens, and underscores'
+      });
+    }
+    
+    // Password validation
+    if (password.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 8 characters long'
+      });
+    }
+    
+    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must contain at least one uppercase letter, one lowercase letter, and one number'
+      });
+    }
+    
+    // Mock duplicate user check
+    if (email === 'existing@example.com' || username === 'existinguser') {
+      return res.status(409).json({
+        success: false,
+        message: email === 'existing@example.com' ? 'User with this email already exists' : 'Username is already taken'
+      });
+    }
+    
+    // Mock successful registration
+    const user = {
+      id: 'user-' + Date.now(),
+      username,
+      email,
+      profileImage: null,
+      bio: null,
+      rankPoints: 0,
+      currentRank: 'Bronze',
+      streakCount: 0,
+      createdAt: new Date().toISOString(),
+      lastActiveAt: new Date().toISOString()
+    };
+    
+    const accessToken = 'access-token-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+    
+    // Set refresh token cookie (mock)
+    res.cookie('refreshToken', 'refresh-token-' + Date.now(), {
+      httpOnly: true,
+      secure: NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+    
+    console.log('User registered:', { username, email, userId: user.id });
+    
     return res.status(201).json({
       success: true,
       message: 'User registered successfully',
       data: {
-        user: {
-          id: 'local-user-' + Date.now(),
-          username,
-          email,
-          provider: 'local',
-          rankPoints: 0,
-          currentRank: 'Bronze',
-          streakCount: 0,
-          createdAt: new Date().toISOString()
-        },
-        accessToken: 'local-access-token-' + Date.now()
+        user,
+        accessToken
       }
     });
   } catch (error) {
@@ -283,6 +347,118 @@ app.post('/api/auth/register', async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Registration failed',
+      error: NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+// User login endpoint
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    // Validation
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email and password are required'
+      });
+    }
+    
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid email format'
+      });
+    }
+    
+    // Mock user database with test credentials
+    const mockUsers = [
+      {
+        id: 'user-123456',
+        username: 'testuser',
+        email: 'test@example.com',
+        password: 'TestPass123!',
+        profileImage: null,
+        bio: 'I love solving math problems!',
+        rankPoints: 1250,
+        currentRank: 'Gold',
+        streakCount: 15,
+        createdAt: new Date(Date.now() - 86400000 * 30).toISOString(),
+        lastActiveAt: new Date().toISOString()
+      },
+      {
+        id: 'user-789012',
+        username: 'mathgeek',
+        email: 'mathgeek@example.com',
+        password: 'MathRocks2024!',
+        profileImage: 'https://avatar.example.com/mathgeek.jpg',
+        bio: 'Mathematics enthusiast and problem solver',
+        rankPoints: 2750,
+        currentRank: 'Platinum',
+        streakCount: 42,
+        createdAt: new Date(Date.now() - 86400000 * 90).toISOString(),
+        lastActiveAt: new Date().toISOString()
+      }
+    ];
+    
+    // Find user by email
+    const user = mockUsers.find(u => u.email === email);
+    
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid email or password'
+      });
+    }
+    
+    // Check password (in production, this would use bcrypt)
+    if (user.password !== password) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid email or password'
+      });
+    }
+    
+    // Generate tokens
+    const accessToken = 'access-token-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+    
+    // Set refresh token cookie
+    res.cookie('refreshToken', 'refresh-token-' + Date.now(), {
+      httpOnly: true,
+      secure: NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+    
+    console.log('User logged in:', { username: user.username, email: user.email, userId: user.id });
+    
+    return res.status(200).json({
+      success: true,
+      message: 'Login successful',
+      data: {
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          profileImage: user.profileImage,
+          bio: user.bio,
+          rankPoints: user.rankPoints,
+          currentRank: user.currentRank,
+          streakCount: user.streakCount,
+          createdAt: user.createdAt,
+          lastActiveAt: user.lastActiveAt
+        },
+        accessToken
+      }
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Login failed',
       error: NODE_ENV === 'development' ? error.message : undefined
     });
   }
@@ -301,7 +477,8 @@ app.use('*', (req, res) => {
       'GET /api/auth/google/url - Generate Google OAuth URL',
       'POST /api/auth/google/callback - Handle Google OAuth callback',
       'POST /api/auth/google/token - Verify Google ID token',
-      'POST /api/auth/register - Register new user'
+      'POST /api/auth/register - Register new user',
+      'POST /api/auth/login - User login'
     ]
   });
 });

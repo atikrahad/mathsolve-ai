@@ -5,6 +5,7 @@ import { corsOptions } from './config/cors';
 import { rateLimitConfig } from './middleware/rateLimit.middleware';
 import { errorHandler } from './middleware/error.middleware';
 import { requestLogger } from './middleware/logger.middleware';
+import { sanitizeGeneral } from './middleware/sanitization.middleware';
 import routes from './routes';
 
 const app = express();
@@ -29,6 +30,9 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Input sanitization
+app.use(sanitizeGeneral);
+
 // Request logging
 app.use(requestLogger);
 
@@ -41,7 +45,11 @@ app.get('/health', (req, res) => {
     status: 'OK',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development',
-    version: process.env.npm_package_version || '1.0.0'
+    version: process.env.npm_package_version || '1.0.0',
+    features: {
+      googleAuth: !!process.env.GOOGLE_CLIENT_ID,
+      database: 'prisma'
+    }
   });
 });
 

@@ -62,74 +62,8 @@ export default function GoogleOAuthButton({
   const handleGoogleSignIn = async () => {
     if (isLoading || disabled) return;
 
-    setIsLoading(true);
-
-    try {
-      // Load Google Sign-In library if not already loaded
-      if (!window.google) {
-        const script = document.createElement('script');
-        script.src = 'https://accounts.google.com/gsi/client';
-        script.async = true;
-        script.defer = true;
-        
-        await new Promise<void>((resolve, reject) => {
-          script.onload = () => resolve();
-          script.onerror = () => reject(new Error('Failed to load Google Sign-In library'));
-          document.head.appendChild(script);
-        });
-      }
-
-      // Wait for Google library to be ready
-      if (!window.google?.accounts?.id) {
-        throw new Error('Google Sign-In library not ready');
-      }
-
-      // Initialize Google Sign-In
-      window.google.accounts.id.initialize({
-        client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-        callback: async (response: any) => {
-          try {
-            if (response.credential) {
-              const result = await googleAuth(response.credential);
-              onSuccess?.(result);
-            } else {
-              throw new Error('No credential received from Google');
-            }
-          } catch (error: any) {
-            console.error('Google sign-in error:', error);
-            onError?.(error.message || 'Google sign-in failed');
-          } finally {
-            setIsLoading(false);
-          }
-        },
-        auto_select: false,
-        cancel_on_tap_outside: true,
-      });
-
-      // Prompt Google Sign-In
-      window.google.accounts.id.prompt((notification: any) => {
-        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-          // Fallback to popup if prompt is not displayed
-          window.google.accounts.id.renderButton(
-            document.createElement('div'),
-            {
-              theme: 'outline',
-              size: 'large',
-              type: 'standard',
-              text: 'continue_with',
-              click_listener: () => {
-                // This will be handled by the callback
-              }
-            }
-          );
-        }
-      });
-
-    } catch (error: any) {
-      console.error('Google sign-in initialization error:', error);
-      onError?.(error.message || 'Failed to initialize Google Sign-In');
-      setIsLoading(false);
-    }
+    // Show "coming soon" popup instead of actual Google OAuth
+    alert('🚀 Google Sign-In - Coming Soon!\n\nWe\'re working on integrating Google authentication.\nFor now, please use email and password to sign in.\n\nThis feature will be available in the next update!');
   };
 
   return (

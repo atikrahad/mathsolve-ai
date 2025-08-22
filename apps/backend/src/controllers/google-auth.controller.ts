@@ -3,6 +3,7 @@ import { GoogleAuthService } from '../services/google-auth.service';
 import { ApiError } from '../utils/errors/ApiError';
 import { logger } from '../config/logger';
 import { z } from 'zod';
+import { CookieUtil } from '../utils/cookie.util';
 
 // Validation schemas
 const googleTokenSchema = z.object({
@@ -50,12 +51,7 @@ export class GoogleAuthController {
       const result = await GoogleAuthService.authenticateWithGoogle(idToken);
       
       // Set refresh token as httpOnly cookie
-      res.cookie('refreshToken', result.tokens.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      });
+      CookieUtil.setRefreshTokenCookie(res, result.tokens.refreshToken);
 
       res.status(200).json({
         success: true,
@@ -82,12 +78,7 @@ export class GoogleAuthController {
       const result = await GoogleAuthService.authenticateWithGoogle(validatedData.token);
       
       // Set refresh token as httpOnly cookie
-      res.cookie('refreshToken', result.tokens.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      });
+      CookieUtil.setRefreshTokenCookie(res, result.tokens.refreshToken);
 
       res.status(200).json({
         success: true,

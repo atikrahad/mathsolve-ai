@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
-import { PrismaClient } from '@prisma/client';
+import prisma from './config/database';
 
 // Load environment variables
 dotenv.config();
@@ -10,9 +10,6 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 const NODE_ENV = process.env.NODE_ENV || 'development';
-
-// Initialize Prisma
-const prisma = new PrismaClient();
 
 // Security middleware
 app.use(helmet({

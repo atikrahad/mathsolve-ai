@@ -1,11 +1,9 @@
 import { OAuth2Client } from 'google-auth-library';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../config/database';
 import { config } from '../config/constants';
 import { JWTUtils } from '../utils/jwt-simple';
 import { ApiError } from '../utils/errors/ApiError';
 import { logger } from '../config/logger';
-
-const prisma = new PrismaClient();
 
 export interface GoogleUserInfo {
   id: string;
