@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { JWTUtils } from '../utils/jwt';
+import { JWTUtils } from '../utils/jwt-simple';
 import { PasswordUtils } from '../utils/password';
 import { ApiError } from '../utils/errors/ApiError';
 import { 
@@ -34,7 +34,7 @@ export interface UserResponse {
 }
 
 export class AuthService {
-  private static emailTransporter = nodemailer.createTransporter({
+  private static emailTransporter = nodemailer.createTransport({
     host: config.SMTP_HOST,
     port: config.SMTP_PORT,
     secure: false,
@@ -252,6 +252,11 @@ export class AuthService {
 
       if (!user) {
         throw new ApiError(404, 'User not found');
+      }
+
+      // Check if user has a password (OAuth users might not have one)
+      if (!user.passwordHash) {
+        throw new ApiError(400, 'This account was created with Google. Password change not available.');
       }
 
       // Verify current password

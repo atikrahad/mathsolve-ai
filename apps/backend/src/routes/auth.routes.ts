@@ -30,7 +30,7 @@ const generalRateLimit = rateLimit({
 });
 
 // Public routes
-router.post('/register', authRateLimit, AuthController.register);
+router.post('/register',  AuthController.register);
 router.post('/login', authRateLimit, AuthController.login);
 router.post('/logout', AuthController.logout);
 router.post('/refresh', generalRateLimit, AuthController.refresh);

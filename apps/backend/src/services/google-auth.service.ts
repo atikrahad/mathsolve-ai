@@ -1,7 +1,7 @@
 import { OAuth2Client } from 'google-auth-library';
 import { PrismaClient } from '@prisma/client';
 import { config } from '../config/constants';
-import { JWTUtils } from '../utils/jwt';
+import { JWTUtils } from '../utils/jwt-simple';
 import { ApiError } from '../utils/errors/ApiError';
 import { logger } from '../config/logger';
 
@@ -180,8 +180,8 @@ export class GoogleAuthService {
           id: user.id,
           username: user.username,
           email: user.email,
-          profileImage: user.profileImage,
-          bio: user.bio,
+          profileImage: user.profileImage || undefined,
+          bio: user.bio || undefined,
           rankPoints: user.rankPoints,
           currentRank: user.currentRank,
           streakCount: user.streakCount,
