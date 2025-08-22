@@ -6,7 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AnimatedCard } from "@/components/ui/animated-card";
 import { FloatingMathEquations, AnimatedCounter, MathFormula } from "@/components/animations/MathAnimation";
-import { ArrowRight, Brain, Users, Trophy, BookOpen, Target, Smartphone, Zap, Star, CheckCircle } from 'lucide-react';
+// import { AuthGuard } from "@/components/auth";
+// import { useAuthStore } from "@/store/auth";
+import Link from "next/link";
+import { ArrowRight, Brain, Users, Trophy, BookOpen, Target, Smartphone, Zap, Star, CheckCircle, LogIn, UserPlus } from 'lucide-react';
 
 // Dynamically import 3D components to avoid SSR issues
 const MathScene3D = dynamic(() => import('@/components/3d/MathScene3D'), {
@@ -47,8 +50,38 @@ const staggerContainer = {
 };
 
 export default function Home() {
+  // const { isAuthenticated, user } = useAuthStore();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#2A3B4E] via-[#1a2332] to-[#0f1419] relative overflow-hidden">
+      
+      {/* Navigation Header */}
+      <header className="absolute top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-sm border-b border-white/10">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex justify-between items-center">
+            <div className="text-2xl font-bold bg-gradient-to-r from-[#4ECDC4] to-[#FFE66D] bg-clip-text text-transparent">
+              MathSolve AI
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Link href="/auth/login">
+                  <Button variant="ghost" size="sm" className="text-[#95E1D3] hover:text-white hover:bg-white/10">
+                    <LogIn size={16} className="mr-1" />
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/auth/register">
+                  <Button size="sm" className="bg-gradient-to-r from-[#4ECDC4] to-[#FFE66D] text-[#2A3B4E] hover:from-[#4ECDC4]/80 hover:to-[#FFE66D]/80">
+                    <UserPlus size={16} className="mr-1" />
+                    Sign Up
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
       
       {/* Floating Math Equations Background */}
       <FloatingMathEquations />
@@ -103,10 +136,13 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <Button size="lg" className="text-lg px-12 py-4 bg-gradient-to-r from-[#4ECDC4] to-[#FFE66D] hover:from-[#4ECDC4]/80 hover:to-[#FFE66D]/80 text-[#2A3B4E] font-bold transform hover:scale-105 transition-all duration-200 shadow-xl">
-              Start Learning Now
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
+            <Link href="/auth/register">
+              <Button size="lg" className="text-lg px-12 py-4 bg-gradient-to-r from-[#4ECDC4] to-[#FFE66D] hover:from-[#4ECDC4]/80 hover:to-[#FFE66D]/80 text-[#2A3B4E] font-bold transform hover:scale-105 transition-all duration-200 shadow-xl">
+                Start Learning Now
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
+            
             <Button size="lg" variant="outline" className="text-lg px-12 py-4 border-2 border-[#4ECDC4] text-[#4ECDC4] hover:bg-[#4ECDC4]/10 transform hover:scale-105 transition-all duration-200">
               Watch Demo
             </Button>
@@ -419,10 +455,13 @@ export default function Home() {
               className="flex flex-col sm:flex-row gap-6 justify-center mb-12"
               variants={fadeInUp}
             >
-              <Button size="lg" className="text-lg px-12 py-4 bg-gradient-to-r from-[#4ECDC4] to-[#FFE66D] text-[#2A3B4E] hover:from-[#4ECDC4]/80 hover:to-[#FFE66D]/80 font-bold transform hover:scale-105 transition-all duration-200 shadow-xl">
-                Get Started Free
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+              <Link href="/auth/register">
+                <Button size="lg" className="text-lg px-12 py-4 bg-gradient-to-r from-[#4ECDC4] to-[#FFE66D] text-[#2A3B4E] hover:from-[#4ECDC4]/80 hover:to-[#FFE66D]/80 font-bold transform hover:scale-105 transition-all duration-200 shadow-xl">
+                  Get Started Free
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+              
               <Button size="lg" variant="outline" className="text-lg px-12 py-4 border-2 border-[#4ECDC4] text-[#4ECDC4] hover:bg-[#4ECDC4]/10 transform hover:scale-105 transition-all duration-200">
                 Explore 3D Demo
               </Button>

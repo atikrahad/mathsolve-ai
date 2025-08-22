@@ -1,15 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import { JWTUtils } from '../utils/jwt';
 import { ApiError } from '../utils/errors/ApiError';
 import { logger } from '../config/logger';
-import prisma from '../config/database';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 // Extend Request interface to include user
 declare global {
   namespace Express {
     interface Request {
       user?: {
-        id: string;
+        userId: string;
         username: string;
         email: string;
         role?: string;
@@ -21,77 +23,74 @@ declare global {
 export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Get token from header
-    let token = req.header('Authorization');
+    const authHeader = req.header('Authorization');
+    const token = JWTUtils.extractTokenFromHeader(authHeader);
     
     if (!token) {
-      throw new ApiError('Access denied. No token provided', 401);
-    }
-    
-    // Remove 'Bearer ' prefix if present
-    if (token.startsWith('Bearer ')) {
-      token = token.slice(7);
+      throw new ApiError(401, 'Access denied. No token provided');
     }
     
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+    const decoded = JWTUtils.verifyAccessToken(token);
     
     // Get user from database
     const user = await prisma.user.findUnique({
-      where: { id: decoded.id },
+      where: { id: decoded.userId },
       select: {
         id: true,
         username: true,
         email: true,
-        // role: true // Add this when roles are implemented
+        lastActiveAt: true
       }
     });
     
     if (!user) {
-      throw new ApiError('Invalid token', 401);
+      throw new ApiError(401, 'Invalid token - user not found');
     }
     
+    // Update last active time
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastActiveAt: new Date() }
+    });
+    
     // Add user to request object
-    req.user = user;
+    req.user = {
+      userId: user.id,
+      username: user.username,
+      email: user.email
+    };
+    
     next();
     
   } catch (error) {
-    if (error instanceof jwt.JsonWebTokenError) {
-      logger.warn('Invalid JWT token', {
-        error: error.message,
-        ip: req.ip,
-        userAgent: req.get('User-Agent')
-      });
-      return next(new ApiError('Invalid token', 401));
+    logger.warn('Authentication failed', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    });
+    
+    if (error instanceof ApiError) {
+      return next(error);
     }
     
-    if (error instanceof jwt.TokenExpiredError) {
-      logger.warn('Expired JWT token', {
-        ip: req.ip,
-        userAgent: req.get('User-Agent')
-      });
-      return next(new ApiError('Token expired', 401));
-    }
-    
-    next(error);
+    next(new ApiError(401, 'Authentication failed'));
   }
 };
 
 // Optional authentication - doesn't fail if no token
 export const optionalAuth = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    let token = req.header('Authorization');
+    const authHeader = req.header('Authorization');
+    const token = JWTUtils.extractTokenFromHeader(authHeader);
     
     if (!token) {
       return next();
     }
     
-    if (token.startsWith('Bearer ')) {
-      token = token.slice(7);
-    }
-    
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+    const decoded = JWTUtils.verifyAccessToken(token);
     const user = await prisma.user.findUnique({
-      where: { id: decoded.id },
+      where: { id: decoded.userId },
       select: {
         id: true,
         username: true,
@@ -100,7 +99,11 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
     });
     
     if (user) {
-      req.user = user;
+      req.user = {
+        userId: user.id,
+        username: user.username,
+        email: user.email
+      };
     }
     
     next();
@@ -114,7 +117,7 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
 export const authorize = (...roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
-      return next(new ApiError('Access denied. Authentication required', 401));
+      return next(new ApiError(401, 'Access denied. Authentication required'));
     }
     
     // If no roles specified, just check authentication
@@ -123,9 +126,9 @@ export const authorize = (...roles: string[]) => {
     }
     
     // Check if user has required role
-    // TODO: Implement role system
+    // TODO: Implement role system in future phases
     // if (!req.user.role || !roles.includes(req.user.role)) {
-    //   return next(new ApiError('Access denied. Insufficient permissions', 403));
+    //   return next(new ApiError(403, 'Access denied. Insufficient permissions'));
     // }
     
     next();
