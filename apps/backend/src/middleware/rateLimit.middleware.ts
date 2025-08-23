@@ -9,7 +9,7 @@ export const rateLimitConfig = rateLimit({
   message: {
     success: false,
     message: 'Too many requests from this IP, please try again later',
-    retryAfter: Math.ceil(RATE_LIMIT_CONSTANTS.WINDOW_MS / 1000 / 60) // minutes
+    retryAfter: Math.ceil(RATE_LIMIT_CONSTANTS.WINDOW_MS / 1000 / 60), // minutes
   },
   standardHeaders: true,
   legacyHeaders: false,
@@ -17,15 +17,15 @@ export const rateLimitConfig = rateLimit({
     logger.warn('Rate limit exceeded', {
       ip: req.ip,
       userAgent: req.get('User-Agent'),
-      url: req.originalUrl
+      url: req.originalUrl,
     });
-    
+
     res.status(429).json({
       success: false,
       message: 'Too many requests from this IP, please try again later',
-      retryAfter: Math.ceil(RATE_LIMIT_CONSTANTS.WINDOW_MS / 1000 / 60)
+      retryAfter: Math.ceil(RATE_LIMIT_CONSTANTS.WINDOW_MS / 1000 / 60),
     });
-  }
+  },
 });
 
 // Stricter rate limiting for auth endpoints
@@ -35,7 +35,7 @@ export const authRateLimit = rateLimit({
   message: {
     success: false,
     message: 'Too many authentication attempts, please try again later',
-    retryAfter: 15
+    retryAfter: 15,
   },
   standardHeaders: true,
   legacyHeaders: false,
@@ -43,15 +43,15 @@ export const authRateLimit = rateLimit({
     logger.warn('Auth rate limit exceeded', {
       ip: req.ip,
       userAgent: req.get('User-Agent'),
-      url: req.originalUrl
+      url: req.originalUrl,
     });
-    
+
     res.status(429).json({
       success: false,
       message: 'Too many authentication attempts, please try again later',
-      retryAfter: 15
+      retryAfter: 15,
     });
-  }
+  },
 });
 
 // Stricter rate limiting for AI endpoints
@@ -61,8 +61,8 @@ export const aiRateLimit = rateLimit({
   message: {
     success: false,
     message: 'Too many AI requests, please try again later',
-    retryAfter: 1
+    retryAfter: 1,
   },
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
 });

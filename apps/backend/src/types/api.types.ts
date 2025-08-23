@@ -44,7 +44,7 @@ export interface ValidationError {
 // Request with authentication
 export interface AuthenticatedRequest extends Request {
   user?: {
-    id: string;
+    userId: string;
     email: string;
     username: string;
     role?: string;
@@ -72,15 +72,8 @@ export interface SearchRequest extends PaginatedRequest {
 
 // File upload request
 export interface FileUploadRequest extends AuthenticatedRequest {
-  file?: {
-    fieldname: string;
-    originalname: string;
-    encoding: string;
-    mimetype: string;
-    size: number;
-    buffer: Buffer;
-  };
-  files?: FileUploadRequest['file'][];
+  file?: Express.Multer.File;
+  files?: Express.Multer.File[];
 }
 
 // Health check response

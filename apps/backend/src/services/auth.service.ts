@@ -1,14 +1,15 @@
 import { UserRepository } from '../repositories/user.repository';
-import { JWTUtils } from '../utils/jwt-simple';
+import { JWTUtils } from '../utils/jwt';
 import { PasswordUtils } from '../utils/password';
 import { ApiError } from '../utils/errors/ApiError';
 import { AuthServiceErrors } from '../utils/errors/service-errors';
-import { 
-  RegisterInput, 
-  LoginInput, 
-  ForgotPasswordInput, 
+import prisma from '../config/database';
+import {
+  RegisterInput,
+  LoginInput,
+  ForgotPasswordInput,
   ResetPasswordInput,
-  ChangePasswordInput
+  ChangePasswordInput,
 } from '../utils/validators/auth.validators';
 import { logger } from '../config/logger';
 import nodemailer from 'nodemailer';
@@ -34,7 +35,7 @@ export interface UserResponse {
 
 export class AuthService {
   private static userRepository = new UserRepository();
-  
+
   private static emailTransporter = nodemailer.createTransport({
     host: config.SMTP_HOST,
     port: config.SMTP_PORT,
@@ -70,7 +71,7 @@ export class AuthService {
         email: input.email,
         passwordHash,
         provider: 'local',
-        bio: input.bio || undefined
+        bio: input.bio || undefined,
       });
 
       // Generate tokens
@@ -109,7 +110,10 @@ export class AuthService {
       }
 
       // Verify password
-      const isValidPassword = await PasswordUtils.comparePassword(input.password, user.passwordHash);
+      const isValidPassword = await PasswordUtils.comparePassword(
+        input.password,
+        user.passwordHash
+      );
       if (!isValidPassword) {
         throw AuthServiceErrors.invalidCredentials();
       }
@@ -145,7 +149,7 @@ export class AuthService {
 
       // Find user
       const user = await prisma.user.findUnique({
-        where: { id: payload.userId }
+        where: { id: payload.userId },
       });
 
       if (!user) {
@@ -171,7 +175,7 @@ export class AuthService {
     try {
       // Find user by email
       const user = await prisma.user.findUnique({
-        where: { email: input.email }
+        where: { email: input.email },
       });
 
       // Always return success to prevent email enumeration
@@ -208,14 +212,12 @@ export class AuthService {
       // For now, we'll implement a basic validation
       logger.info(`Password reset attempt with token: ${input.token}`);
 
-      // Hash new password
-      const passwordHash = await PasswordUtils.hashPassword(input.password);
-
       // In production, you would:
-      // 1. Verify token from database
-      // 2. Check if token is not expired
-      // 3. Update user password
-      // 4. Invalidate the reset token
+      // 1. Hash new password: const passwordHash = await PasswordUtils.hashPassword(input.password);
+      // 2. Verify token from database
+      // 3. Check if token is not expired
+      // 4. Update user password
+      // 5. Invalidate the reset token
 
       // For now, just log the attempt
       logger.info('Password reset completed (mock implementation)');
@@ -232,7 +234,7 @@ export class AuthService {
     try {
       // Find user
       const user = await prisma.user.findUnique({
-        where: { id: userId }
+        where: { id: userId },
       });
 
       if (!user) {
@@ -241,12 +243,15 @@ export class AuthService {
 
       // Check if user has a password (OAuth users might not have one)
       if (!user.passwordHash) {
-        throw new ApiError(400, 'This account was created with Google. Password change not available.');
+        throw new ApiError(
+          400,
+          'This account was created with Google. Password change not available.'
+        );
       }
 
       // Verify current password
       const isValidPassword = await PasswordUtils.comparePassword(
-        input.currentPassword, 
+        input.currentPassword,
         user.passwordHash
       );
 
@@ -260,7 +265,7 @@ export class AuthService {
       // Update password
       await prisma.user.update({
         where: { id: userId },
-        data: { passwordHash }
+        data: { passwordHash },
       });
 
       logger.info(`Password changed for user: ${userId}`);
@@ -279,7 +284,7 @@ export class AuthService {
   static async getUserById(userId: string): Promise<UserResponse> {
     try {
       const user = await prisma.user.findUnique({
-        where: { id: userId }
+        where: { id: userId },
       });
 
       if (!user) {
@@ -310,7 +315,7 @@ export class AuthService {
       currentRank: user.currentRank,
       streakCount: user.streakCount,
       createdAt: user.createdAt,
-      lastActiveAt: user.lastActiveAt
+      lastActiveAt: user.lastActiveAt,
     };
   }
 
@@ -332,7 +337,7 @@ export class AuthService {
           <a href="${resetUrl}" style="background-color: #4ECDC4; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Reset Password</a>
           <p>This link will expire in 1 hour.</p>
           <p>If you did not request this reset, please ignore this email.</p>
-        `
+        `,
       };
 
       await this.emailTransporter.sendMail(mailOptions);

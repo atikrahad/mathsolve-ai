@@ -29,9 +29,9 @@ export class PasswordUtils {
   /**
    * Validate password strength
    */
-  static validatePasswordStrength(password: string): { 
-    isValid: boolean; 
-    errors: string[] 
+  static validatePasswordStrength(password: string): {
+    isValid: boolean;
+    errors: string[];
   } {
     const errors: string[] = [];
 
@@ -55,19 +55,12 @@ export class PasswordUtils {
       errors.push('Password must contain at least one number');
     }
 
-    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
       errors.push('Password must contain at least one special character');
     }
 
     // Check for common patterns
-    const commonPatterns = [
-      /123456/,
-      /password/i,
-      /qwerty/i,
-      /abc123/i,
-      /admin/i,
-      /letmein/i
-    ];
+    const commonPatterns = [/123456/, /password/i, /qwerty/i, /abc123/i, /admin/i, /letmein/i];
 
     for (const pattern of commonPatterns) {
       if (pattern.test(password)) {
@@ -78,7 +71,7 @@ export class PasswordUtils {
 
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     };
   }
 

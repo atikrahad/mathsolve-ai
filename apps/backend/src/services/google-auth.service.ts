@@ -1,7 +1,7 @@
 import { OAuth2Client } from 'google-auth-library';
 import prisma from '../config/database';
 import { config } from '../config/constants';
-import { JWTUtils } from '../utils/jwt-simple';
+import { JWTUtils } from '../utils/jwt';
 import { ApiError } from '../utils/errors/ApiError';
 import { logger } from '../config/logger';
 
@@ -78,7 +78,7 @@ export class GoogleAuthService {
   static async exchangeCodeForTokens(code: string): Promise<string> {
     try {
       const { tokens } = await this.client.getToken(code);
-      
+
       if (!tokens.id_token) {
         throw new ApiError(400, 'No ID token received from Google');
       }
@@ -104,7 +104,7 @@ export class GoogleAuthService {
 
       // Check if user already exists
       let user = await prisma.user.findUnique({
-        where: { email: googleUser.email }
+        where: { email: googleUser.email },
       });
 
       let isNewUser = false;
@@ -112,10 +112,10 @@ export class GoogleAuthService {
       if (!user) {
         // Create new user from Google account
         isNewUser = true;
-        
+
         // Generate unique username from email or name
         let username = this.generateUsername(googleUser.email, googleUser.name);
-        
+
         // Ensure username is unique
         username = await this.ensureUniqueUsername(username);
 
@@ -131,12 +131,12 @@ export class GoogleAuthService {
             currentRank: 'Beginner',
             streakCount: 0,
             lastActiveAt: new Date(),
-          }
+          },
         });
 
-        logger.info('New user created via Google OAuth', { 
-          userId: user.id, 
-          email: user.email 
+        logger.info('New user created via Google OAuth', {
+          userId: user.id,
+          email: user.email,
         });
       } else {
         // Update existing user's last active time and Google info if needed
@@ -157,12 +157,12 @@ export class GoogleAuthService {
 
         user = await prisma.user.update({
           where: { id: user.id },
-          data: updateData
+          data: updateData,
         });
 
-        logger.info('Existing user authenticated via Google OAuth', { 
-          userId: user.id, 
-          email: user.email 
+        logger.info('Existing user authenticated via Google OAuth', {
+          userId: user.id,
+          email: user.email,
         });
       }
 
@@ -170,7 +170,7 @@ export class GoogleAuthService {
       const tokens = JWTUtils.generateTokenPair({
         id: user.id,
         email: user.email,
-        username: user.username
+        username: user.username,
       });
 
       return {
@@ -187,14 +187,13 @@ export class GoogleAuthService {
           lastActiveAt: user.lastActiveAt?.toISOString(),
         },
         tokens,
-        isNewUser
+        isNewUser,
       };
-
     } catch (error) {
       if (error instanceof ApiError) {
         throw error;
       }
-      
+
       logger.error('Google authentication failed', { error });
       throw new ApiError(500, 'Google authentication failed');
     }
@@ -206,13 +205,19 @@ export class GoogleAuthService {
   private static generateUsername(email: string, name?: string): string {
     if (name) {
       // Use name, remove spaces and special characters
-      return name.toLowerCase()
-        .replace(/[^a-z0-9]/g, '')
-        .substring(0, 20) || email.split('@')[0];
+      return (
+        name
+          .toLowerCase()
+          .replace(/[^a-z0-9]/g, '')
+          .substring(0, 20) || email.split('@')[0]
+      );
     }
-    
+
     // Use email prefix
-    return email.split('@')[0].replace(/[^a-z0-9]/g, '').substring(0, 20);
+    return email
+      .split('@')[0]
+      .replace(/[^a-z0-9]/g, '')
+      .substring(0, 20);
   }
 
   /**
@@ -242,7 +247,7 @@ export class GoogleAuthService {
     return this.client.generateAuthUrl({
       access_type: 'offline',
       scope: scopes,
-      state: state,
+      state,
       prompt: 'select_account',
     });
   }

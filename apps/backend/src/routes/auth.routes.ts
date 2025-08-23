@@ -12,7 +12,7 @@ const authRateLimit = rateLimit({
   max: 5, // Limit each IP to 5 requests per windowMs
   message: {
     success: false,
-    message: 'Too many authentication attempts, please try again later.'
+    message: 'Too many authentication attempts, please try again later.',
   },
   standardHeaders: true,
   legacyHeaders: false,
@@ -23,14 +23,14 @@ const generalRateLimit = rateLimit({
   max: 10, // Limit each IP to 10 requests per windowMs
   message: {
     success: false,
-    message: 'Too many requests, please try again later.'
+    message: 'Too many requests, please try again later.',
   },
   standardHeaders: true,
   legacyHeaders: false,
 });
 
 // Public routes
-router.post('/register',  AuthController.register);
+router.post('/register', AuthController.register);
 router.post('/login', authRateLimit, AuthController.login);
 router.post('/logout', AuthController.logout);
 router.post('/refresh', generalRateLimit, AuthController.refresh);
@@ -56,7 +56,7 @@ router.get('/', (req, res) => {
     endpoints: {
       public: [
         'POST /auth/register - User registration',
-        'POST /auth/login - User login', 
+        'POST /auth/login - User login',
         'POST /auth/logout - User logout',
         'POST /auth/refresh - Refresh access token',
         'POST /auth/forgot-password - Request password reset',
@@ -64,14 +64,14 @@ router.get('/', (req, res) => {
         'GET /auth/verify-email - Verify email address',
         'GET /auth/google/url - Get Google OAuth URL',
         'POST /auth/google/callback - Handle Google OAuth callback',
-        'POST /auth/google/token - Authenticate with Google token'
+        'POST /auth/google/token - Authenticate with Google token',
       ],
       protected: [
         'GET /auth/profile - Get current user profile',
         'POST /auth/change-password - Change user password',
-        'POST /auth/google/link - Link Google account to existing user'
-      ]
-    }
+        'POST /auth/google/link - Link Google account to existing user',
+      ],
+    },
   });
 });
 

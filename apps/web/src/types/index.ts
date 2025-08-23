@@ -61,15 +61,15 @@ export interface Resource {
 }
 
 export enum Difficulty {
-  LOW = "LOW",
-  MEDIUM = "MEDIUM",
-  HIGH = "HIGH",
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
 }
 
 export enum ResourceType {
-  TUTORIAL = "TUTORIAL",
-  GUIDE = "GUIDE",
-  REFERENCE = "REFERENCE",
+  TUTORIAL = 'TUTORIAL',
+  GUIDE = 'GUIDE',
+  REFERENCE = 'REFERENCE',
 }
 
 export interface Achievement {

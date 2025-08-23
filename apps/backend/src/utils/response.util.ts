@@ -29,8 +29,8 @@ export class ResponseUtil {
    * Send successful response
    */
   static success<T>(
-    res: Response, 
-    data: T, 
+    res: Response,
+    data: T,
     message: string = 'Operation successful',
     statusCode: number = 200
   ): Response {
@@ -38,7 +38,7 @@ export class ResponseUtil {
       success: true,
       message,
       data,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     return res.status(statusCode).json(response);
@@ -62,7 +62,7 @@ export class ResponseUtil {
       total,
       totalPages,
       hasNextPage: page < totalPages,
-      hasPreviousPage: page > 1
+      hasPreviousPage: page > 1,
     };
 
     const response: ApiResponse<T[]> = {
@@ -70,7 +70,7 @@ export class ResponseUtil {
       message,
       data,
       meta,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     return res.status(200).json(response);
@@ -90,11 +90,7 @@ export class ResponseUtil {
   /**
    * Send accepted response
    */
-  static accepted<T>(
-    res: Response,
-    data?: T,
-    message: string = 'Request accepted'
-  ): Response {
+  static accepted<T>(res: Response, data?: T, message: string = 'Request accepted'): Response {
     return this.success(res, data, message, 202);
   }
 
@@ -108,16 +104,11 @@ export class ResponseUtil {
   /**
    * Send error response
    */
-  static error(
-    res: Response,
-    message: string,
-    statusCode: number = 500,
-    details?: any
-  ): Response {
+  static error(res: Response, message: string, statusCode: number = 500, details?: any): Response {
     const response: ApiResponse = {
       success: false,
       message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     // Include details only in development
@@ -129,7 +120,7 @@ export class ResponseUtil {
     logger.error(`API Error Response: ${statusCode} - ${message}`, {
       statusCode,
       message,
-      details
+      details,
     });
 
     return res.status(statusCode).json(response);
@@ -138,51 +129,35 @@ export class ResponseUtil {
   /**
    * Send bad request response
    */
-  static badRequest(
-    res: Response,
-    message: string = 'Bad request',
-    details?: any
-  ): Response {
+  static badRequest(res: Response, message: string = 'Bad request', details?: any): Response {
     return this.error(res, message, 400, details);
   }
 
   /**
    * Send unauthorized response
    */
-  static unauthorized(
-    res: Response,
-    message: string = 'Unauthorized access'
-  ): Response {
+  static unauthorized(res: Response, message: string = 'Unauthorized access'): Response {
     return this.error(res, message, 401);
   }
 
   /**
    * Send forbidden response
    */
-  static forbidden(
-    res: Response,
-    message: string = 'Access forbidden'
-  ): Response {
+  static forbidden(res: Response, message: string = 'Access forbidden'): Response {
     return this.error(res, message, 403);
   }
 
   /**
    * Send not found response
    */
-  static notFound(
-    res: Response,
-    message: string = 'Resource not found'
-  ): Response {
+  static notFound(res: Response, message: string = 'Resource not found'): Response {
     return this.error(res, message, 404);
   }
 
   /**
    * Send conflict response
    */
-  static conflict(
-    res: Response,
-    message: string = 'Resource conflict'
-  ): Response {
+  static conflict(res: Response, message: string = 'Resource conflict'): Response {
     return this.error(res, message, 409);
   }
 
@@ -221,10 +196,7 @@ export class ResponseUtil {
   /**
    * Send too many requests response
    */
-  static tooManyRequests(
-    res: Response,
-    message: string = 'Too many requests'
-  ): Response {
+  static tooManyRequests(res: Response, message: string = 'Too many requests'): Response {
     return this.error(res, message, 429);
   }
 }
@@ -245,5 +217,5 @@ export const {
   validationError,
   internalError,
   serviceUnavailable,
-  tooManyRequests
+  tooManyRequests,
 } = ResponseUtil;

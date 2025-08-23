@@ -17,16 +17,18 @@ const DEFAULT_OPTIONS: SanitizationOptions = {
   params: true,
   excludeFields: [],
   allowHtml: false,
-  logSanitization: process.env.NODE_ENV === 'development'
+  logSanitization: process.env.NODE_ENV === 'development',
 };
 
 export class SanitizationMiddleware {
   /**
    * Create sanitization middleware with options
    */
-  static create(options: SanitizationOptions = {}): (req: Request, res: Response, next: NextFunction) => void {
+  static create(
+    options: SanitizationOptions = {}
+  ): (req: Request, res: Response, next: NextFunction) => void {
     const config = { ...DEFAULT_OPTIONS, ...options };
-    
+
     return (req: Request, res: Response, next: NextFunction) => {
       try {
         const sanitized: any = {};
@@ -60,7 +62,7 @@ export class SanitizationMiddleware {
           logger.debug('Input sanitized', {
             url: req.url,
             method: req.method,
-            sanitized: Object.keys(sanitized)
+            sanitized: Object.keys(sanitized),
           });
         }
 
@@ -81,12 +83,12 @@ export class SanitizationMiddleware {
     }
 
     if (Array.isArray(obj)) {
-      return obj.map(item => this.sanitizeObject(item, config));
+      return obj.map((item) => this.sanitizeObject(item, config));
     }
 
     if (typeof obj === 'object') {
       const sanitized: any = {};
-      
+
       for (const [key, value] of Object.entries(obj)) {
         // Skip excluded fields
         if (config.excludeFields?.includes(key)) {
@@ -102,7 +104,7 @@ export class SanitizationMiddleware {
           sanitized[key] = value;
         }
       }
-      
+
       return sanitized;
     }
 
@@ -134,7 +136,7 @@ export class SanitizationMiddleware {
       // Allow basic HTML but sanitize dangerous elements
       sanitized = DOMPurify.sanitize(sanitized, {
         ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'br'],
-        ALLOWED_ATTR: ['href', 'title']
+        ALLOWED_ATTR: ['href', 'title'],
       });
     } else {
       // Strip all HTML tags
@@ -167,11 +169,11 @@ export class SanitizationMiddleware {
       /<object[\s\S]*?>[\s\S]*?<\/object>/gi,
       /<embed[\s\S]*?>[\s\S]*?<\/embed>/gi,
       /<link[\s\S]*?>/gi,
-      /<meta[\s\S]*?>/gi
+      /<meta[\s\S]*?>/gi,
     ];
 
     let sanitized = str;
-    xssPatterns.forEach(pattern => {
+    xssPatterns.forEach((pattern) => {
       sanitized = sanitized.replace(pattern, '');
     });
 
@@ -193,7 +195,7 @@ export class SanitizationMiddleware {
       body: true,
       query: true,
       params: true,
-      allowHtml: false
+      allowHtml: false,
     });
   }
 
@@ -205,7 +207,7 @@ export class SanitizationMiddleware {
       body: true,
       query: true,
       params: true,
-      allowHtml: true
+      allowHtml: true,
     });
   }
 
@@ -218,7 +220,7 @@ export class SanitizationMiddleware {
       query: true,
       params: true,
       allowHtml: false,
-      logSanitization: true
+      logSanitization: true,
     });
   }
 
@@ -232,7 +234,7 @@ export class SanitizationMiddleware {
       params: false,
       allowHtml: false,
       excludeFields: ['password', 'token', 'refreshToken'],
-      logSanitization: false
+      logSanitization: false,
     });
   }
 }

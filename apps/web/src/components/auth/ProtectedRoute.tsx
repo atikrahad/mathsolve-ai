@@ -12,14 +12,14 @@ interface ProtectedRouteProps {
   fallback?: React.ReactNode;
 }
 
-export default function ProtectedRoute({ 
-  children, 
+export default function ProtectedRoute({
+  children,
   redirectTo = '/auth/login',
   requireAuth = true,
-  fallback
+  fallback,
 }: ProtectedRouteProps) {
   const router = useRouter();
-  const { isAuthenticated, isLoading, user } = useAuthStore();
+  const { isAuthenticated, isLoading } = useAuthStore();
 
   useEffect(() => {
     // If auth is required but user is not authenticated, redirect
@@ -34,13 +34,15 @@ export default function ProtectedRoute({
 
   // Show loading state while checking auth
   if (isLoading) {
-    return fallback || (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 size={32} className="animate-spin text-blue-600" />
-          <p className="text-gray-600">Checking authentication...</p>
+    return (
+      fallback || (
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 size={32} className="animate-spin text-blue-600" />
+            <p className="text-gray-600">Checking authentication...</p>
+          </div>
         </div>
-      </div>
+      )
     );
   }
 

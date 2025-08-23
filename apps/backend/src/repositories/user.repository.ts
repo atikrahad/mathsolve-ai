@@ -39,7 +39,7 @@ export class UserRepository extends AbstractRepository<User> {
    */
   async findByEmail(email: string): Promise<User | null> {
     return await this.model.findUnique({
-      where: { email }
+      where: { email },
     });
   }
 
@@ -48,7 +48,7 @@ export class UserRepository extends AbstractRepository<User> {
    */
   async findByUsername(username: string): Promise<User | null> {
     return await this.model.findUnique({
-      where: { username }
+      where: { username },
     });
   }
 
@@ -59,37 +59,43 @@ export class UserRepository extends AbstractRepository<User> {
     return await this.model.findFirst({
       where: {
         provider,
-        providerId
-      }
+        providerId,
+      },
     });
   }
 
   /**
    * Find user by reset password token
+   * TODO: Add resetPasswordToken and resetPasswordExpires fields to Prisma schema
    */
   async findByResetToken(token: string): Promise<User | null> {
-    return await this.model.findFirst({
-      where: {
-        resetPasswordToken: token,
-        resetPasswordExpires: {
-          gt: new Date()
-        }
-      }
-    });
+    // Commented out until schema is updated
+    // return await this.model.findFirst({
+    //   where: {
+    //     resetPasswordToken: token,
+    //     resetPasswordExpires: {
+    //       gt: new Date(),
+    //     },
+    //   },
+    // });
+    return null;
   }
 
   /**
    * Find user by email verification token
+   * TODO: Add emailVerificationToken and emailVerificationExpires fields to Prisma schema
    */
   async findByEmailVerificationToken(token: string): Promise<User | null> {
-    return await this.model.findFirst({
-      where: {
-        emailVerificationToken: token,
-        emailVerificationExpires: {
-          gt: new Date()
-        }
-      }
-    });
+    // Commented out until schema is updated
+    // return await this.model.findFirst({
+    //   where: {
+    //     emailVerificationToken: token,
+    //     emailVerificationExpires: {
+    //       gt: new Date(),
+    //     },
+    //   },
+    // });
+    return null;
   }
 
   /**
@@ -102,8 +108,8 @@ export class UserRepository extends AbstractRepository<User> {
         rankPoints: 0,
         currentRank: 'Bronze',
         streakCount: 0,
-        lastActiveAt: new Date()
-      }
+        lastActiveAt: new Date(),
+      },
     });
   }
 
@@ -113,34 +119,31 @@ export class UserRepository extends AbstractRepository<User> {
   async updateUser(id: string, data: UserUpdateInput): Promise<User> {
     return await this.model.update({
       where: { id },
-      data
+      data,
     });
   }
 
   /**
    * Search users with advanced options
    */
-  async searchUsers(options: UserSearchOptions): Promise<User[]> {
+  async searchUsers(options: UserSearchOptions) {
     const {
       searchTerm,
       isEmailVerified,
       provider,
       skip,
       take,
-      orderBy = { createdAt: 'desc' }
+      orderBy = { createdAt: 'desc' },
     } = options;
 
     const where: Prisma.UserWhereInput = {};
 
     if (searchTerm) {
-      where.OR = [
-        { username: { contains: searchTerm, mode: 'insensitive' } },
-        { email: { contains: searchTerm, mode: 'insensitive' } }
-      ];
+      where.OR = [{ username: { contains: searchTerm } }, { email: { contains: searchTerm } }];
     }
 
     if (isEmailVerified !== undefined) {
-      where.isEmailVerified = isEmailVerified;
+      where.emailVerified = isEmailVerified;
     }
 
     if (provider) {
@@ -161,11 +164,11 @@ export class UserRepository extends AbstractRepository<User> {
         rankPoints: true,
         currentRank: true,
         streakCount: true,
-        isEmailVerified: true,
+        emailVerified: true,
         provider: true,
         createdAt: true,
-        lastActiveAt: true
-      }
+        lastActiveAt: true,
+      },
     });
   }
 
@@ -175,7 +178,7 @@ export class UserRepository extends AbstractRepository<User> {
   async updateLastActive(id: string): Promise<void> {
     await this.model.update({
       where: { id },
-      data: { lastActiveAt: new Date() }
+      data: { lastActiveAt: new Date() },
     });
   }
 
@@ -187,10 +190,10 @@ export class UserRepository extends AbstractRepository<User> {
       where: { id },
       data: {
         rankPoints: {
-          increment: points
+          increment: points,
         },
-        lastActiveAt: new Date()
-      }
+        lastActiveAt: new Date(),
+      },
     });
   }
 
@@ -202,8 +205,8 @@ export class UserRepository extends AbstractRepository<User> {
       where: { id },
       data: {
         streakCount: count,
-        lastActiveAt: new Date()
-      }
+        lastActiveAt: new Date(),
+      },
     });
   }
 
@@ -215,23 +218,23 @@ export class UserRepository extends AbstractRepository<User> {
       where: {
         rankPoints: {
           gte: minPoints,
-          lte: maxPoints
-        }
+          lte: maxPoints,
+        },
       },
       orderBy: {
-        rankPoints: 'desc'
-      }
+        rankPoints: 'desc',
+      },
     });
   }
 
   /**
    * Get top users by rank points
    */
-  async getTopUsers(limit: number = 10): Promise<User[]> {
+  async getTopUsers(limit: number = 10) {
     return await this.model.findMany({
       take: limit,
       orderBy: {
-        rankPoints: 'desc'
+        rankPoints: 'desc',
       },
       select: {
         id: true,
@@ -239,8 +242,8 @@ export class UserRepository extends AbstractRepository<User> {
         profileImage: true,
         rankPoints: true,
         currentRank: true,
-        streakCount: true
-      }
+        streakCount: true,
+      },
     });
   }
 
@@ -249,7 +252,7 @@ export class UserRepository extends AbstractRepository<User> {
    */
   async emailExists(email: string, excludeId?: string): Promise<boolean> {
     const where: Prisma.UserWhereInput = { email };
-    
+
     if (excludeId) {
       where.id = { not: excludeId };
     }
@@ -263,7 +266,7 @@ export class UserRepository extends AbstractRepository<User> {
    */
   async usernameExists(username: string, excludeId?: string): Promise<boolean> {
     const where: Prisma.UserWhereInput = { username };
-    
+
     if (excludeId) {
       where.id = { not: excludeId };
     }

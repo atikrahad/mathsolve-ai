@@ -5,7 +5,7 @@ export class ValidationError extends Error {
     super('Validation Error');
     this.errors = errors;
     this.name = 'ValidationError';
-    
+
     // Maintain proper stack trace
     Error.captureStackTrace(this, this.constructor);
   }

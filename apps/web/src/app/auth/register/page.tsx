@@ -27,7 +27,7 @@ const passwordRequirements: PasswordRequirement[] = [
 export default function RegisterPage() {
   const router = useRouter();
   const { register, isLoading, error, clearError } = useAuthStore();
-  
+
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -40,7 +40,7 @@ export default function RegisterPage() {
 
   const validateForm = () => {
     const errors: Record<string, string> = {};
-    
+
     // Username validation
     if (!formData.username) {
       errors.username = 'Username is required';
@@ -51,31 +51,31 @@ export default function RegisterPage() {
     } else if (!/^[a-zA-Z0-9_-]+$/.test(formData.username)) {
       errors.username = 'Username can only contain letters, numbers, hyphens, and underscores';
     }
-    
+
     // Email validation
     if (!formData.email) {
       errors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       errors.email = 'Please enter a valid email address';
     }
-    
+
     // Password validation
     if (!formData.password) {
       errors.password = 'Password is required';
     } else {
-      const failedRequirements = passwordRequirements.filter(req => !req.test(formData.password));
+      const failedRequirements = passwordRequirements.filter((req) => !req.test(formData.password));
       if (failedRequirements.length > 0) {
         errors.password = 'Password does not meet all requirements';
       }
     }
-    
+
     // Confirm password validation
     if (!formData.confirmPassword) {
       errors.confirmPassword = 'Please confirm your password';
     } else if (formData.password !== formData.confirmPassword) {
       errors.confirmPassword = 'Passwords do not match';
     }
-    
+
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -83,11 +83,11 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     try {
       await register({
         username: formData.username,
@@ -95,17 +95,17 @@ export default function RegisterPage() {
         password: formData.password,
       });
       router.push('/dashboard');
-    } catch (error) {
+    } catch {
       // Error is handled by the store
     }
   };
 
   const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({ ...prev, [field]: e.target.value }));
-    
+    setFormData((prev) => ({ ...prev, [field]: e.target.value }));
+
     // Clear validation error when user starts typing
     if (validationErrors[field]) {
-      setValidationErrors(prev => ({ ...prev, [field]: '' }));
+      setValidationErrors((prev) => ({ ...prev, [field]: '' }));
     }
   };
 
@@ -118,7 +118,7 @@ export default function RegisterPage() {
             Join MathSolve AI and start your learning journey
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent>
           {/* Google OAuth Button */}
           <div className="mb-6">
@@ -128,7 +128,7 @@ export default function RegisterPage() {
               onError={(error) => console.error('Google sign-up error:', error)}
             />
           </div>
-          
+
           {/* Divider */}
           <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
@@ -138,7 +138,7 @@ export default function RegisterPage() {
               <span className="bg-white px-2 text-gray-500">Or create account with email</span>
             </div>
           </div>
-          
+
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Global Error */}
             {error && (
@@ -147,7 +147,7 @@ export default function RegisterPage() {
                 <span className="text-sm">{error}</span>
               </div>
             )}
-            
+
             {/* Username Field */}
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
@@ -164,7 +164,7 @@ export default function RegisterPage() {
                 <p className="text-sm text-red-600">{validationErrors.username}</p>
               )}
             </div>
-            
+
             {/* Email Field */}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
@@ -181,7 +181,7 @@ export default function RegisterPage() {
                 <p className="text-sm text-red-600">{validationErrors.email}</p>
               )}
             </div>
-            
+
             {/* Password Field */}
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
@@ -204,14 +204,17 @@ export default function RegisterPage() {
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
-              
+
               {/* Password Requirements */}
               {formData.password && (
                 <div className="space-y-1">
                   {passwordRequirements.map((requirement, index) => {
                     const isMet = requirement.test(formData.password);
                     return (
-                      <div key={index} className={`flex items-center gap-2 text-xs ${isMet ? 'text-green-600' : 'text-gray-400'}`}>
+                      <div
+                        key={index}
+                        className={`flex items-center gap-2 text-xs ${isMet ? 'text-green-600' : 'text-gray-400'}`}
+                      >
                         {isMet ? <Check size={12} /> : <X size={12} />}
                         <span>{requirement.label}</span>
                       </div>
@@ -219,12 +222,12 @@ export default function RegisterPage() {
                   })}
                 </div>
               )}
-              
+
               {validationErrors.password && (
                 <p className="text-sm text-red-600">{validationErrors.password}</p>
               )}
             </div>
-            
+
             {/* Confirm Password Field */}
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm Password</Label>
@@ -251,13 +254,9 @@ export default function RegisterPage() {
                 <p className="text-sm text-red-600">{validationErrors.confirmPassword}</p>
               )}
             </div>
-            
+
             {/* Submit Button */}
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-            >
+            <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Loader2 size={16} className="animate-spin mr-2" />
@@ -268,15 +267,12 @@ export default function RegisterPage() {
               )}
             </Button>
           </form>
-          
+
           {/* Login Link */}
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Already have an account?{' '}
-              <Link 
-                href="/auth/login" 
-                className="text-blue-600 hover:text-blue-500 font-medium"
-              >
+              <Link href="/auth/login" className="text-blue-600 hover:text-blue-500 font-medium">
                 Sign in
               </Link>
             </p>

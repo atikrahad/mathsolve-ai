@@ -11,16 +11,16 @@ export const corsOptions: CorsOptions = {
   origin: (origin, callback) => {
     // Allow requests with no origin (mobile apps, desktop apps, Postman, etc.)
     if (!origin) return callback(null, true);
-    
+
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-    
+
     // In development, allow localhost with any port
     if (process.env.NODE_ENV === 'development' && origin.includes('localhost')) {
       return callback(null, true);
     }
-    
+
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
@@ -31,12 +31,8 @@ export const corsOptions: CorsOptions = {
     'Content-Type',
     'Accept',
     'Authorization',
-    'x-access-token'
+    'x-access-token',
   ],
-  exposedHeaders: [
-    'Authorization',
-    'x-total-count',
-    'x-page-count'
-  ],
+  exposedHeaders: ['Authorization', 'x-total-count', 'x-page-count'],
   maxAge: 86400, // 24 hours
 };

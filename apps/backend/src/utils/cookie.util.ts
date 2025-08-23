@@ -17,7 +17,7 @@ export class CookieUtil {
     httpOnly: COOKIE_CONSTANTS.HTTP_ONLY,
     secure: COOKIE_CONSTANTS.SECURE,
     sameSite: COOKIE_CONSTANTS.SAME_SITE,
-    path: COOKIE_CONSTANTS.PATH
+    path: COOKIE_CONSTANTS.PATH,
   };
 
   // Refresh token specific configuration
@@ -49,7 +49,12 @@ export class CookieUtil {
   /**
    * Set custom cookie with default options
    */
-  static setCookie(res: Response, name: string, value: string, options?: Partial<CookieOptions>): void {
+  static setCookie(
+    res: Response,
+    name: string,
+    value: string,
+    options?: Partial<CookieOptions>
+  ): void {
     const finalOptions = { ...this.DEFAULT_OPTIONS, ...options };
     res.cookie(name, value, finalOptions);
   }
@@ -102,5 +107,5 @@ export const {
   clearAllAuthCookies,
   getRefreshTokenOptions,
   getAccessTokenOptions,
-  getDefaultOptions
+  getDefaultOptions,
 } = CookieUtil;

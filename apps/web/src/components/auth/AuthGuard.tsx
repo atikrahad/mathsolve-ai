@@ -12,10 +12,10 @@ interface AuthGuardProps {
  * A simple component that shows/hides content based on authentication status
  * Useful for showing different UI elements to authenticated vs non-authenticated users
  */
-export default function AuthGuard({ 
-  children, 
+export default function AuthGuard({
+  children,
   fallback = null,
-  showWhenAuthenticated = true 
+  showWhenAuthenticated = true,
 }: AuthGuardProps) {
   const { isAuthenticated } = useAuthStore();
 
