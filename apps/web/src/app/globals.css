@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* KaTeX Math Rendering Styles */
+@import 'katex/dist/katex.min.css';
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -84,5 +87,40 @@
 
   .transform-style-preserve-3d {
     transform-style: preserve-3d;
+  }
+}
+
+/* Custom Math Rendering Styles */
+@layer components {
+  .katex-container {
+    @apply text-gray-900;
+  }
+
+  .katex-display-block {
+    @apply my-4 text-center;
+  }
+
+  .katex-inline {
+    @apply inline;
+  }
+
+  .katex-display {
+    @apply block my-4 text-center overflow-x-auto;
+  }
+
+  .math-text {
+    @apply leading-relaxed;
+  }
+
+  .math-text .katex-display-block {
+    @apply my-6;
+  }
+
+  .problem-content .katex {
+    font-size: 1.1em;
+  }
+
+  .problem-solution .katex {
+    font-size: 1.05em;
   }
 }

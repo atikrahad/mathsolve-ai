@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import Header from '@/components/layout/Header';
-import { Trophy, Target, Calendar } from 'lucide-react';
+import { Trophy, Target, Calendar, BookOpen, Plus, TrendingUp } from 'lucide-react';
+import Link from 'next/link';
 
 function DashboardContent() {
   const { user } = useAuthStore();
@@ -57,18 +58,47 @@ function DashboardContent() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5" />
+                Problems
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Link href="/problems">
+                <Button className="w-full" size="lg">
+                  <TrendingUp className="w-4 h-4 mr-2" />
+                  Browse Problems
+                </Button>
+              </Link>
+              <Link href="/problems/create">
+                <Button variant="outline" className="w-full" size="lg">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Problem
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>Quick Start</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Button className="w-full" size="lg">
-                Solve New Problem
-              </Button>
-              <Button variant="outline" className="w-full" size="lg">
-                Continue Learning
-              </Button>
+              <Link href="/problems?difficulty=beginner">
+                <Button className="w-full" size="lg">
+                  <Target className="w-4 h-4 mr-2" />
+                  Start Easy
+                </Button>
+              </Link>
+              <Link href="/problems?sortBy=popularity&sortOrder=desc">
+                <Button variant="outline" className="w-full" size="lg">
+                  <Trophy className="w-4 h-4 mr-2" />
+                  Popular Problems
+                </Button>
+              </Link>
             </CardContent>
           </Card>
 
@@ -81,6 +111,11 @@ function DashboardContent() {
               <p className="text-sm text-gray-500 mt-2">
                 Start solving problems to see your activity here!
               </p>
+              <Link href="/problems">
+                <Button variant="outline" className="w-full mt-4">
+                  Get Started
+                </Button>
+              </Link>
             </CardContent>
           </Card>
         </div>

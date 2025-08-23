@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { LogOut, User, Settings, Home, Users, Search, Trophy } from 'lucide-react';
+import { LogOut, User, Settings, Home, Users, Search, Trophy, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -35,8 +35,13 @@ export default function Header() {
       icon: Home,
     },
     {
+      href: '/problems',
+      label: 'Problems',
+      icon: BookOpen,
+    },
+    {
       href: '/users',
-      label: 'Discover Users',
+      label: 'Users',
       icon: Users,
     },
     {
