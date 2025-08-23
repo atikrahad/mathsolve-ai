@@ -10,7 +10,7 @@ dotenv.config();
 
 const server = createServer(app);
 const io = new Server(server, {
-  cors: corsOptions
+  cors: corsOptions,
 });
 
 const PORT = process.env.PORT || 3001;
@@ -19,23 +19,23 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 // Socket.IO connection handling
 io.on('connection', (socket) => {
   logger.info(`Client connected: ${socket.id}`);
-  
+
   socket.on('disconnect', () => {
     logger.info(`Client disconnected: ${socket.id}`);
   });
-  
+
   // Add more socket event handlers here as needed
 });
 
 // Graceful shutdown handler
 const gracefulShutdown = () => {
   logger.info('Starting graceful shutdown...');
-  
+
   server.close(() => {
     logger.info('HTTP server closed.');
     process.exit(0);
   });
-  
+
   // Force close after 30 seconds
   setTimeout(() => {
     logger.error('Forcing shutdown after timeout');
@@ -53,10 +53,14 @@ server.listen(PORT, () => {
   logger.info(`🔧 API info: http://localhost:${PORT}/api`);
   logger.info('');
   logger.info('Google OAuth Configuration Status:');
-  logger.info(`- GOOGLE_CLIENT_ID: ${process.env.GOOGLE_CLIENT_ID ? '✅ Configured' : '❌ NOT CONFIGURED'}`);
-  logger.info(`- GOOGLE_CLIENT_SECRET: ${process.env.GOOGLE_CLIENT_SECRET ? '✅ Configured' : '❌ NOT CONFIGURED'}`);
+  logger.info(
+    `- GOOGLE_CLIENT_ID: ${process.env.GOOGLE_CLIENT_ID ? '✅ Configured' : '❌ NOT CONFIGURED'}`
+  );
+  logger.info(
+    `- GOOGLE_CLIENT_SECRET: ${process.env.GOOGLE_CLIENT_SECRET ? '✅ Configured' : '❌ NOT CONFIGURED'}`
+  );
   logger.info(`- GOOGLE_REDIRECT_URI: ${process.env.GOOGLE_REDIRECT_URI || '⚠️  Using default'}`);
-  
+
   if (!process.env.GOOGLE_CLIENT_ID) {
     logger.info('');
     logger.info('⚠️  To enable real Google OAuth:');

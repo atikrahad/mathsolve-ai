@@ -2,13 +2,13 @@ import { Request, Response, NextFunction } from 'express';
 import { AuthService } from '../services/auth.service';
 import { ApiError } from '../utils/errors/ApiError';
 import { ResponseUtil } from '../utils/response.util';
-import { 
-  registerSchema, 
-  loginSchema, 
-  forgotPasswordSchema, 
+import {
+  registerSchema,
+  loginSchema,
+  forgotPasswordSchema,
   resetPasswordSchema,
   refreshTokenSchema,
-  changePasswordSchema
+  changePasswordSchema,
 } from '../utils/validators/auth.validators';
 import { logger } from '../config/logger';
 import { CookieUtil } from '../utils/cookie.util';
@@ -28,10 +28,14 @@ export class AuthController {
       // Set refresh token as httpOnly cookie
       CookieUtil.setRefreshTokenCookie(res, result.tokens.refreshToken);
 
-      return ResponseUtil.created(res, {
-        user: result.user,
-        accessToken: result.tokens.accessToken
-      }, 'User registered successfully');
+      ResponseUtil.created(
+        res,
+        {
+          user: result.user,
+          accessToken: result.tokens.accessToken,
+        },
+        'User registered successfully'
+      );
     } catch (error) {
       next(error);
     }
@@ -51,10 +55,14 @@ export class AuthController {
       // Set refresh token as httpOnly cookie
       CookieUtil.setRefreshTokenCookie(res, result.tokens.refreshToken);
 
-      return ResponseUtil.success(res, {
-        user: result.user,
-        accessToken: result.tokens.accessToken
-      }, 'Login successful');
+      ResponseUtil.success(
+        res,
+        {
+          user: result.user,
+          accessToken: result.tokens.accessToken,
+        },
+        'Login successful'
+      );
     } catch (error) {
       next(error);
     }
@@ -68,7 +76,7 @@ export class AuthController {
       // Clear refresh token cookie
       CookieUtil.clearRefreshTokenCookie(res);
 
-      return ResponseUtil.success(res, undefined, 'Logout successful');
+      ResponseUtil.success(res, undefined, 'Logout successful');
     } catch (error) {
       next(error);
     }
@@ -99,8 +107,8 @@ export class AuthController {
         success: true,
         message: 'Token refreshed successfully',
         data: {
-          accessToken: tokens.accessToken
-        }
+          accessToken: tokens.accessToken,
+        },
       });
     } catch (error) {
       next(error);
@@ -120,7 +128,7 @@ export class AuthController {
 
       res.status(200).json({
         success: true,
-        message: 'If an account with that email exists, a password reset email has been sent'
+        message: 'If an account with that email exists, a password reset email has been sent',
       });
     } catch (error) {
       next(error);
@@ -140,7 +148,7 @@ export class AuthController {
 
       res.status(200).json({
         success: true,
-        message: 'Password reset successfully'
+        message: 'Password reset successfully',
       });
     } catch (error) {
       next(error);
@@ -166,7 +174,7 @@ export class AuthController {
 
       res.status(200).json({
         success: true,
-        message: 'Password changed successfully'
+        message: 'Password changed successfully',
       });
     } catch (error) {
       next(error);
@@ -190,7 +198,7 @@ export class AuthController {
       res.status(200).json({
         success: true,
         message: 'Profile retrieved successfully',
-        data: { user }
+        data: { user },
       });
     } catch (error) {
       next(error);
@@ -213,7 +221,7 @@ export class AuthController {
 
       res.status(200).json({
         success: true,
-        message: 'Email verified successfully'
+        message: 'Email verified successfully',
       });
     } catch (error) {
       next(error);

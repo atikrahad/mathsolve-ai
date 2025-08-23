@@ -11,17 +11,19 @@ import routes from './routes';
 const app = express();
 
 // Security middleware
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "https:"],
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
+        imgSrc: ["'self'", 'data:', 'https:'],
+      },
     },
-  },
-  crossOriginEmbedderPolicy: false,
-}));
+    crossOriginEmbedderPolicy: false,
+  })
+);
 
 // CORS
 app.use(cors(corsOptions));
@@ -48,8 +50,8 @@ app.get('/health', (req, res) => {
     version: process.env.npm_package_version || '1.0.0',
     features: {
       googleAuth: !!process.env.GOOGLE_CLIENT_ID,
-      database: 'prisma'
-    }
+      database: 'prisma',
+    },
   });
 });
 
@@ -61,7 +63,7 @@ app.use('*', (req, res) => {
   res.status(404).json({
     success: false,
     message: 'API endpoint not found',
-    path: req.originalUrl
+    path: req.originalUrl,
   });
 });
 

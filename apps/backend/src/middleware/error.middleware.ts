@@ -8,6 +8,7 @@ export const errorHandler = (
   err: Error,
   req: Request,
   res: Response,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   next: NextFunction
 ) => {
   let error = { ...err };
@@ -20,7 +21,7 @@ export const errorHandler = (
     url: req.originalUrl,
     method: req.method,
     body: req.body,
-    user: (req as any).user?.userId || 'anonymous'
+    user: (req as any).user?.userId || 'anonymous',
   });
 
   // Mongoose bad ObjectId
@@ -77,9 +78,7 @@ export const errorHandler = (
 
   // Default to 500 server error
   if (!(error instanceof ApiError)) {
-    const message = process.env.NODE_ENV === 'production' 
-      ? 'Internal server error' 
-      : error.message;
+    const message = process.env.NODE_ENV === 'production' ? 'Internal server error' : error.message;
     error = new ApiError(500, message);
   }
 
@@ -87,9 +86,12 @@ export const errorHandler = (
   res.status((error as ApiError).statusCode || 500).json({
     success: false,
     message: error.message,
-    error: process.env.NODE_ENV === 'development' ? {
-      name: error.name,
-      stack: error.stack
-    } : undefined
+    error:
+      process.env.NODE_ENV === 'development'
+        ? {
+            name: error.name,
+            stack: error.stack,
+          }
+        : undefined,
   });
 };

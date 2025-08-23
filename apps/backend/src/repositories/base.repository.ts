@@ -28,7 +28,7 @@ export abstract class AbstractRepository<T> implements BaseRepository<T> {
 
   async findById(id: string): Promise<T | null> {
     return await this.model.findUnique({
-      where: { id }
+      where: { id },
     });
   }
 
@@ -38,20 +38,20 @@ export abstract class AbstractRepository<T> implements BaseRepository<T> {
 
   async create(data: Partial<T>): Promise<T> {
     return await this.model.create({
-      data
+      data,
     });
   }
 
   async update(id: string, data: Partial<T>): Promise<T> {
     return await this.model.update({
       where: { id },
-      data
+      data,
     });
   }
 
   async delete(id: string): Promise<void> {
     await this.model.delete({
-      where: { id }
+      where: { id },
     });
   }
 
@@ -61,7 +61,7 @@ export abstract class AbstractRepository<T> implements BaseRepository<T> {
 
   async exists(id: string): Promise<boolean> {
     const count = await this.model.count({
-      where: { id }
+      where: { id },
     });
     return count > 0;
   }

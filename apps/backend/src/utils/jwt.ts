@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 import { config } from '../config/constants';
 
 export interface JWTPayload {
@@ -18,22 +18,40 @@ export class JWTUtils {
    * Generate access token
    */
   static generateAccessToken(payload: JWTPayload): string {
-    return jwt.sign(payload, config.JWT_SECRET, {
+    if (!config.JWT_SECRET) {
+      throw new Error('JWT_SECRET is not configured');
+    }
+    if (!config.JWT_EXPIRES_IN) {
+      throw new Error('JWT_EXPIRES_IN is not configured');
+    }
+
+    const options = {
       expiresIn: config.JWT_EXPIRES_IN,
       issuer: 'mathsolve-ai',
-      audience: 'mathsolve-ai-users'
-    });
+      audience: 'mathsolve-ai-users',
+    };
+
+    return jwt.sign(payload, config.JWT_SECRET, options as any);
   }
 
   /**
    * Generate refresh token
    */
   static generateRefreshToken(payload: RefreshTokenPayload): string {
-    return jwt.sign(payload, config.JWT_REFRESH_SECRET, {
+    if (!config.JWT_REFRESH_SECRET) {
+      throw new Error('JWT_REFRESH_SECRET is not configured');
+    }
+    if (!config.JWT_REFRESH_EXPIRES_IN) {
+      throw new Error('JWT_REFRESH_EXPIRES_IN is not configured');
+    }
+
+    const options = {
       expiresIn: config.JWT_REFRESH_EXPIRES_IN,
       issuer: 'mathsolve-ai',
-      audience: 'mathsolve-ai-users'
-    });
+      audience: 'mathsolve-ai-users',
+    };
+
+    return jwt.sign(payload, config.JWT_REFRESH_SECRET, options as any);
   }
 
   /**
@@ -41,9 +59,13 @@ export class JWTUtils {
    */
   static verifyAccessToken(token: string): JWTPayload {
     try {
+      if (!config.JWT_SECRET) {
+        throw new Error('JWT_SECRET is not configured');
+      }
+
       return jwt.verify(token, config.JWT_SECRET, {
         issuer: 'mathsolve-ai',
-        audience: 'mathsolve-ai-users'
+        audience: 'mathsolve-ai-users',
       }) as JWTPayload;
     } catch (error) {
       throw new Error('Invalid or expired access token');
@@ -55,9 +77,13 @@ export class JWTUtils {
    */
   static verifyRefreshToken(token: string): RefreshTokenPayload {
     try {
+      if (!config.JWT_REFRESH_SECRET) {
+        throw new Error('JWT_REFRESH_SECRET is not configured');
+      }
+
       return jwt.verify(token, config.JWT_REFRESH_SECRET, {
         issuer: 'mathsolve-ai',
-        audience: 'mathsolve-ai-users'
+        audience: 'mathsolve-ai-users',
       }) as RefreshTokenPayload;
     } catch (error) {
       throw new Error('Invalid or expired refresh token');
@@ -71,13 +97,13 @@ export class JWTUtils {
     const accessToken = this.generateAccessToken({
       userId: user.id,
       email: user.email,
-      username: user.username
+      username: user.username,
     });
 
     const refreshToken = this.generateRefreshToken({
       userId: user.id,
       email: user.email,
-      tokenVersion: 1 // For token revocation in future
+      tokenVersion: 1, // For token revocation in future
     });
 
     return { accessToken, refreshToken };

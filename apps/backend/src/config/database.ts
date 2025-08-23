@@ -1,14 +1,15 @@
 import { PrismaClient } from '@prisma/client';
-import { logger } from './logger';
 
 declare global {
   // eslint-disable-next-line no-var
   var __prisma: PrismaClient | undefined;
 }
 
-const prisma = globalThis.__prisma || new PrismaClient({
-  log: process.env.NODE_ENV === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'],
-});
+const prisma =
+  globalThis.__prisma ||
+  new PrismaClient({
+    log: process.env.NODE_ENV === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'],
+  });
 
 // Ensure connection is closed properly
 process.on('beforeExit', async () => {

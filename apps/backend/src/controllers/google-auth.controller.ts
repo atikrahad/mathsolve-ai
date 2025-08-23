@@ -22,15 +22,15 @@ export class GoogleAuthController {
   static async getAuthUrl(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { state } = req.query;
-      
+
       const authUrl = GoogleAuthService.generateAuthUrl(state as string);
-      
+
       res.status(200).json({
         success: true,
         message: 'Google OAuth URL generated successfully',
         data: {
-          authUrl
-        }
+          authUrl,
+        },
       });
     } catch (error) {
       next(error);
@@ -43,13 +43,13 @@ export class GoogleAuthController {
   static async handleCallback(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const validatedData = googleCodeSchema.parse(req.body);
-      
+
       // Exchange authorization code for ID token
       const idToken = await GoogleAuthService.exchangeCodeForTokens(validatedData.code);
-      
+
       // Authenticate user with the ID token
       const result = await GoogleAuthService.authenticateWithGoogle(idToken);
-      
+
       // Set refresh token as httpOnly cookie
       CookieUtil.setRefreshTokenCookie(res, result.tokens.refreshToken);
 
@@ -59,8 +59,8 @@ export class GoogleAuthController {
         data: {
           user: result.user,
           accessToken: result.tokens.accessToken,
-          isNewUser: result.isNewUser
-        }
+          isNewUser: result.isNewUser,
+        },
       });
     } catch (error) {
       next(error);
@@ -70,13 +70,17 @@ export class GoogleAuthController {
   /**
    * Authenticate with Google ID token directly (for frontend)
    */
-  static async authenticateWithToken(req: Request, res: Response, next: NextFunction): Promise<void> {
+  static async authenticateWithToken(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
       const validatedData = googleTokenSchema.parse(req.body);
-      
+
       // Authenticate user with Google ID token
       const result = await GoogleAuthService.authenticateWithGoogle(validatedData.token);
-      
+
       // Set refresh token as httpOnly cookie
       CookieUtil.setRefreshTokenCookie(res, result.tokens.refreshToken);
 
@@ -86,8 +90,8 @@ export class GoogleAuthController {
         data: {
           user: result.user,
           accessToken: result.tokens.accessToken,
-          isNewUser: result.isNewUser
-        }
+          isNewUser: result.isNewUser,
+        },
       });
     } catch (error) {
       next(error);
@@ -105,10 +109,10 @@ export class GoogleAuthController {
       }
 
       const validatedData = googleTokenSchema.parse(req.body);
-      
+
       // Verify Google token
       const googleUser = await GoogleAuthService.verifyGoogleToken(validatedData.token);
-      
+
       if (!googleUser.verified_email) {
         throw new ApiError(400, 'Google account email is not verified');
       }
@@ -116,10 +120,10 @@ export class GoogleAuthController {
       // TODO: Implement account linking logic
       // This would involve updating the existing user with Google provider info
       // and handling potential conflicts (email already exists, etc.)
-      
-      logger.info('Google account link attempt', { 
-        userId, 
-        googleEmail: googleUser.email 
+
+      logger.info('Google account link attempt', {
+        userId,
+        googleEmail: googleUser.email,
       });
 
       res.status(200).json({
@@ -129,9 +133,9 @@ export class GoogleAuthController {
           googleUser: {
             email: googleUser.email,
             name: googleUser.name,
-            picture: googleUser.picture
-          }
-        }
+            picture: googleUser.picture,
+          },
+        },
       });
     } catch (error) {
       next(error);

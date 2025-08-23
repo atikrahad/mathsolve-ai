@@ -17,7 +17,7 @@ router.get('/', (req, res) => {
       // ai: '/api/ai',
       // rankings: '/api/rankings',
       // resources: '/api/resources'
-    }
+    },
   });
 });
 

@@ -1,7 +1,7 @@
 // API types
 export * from './api.types';
 
-// Authentication types  
+// Authentication types
 export * from './auth.types';
 
 // Database types
@@ -13,7 +13,7 @@ export type {
   ResponseMeta,
   PaginationOptions,
   AuthenticatedRequest,
-  PaginatedRequest
+  PaginatedRequest,
 } from './api.types';
 
 export type {
@@ -24,7 +24,7 @@ export type {
   RegisterData,
   UserRank,
   UserRole,
-  AuthProvider
+  AuthProvider,
 } from './auth.types';
 
 export type {
@@ -33,5 +33,5 @@ export type {
   DatabaseOperationResult,
   SortOptions,
   FilterOptions,
-  QueryBuilderOptions
+  QueryBuilderOptions,
 } from './database.types';
