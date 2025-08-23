@@ -23,6 +23,9 @@ export interface UserUpdateInput {
   resetPasswordExpires?: Date;
   emailVerificationToken?: string;
   emailVerificationExpires?: Date;
+  rankPoints?: number;
+  currentRank?: string;
+  streakCount?: number;
 }
 
 export interface UserSearchOptions extends FindManyOptions {
@@ -68,7 +71,7 @@ export class UserRepository extends AbstractRepository<User> {
    * Find user by reset password token
    * TODO: Add resetPasswordToken and resetPasswordExpires fields to Prisma schema
    */
-  async findByResetToken(token: string): Promise<User | null> {
+  async findByResetToken(): Promise<User | null> {
     // Commented out until schema is updated
     // return await this.model.findFirst({
     //   where: {
@@ -85,7 +88,7 @@ export class UserRepository extends AbstractRepository<User> {
    * Find user by email verification token
    * TODO: Add emailVerificationToken and emailVerificationExpires fields to Prisma schema
    */
-  async findByEmailVerificationToken(token: string): Promise<User | null> {
+  async findByEmailVerificationToken(): Promise<User | null> {
     // Commented out until schema is updated
     // return await this.model.findFirst({
     //   where: {
