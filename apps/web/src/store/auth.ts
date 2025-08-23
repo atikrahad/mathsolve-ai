@@ -18,6 +18,7 @@ export interface AuthState {
   refreshToken: () => Promise<void>;
   clearError: () => void;
   fetchProfile: () => Promise<void>;
+  setUser: (user: User | null) => void;
 
   // Reset state
   reset: () => void;
@@ -62,7 +63,9 @@ export const useAuthStore = create<AuthState>()(
             });
           }
         } catch (error: unknown) {
-          const errorMessage = error.response?.data?.message || 'Login failed';
+          const errorMessage =
+            (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
+            'Login failed';
           set({
             user: null,
             isAuthenticated: false,
@@ -100,7 +103,9 @@ export const useAuthStore = create<AuthState>()(
             });
           }
         } catch (error: unknown) {
-          const errorMessage = error.response?.data?.message || 'Registration failed';
+          const errorMessage =
+            (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
+            'Registration failed';
           set({
             user: null,
             isAuthenticated: false,
@@ -141,7 +146,9 @@ export const useAuthStore = create<AuthState>()(
 
           throw new Error('Invalid response from server');
         } catch (error: unknown) {
-          const errorMessage = error.response?.data?.message || 'Google authentication failed';
+          const errorMessage =
+            (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
+            'Google authentication failed';
           set({
             user: null,
             isAuthenticated: false,
@@ -184,7 +191,7 @@ export const useAuthStore = create<AuthState>()(
 
             return;
           }
-        } catch {
+        } catch (error) {
           // Refresh failed, logout user
           await get().logout();
           throw error;
@@ -206,7 +213,9 @@ export const useAuthStore = create<AuthState>()(
             });
           }
         } catch (error: unknown) {
-          const errorMessage = error.response?.data?.message || 'Failed to fetch profile';
+          const errorMessage =
+            (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
+            'Failed to fetch profile';
           set({
             user: null,
             isAuthenticated: false,
@@ -218,6 +227,10 @@ export const useAuthStore = create<AuthState>()(
 
       clearError: () => {
         set({ error: null });
+      },
+
+      setUser: (user) => {
+        set({ user });
       },
 
       reset: () => {

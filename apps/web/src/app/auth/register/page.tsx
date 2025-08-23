@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { useAuthStore } from '@/store/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import GoogleOAuthButton from '@/components/auth/GoogleOAuthButton';
 import { Eye, EyeOff, AlertCircle, Loader2, Check, X } from 'lucide-react';
@@ -150,7 +149,12 @@ export default function RegisterPage() {
 
             {/* Username Field */}
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <label
+                htmlFor="username"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Username
+              </label>
               <Input
                 id="username"
                 type="text"
@@ -167,7 +171,12 @@ export default function RegisterPage() {
 
             {/* Email Field */}
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <label
+                htmlFor="email"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Email
+              </label>
               <Input
                 id="email"
                 type="email"
@@ -184,7 +193,12 @@ export default function RegisterPage() {
 
             {/* Password Field */}
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <label
+                htmlFor="password"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Password
+              </label>
               <div className="relative">
                 <Input
                   id="password"
@@ -230,7 +244,12 @@ export default function RegisterPage() {
 
             {/* Confirm Password Field */}
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <label
+                htmlFor="confirmPassword"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Confirm Password
+              </label>
               <div className="relative">
                 <Input
                   id="confirmPassword"
