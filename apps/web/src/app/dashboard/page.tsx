@@ -23,16 +23,14 @@ function DashboardContent() {
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <h1 className="text-xl font-semibold text-gray-900">
-              Welcome back, {user?.username}!
-            </h1>
-            
+            <h1 className="text-xl font-semibold text-gray-900">Welcome back, {user?.username}!</h1>
+
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <User size={16} />
                 <span>{user?.email}</span>
               </div>
-              
+
               <Button
                 variant="outline"
                 size="sm"
@@ -71,9 +69,7 @@ function DashboardContent() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{user?.streakCount || 0}</div>
-              <p className="text-xs text-muted-foreground">
-                Days in a row
-              </p>
+              <p className="text-xs text-muted-foreground">Days in a row</p>
             </CardContent>
           </Card>
 
@@ -86,9 +82,7 @@ function DashboardContent() {
               <div className="text-2xl font-bold">
                 {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Today'}
               </div>
-              <p className="text-xs text-muted-foreground">
-                Join date
-              </p>
+              <p className="text-xs text-muted-foreground">Join date</p>
             </CardContent>
           </Card>
         </div>

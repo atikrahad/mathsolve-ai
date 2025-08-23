@@ -10,12 +10,12 @@ interface MathEquation {
 }
 
 const mathEquations: MathEquation[] = [
-  { equation: "∫ x² dx", solution: "x³/3 + C", id: 1 },
-  { equation: "lim(x→0) sin(x)/x", solution: "1", id: 2 },
-  { equation: "∇²φ = 0", solution: "Laplace's equation", id: 3 },
-  { equation: "e^(iπ) + 1", solution: "0", id: 4 },
-  { equation: "∑(n=1 to ∞) 1/n²", solution: "π²/6", id: 5 },
-  { equation: "f'(x) = lim(h→0)", solution: "[f(x+h)-f(x)]/h", id: 6 }
+  { equation: '∫ x² dx', solution: 'x³/3 + C', id: 1 },
+  { equation: 'lim(x→0) sin(x)/x', solution: '1', id: 2 },
+  { equation: '∇²φ = 0', solution: "Laplace's equation", id: 3 },
+  { equation: 'e^(iπ) + 1', solution: '0', id: 4 },
+  { equation: '∑(n=1 to ∞) 1/n²', solution: 'π²/6', id: 5 },
+  { equation: "f'(x) = lim(h→0)", solution: '[f(x+h)-f(x)]/h', id: 6 },
 ];
 
 export const FloatingMathEquations = () => {
@@ -24,7 +24,7 @@ export const FloatingMathEquations = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       const randomEquation = mathEquations[Math.floor(Math.random() * mathEquations.length)];
-      setCurrentEquations(prev => {
+      setCurrentEquations((prev) => {
         const newEquations = [...prev, { ...randomEquation, id: Date.now() }];
         return newEquations.slice(-6); // Keep only last 6 equations
       });
@@ -52,10 +52,10 @@ export const FloatingMathEquations = () => {
           }}
           transition={{
             duration: 15 + Math.random() * 10,
-            ease: "linear",
+            ease: 'linear',
           }}
           style={{
-            left: `${10 + (index * 15) % 80}%`,
+            left: `${10 + ((index * 15) % 80)}%`,
           }}
         >
           {eq.equation}
@@ -75,9 +75,9 @@ export const AnimatedCounter = ({ end, duration = 2 }: { end: number; duration?:
     const animate = (timestamp: number) => {
       if (!startTime) startTime = timestamp;
       const progress = Math.min((timestamp - startTime) / (duration * 1000), 1);
-      
+
       setCount(Math.floor(progress * end));
-      
+
       if (progress < 1) {
         animationFrame = requestAnimationFrame(animate);
       }

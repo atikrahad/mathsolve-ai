@@ -14,7 +14,7 @@ import { Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 export default function LoginPage() {
   const router = useRouter();
   const { login, isLoading, error, clearError } = useAuthStore();
-  
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -24,17 +24,17 @@ export default function LoginPage() {
 
   const validateForm = () => {
     const errors: Record<string, string> = {};
-    
+
     if (!formData.email) {
       errors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       errors.email = 'Please enter a valid email address';
     }
-    
+
     if (!formData.password) {
       errors.password = 'Password is required';
     }
-    
+
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -42,25 +42,25 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     try {
       await login(formData);
       router.push('/dashboard');
-    } catch (error) {
+    } catch {
       // Error is handled by the store
     }
   };
 
   const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({ ...prev, [field]: e.target.value }));
-    
+    setFormData((prev) => ({ ...prev, [field]: e.target.value }));
+
     // Clear validation error when user starts typing
     if (validationErrors[field]) {
-      setValidationErrors(prev => ({ ...prev, [field]: '' }));
+      setValidationErrors((prev) => ({ ...prev, [field]: '' }));
     }
   };
 
@@ -73,7 +73,7 @@ export default function LoginPage() {
             Sign in to your MathSolve AI account
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent>
           {/* Google OAuth Button */}
           <div className="mb-6">
@@ -83,7 +83,7 @@ export default function LoginPage() {
               onError={(error) => console.error('Google sign-in error:', error)}
             />
           </div>
-          
+
           {/* Divider */}
           <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
@@ -93,7 +93,7 @@ export default function LoginPage() {
               <span className="bg-white px-2 text-gray-500">Or continue with email</span>
             </div>
           </div>
-          
+
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Global Error */}
             {error && (
@@ -102,7 +102,7 @@ export default function LoginPage() {
                 <span className="text-sm">{error}</span>
               </div>
             )}
-            
+
             {/* Email Field */}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
@@ -119,7 +119,7 @@ export default function LoginPage() {
                 <p className="text-sm text-red-600">{validationErrors.email}</p>
               )}
             </div>
-            
+
             {/* Password Field */}
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
@@ -146,23 +146,19 @@ export default function LoginPage() {
                 <p className="text-sm text-red-600">{validationErrors.password}</p>
               )}
             </div>
-            
+
             {/* Forgot Password Link */}
             <div className="text-right">
-              <Link 
-                href="/auth/forgot-password" 
+              <Link
+                href="/auth/forgot-password"
                 className="text-sm text-blue-600 hover:text-blue-500"
               >
                 Forgot your password?
               </Link>
             </div>
-            
+
             {/* Submit Button */}
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-            >
+            <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Loader2 size={16} className="animate-spin mr-2" />
@@ -173,15 +169,12 @@ export default function LoginPage() {
               )}
             </Button>
           </form>
-          
+
           {/* Register Link */}
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
-              <Link 
-                href="/auth/register" 
-                className="text-blue-600 hover:text-blue-500 font-medium"
-              >
+              Don&apos;t have an account?{' '}
+              <Link href="/auth/register" className="text-blue-600 hover:text-blue-500 font-medium">
                 Sign up
               </Link>
             </p>

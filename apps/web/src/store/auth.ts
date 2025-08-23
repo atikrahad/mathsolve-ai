@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import Cookies from 'js-cookie';
-import api, { type User, type ApiResponse, type AuthTokens } from '@/lib/api';
+import api, { type User, type ApiResponse } from '@/lib/api';
 
 export interface AuthState {
   // State
@@ -9,20 +9,16 @@ export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  
+
   // Actions
   login: (credentials: { email: string; password: string }) => Promise<void>;
-  register: (userData: { 
-    username: string; 
-    email: string; 
-    password: string; 
-  }) => Promise<void>;
+  register: (userData: { username: string; email: string; password: string }) => Promise<void>;
   googleAuth: (token: string) => Promise<{ user: User; isNewUser: boolean }>;
   logout: () => Promise<void>;
   refreshToken: () => Promise<void>;
   clearError: () => void;
   fetchProfile: () => Promise<void>;
-  
+
   // Reset state
   reset: () => void;
 }
@@ -41,7 +37,7 @@ export const useAuthStore = create<AuthState>()(
 
       login: async (credentials) => {
         set({ isLoading: true, error: null });
-        
+
         try {
           const response = await api.post<ApiResponse<{ user: User; accessToken: string }>>(
             '/auth/login',
@@ -50,12 +46,12 @@ export const useAuthStore = create<AuthState>()(
 
           if (response.data.success && response.data.data) {
             const { user, accessToken } = response.data.data;
-            
+
             // Store access token in cookie (refresh token is automatically set as httpOnly cookie by backend)
             Cookies.set('accessToken', accessToken, {
-              expires: 1/96, // 15 minutes
+              expires: 1 / 96, // 15 minutes
               secure: process.env.NODE_ENV === 'production',
-              sameSite: 'strict'
+              sameSite: 'strict',
             });
 
             set({
@@ -65,7 +61,7 @@ export const useAuthStore = create<AuthState>()(
               error: null,
             });
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           const errorMessage = error.response?.data?.message || 'Login failed';
           set({
             user: null,
@@ -79,7 +75,7 @@ export const useAuthStore = create<AuthState>()(
 
       register: async (userData) => {
         set({ isLoading: true, error: null });
-        
+
         try {
           const response = await api.post<ApiResponse<{ user: User; accessToken: string }>>(
             '/auth/register',
@@ -88,12 +84,12 @@ export const useAuthStore = create<AuthState>()(
 
           if (response.data.success && response.data.data) {
             const { user, accessToken } = response.data.data;
-            
+
             // Store access token in cookie
             Cookies.set('accessToken', accessToken, {
-              expires: 1/96, // 15 minutes
+              expires: 1 / 96, // 15 minutes
               secure: process.env.NODE_ENV === 'production',
-              sameSite: 'strict'
+              sameSite: 'strict',
             });
 
             set({
@@ -103,7 +99,7 @@ export const useAuthStore = create<AuthState>()(
               error: null,
             });
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           const errorMessage = error.response?.data?.message || 'Registration failed';
           set({
             user: null,
@@ -117,21 +113,20 @@ export const useAuthStore = create<AuthState>()(
 
       googleAuth: async (token: string) => {
         set({ isLoading: true, error: null });
-        
+
         try {
-          const response = await api.post<ApiResponse<{ user: User; accessToken: string; isNewUser: boolean }>>(
-            '/auth/google/token',
-            { token }
-          );
+          const response = await api.post<
+            ApiResponse<{ user: User; accessToken: string; isNewUser: boolean }>
+          >('/auth/google/token', { token });
 
           if (response.data.success && response.data.data) {
             const { user, accessToken, isNewUser } = response.data.data;
-            
+
             // Store access token in cookie
             Cookies.set('accessToken', accessToken, {
-              expires: 1/96, // 15 minutes
+              expires: 1 / 96, // 15 minutes
               secure: process.env.NODE_ENV === 'production',
-              sameSite: 'strict'
+              sameSite: 'strict',
             });
 
             set({
@@ -145,7 +140,7 @@ export const useAuthStore = create<AuthState>()(
           }
 
           throw new Error('Invalid response from server');
-        } catch (error: any) {
+        } catch (error: unknown) {
           const errorMessage = error.response?.data?.message || 'Google authentication failed';
           set({
             user: null,
@@ -159,10 +154,10 @@ export const useAuthStore = create<AuthState>()(
 
       logout: async () => {
         set({ isLoading: true });
-        
+
         try {
           await api.post('/auth/logout');
-        } catch (error) {
+        } catch {
           // Even if logout fails on server, we should clear local state
           console.warn('Logout request failed, clearing local state anyway');
         } finally {
@@ -176,22 +171,20 @@ export const useAuthStore = create<AuthState>()(
 
       refreshToken: async () => {
         try {
-          const response = await api.post<ApiResponse<{ accessToken: string }>>(
-            '/auth/refresh'
-          );
+          const response = await api.post<ApiResponse<{ accessToken: string }>>('/auth/refresh');
 
           if (response.data.success && response.data.data) {
             const { accessToken } = response.data.data;
-            
+
             Cookies.set('accessToken', accessToken, {
-              expires: 1/96, // 15 minutes
+              expires: 1 / 96, // 15 minutes
               secure: process.env.NODE_ENV === 'production',
-              sameSite: 'strict'
+              sameSite: 'strict',
             });
 
             return;
           }
-        } catch (error) {
+        } catch {
           // Refresh failed, logout user
           await get().logout();
           throw error;
@@ -200,10 +193,10 @@ export const useAuthStore = create<AuthState>()(
 
       fetchProfile: async () => {
         set({ isLoading: true, error: null });
-        
+
         try {
           const response = await api.get<ApiResponse<{ user: User }>>('/auth/profile');
-          
+
           if (response.data.success && response.data.data) {
             set({
               user: response.data.data.user,
@@ -212,7 +205,7 @@ export const useAuthStore = create<AuthState>()(
               error: null,
             });
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           const errorMessage = error.response?.data?.message || 'Failed to fetch profile';
           set({
             user: null,
@@ -233,9 +226,9 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
-      partialize: (state) => ({ 
-        user: state.user, 
-        isAuthenticated: state.isAuthenticated 
+      partialize: (state) => ({
+        user: state.user,
+        isAuthenticated: state.isAuthenticated,
       }),
       skipHydration: true,
     }
@@ -246,18 +239,18 @@ export const useAuthStore = create<AuthState>()(
 export const initializeAuth = async () => {
   const { user, fetchProfile } = useAuthStore.getState();
   const accessToken = Cookies.get('accessToken');
-  
+
   // If we have a token but no user data, fetch profile
   if (accessToken && !user) {
     try {
       await fetchProfile();
-    } catch (error) {
+    } catch {
       // Token might be invalid, clear it
       Cookies.remove('accessToken');
       useAuthStore.getState().reset();
     }
   }
-  
+
   // If we have user data but no token, clear state
   if (!accessToken && user) {
     useAuthStore.getState().reset();

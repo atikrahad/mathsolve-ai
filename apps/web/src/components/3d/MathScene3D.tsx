@@ -6,7 +6,15 @@ import { useRef, useMemo, useState } from 'react';
 import * as THREE from 'three';
 
 // Mathematical Equation 3D Component
-function MathEquation3D({ position, text, color = '#4ECDC4' }: { position: [number, number, number], text: string, color?: string }) {
+function MathEquation3D({
+  position,
+  text,
+  color = '#4ECDC4',
+}: {
+  position: [number, number, number];
+  text: string;
+  color?: string;
+}) {
   const meshRef = useRef<THREE.Mesh>(null);
 
   useFrame((state) => {
@@ -18,13 +26,7 @@ function MathEquation3D({ position, text, color = '#4ECDC4' }: { position: [numb
 
   return (
     <group position={position}>
-      <Text
-        ref={meshRef}
-        fontSize={0.8}
-        color={color}
-        anchorX="center"
-        anchorY="middle"
-      >
+      <Text ref={meshRef} fontSize={0.8} color={color} anchorX="center" anchorY="middle">
         {text}
       </Text>
       <Sphere args={[0.1, 16, 16]} position={[0, 0, -0.5]}>
@@ -37,15 +39,8 @@ function MathEquation3D({ position, text, color = '#4ECDC4' }: { position: [numb
 // 3D Mathematical Cube with Equations
 function MathCube3D({ position }: { position: [number, number, number] }) {
   const meshRef = useRef<THREE.Mesh>(null);
-  
-  const equations = [
-    '∫ f(x)dx',
-    '∂f/∂x',
-    'Σ n=1',
-    '∇ × F',
-    'e^(iπ)',
-    'lim x→∞'
-  ];
+
+  const equations = ['∫ f(x)dx', '∂f/∂x', 'Σ n=1', '∇ × F', 'e^(iπ)', 'lim x→∞'];
 
   useFrame((state) => {
     if (meshRef.current) {
@@ -71,7 +66,7 @@ function MathCube3D({ position }: { position: [number, number, number] }) {
           position={[
             index === 0 ? 1.1 : index === 1 ? -1.1 : 0,
             index === 2 ? 1.1 : index === 3 ? -1.1 : 0,
-            index === 4 ? 1.1 : index === 5 ? -1.1 : 0
+            index === 4 ? 1.1 : index === 5 ? -1.1 : 0,
           ]}
           fontSize={0.3}
           color="#4ECDC4"
@@ -114,22 +109,12 @@ function MathSphere3D({ position }: { position: [number, number, number] }) {
       </Sphere>
       <group ref={gridRef}>
         {Array.from({ length: 10 }).map((_, i) => (
-          <Torus
-            key={i}
-            args={[1.6, 0.02, 8, 32]}
-            rotation={[0, 0, (i / 10) * Math.PI]}
-          >
+          <Torus key={i} args={[1.6, 0.02, 8, 32]} rotation={[0, 0, (i / 10) * Math.PI]}>
             <meshStandardMaterial color="#4ECDC4" emissive="#4ECDC4" emissiveIntensity={0.3} />
           </Torus>
         ))}
       </group>
-      <Text
-        position={[0, 0, 0]}
-        fontSize={0.4}
-        color="#FFE66D"
-        anchorX="center"
-        anchorY="middle"
-      >
+      <Text position={[0, 0, 0]} fontSize={0.4} color="#FFE66D" anchorX="center" anchorY="middle">
         x²+y²+z²=r²
       </Text>
     </group>
@@ -139,17 +124,17 @@ function MathSphere3D({ position }: { position: [number, number, number] }) {
 // 3D Function Graph Visualization
 function FunctionGraph3D({ position }: { position: [number, number, number] }) {
   const meshRef = useRef<THREE.Mesh>(null);
-  
+
   const geometry = useMemo(() => {
     const geom = new THREE.PlaneGeometry(4, 4, 50, 50);
     const vertices = geom.attributes.position.array as Float32Array;
-    
+
     for (let i = 0; i < vertices.length; i += 3) {
       const x = vertices[i];
       const y = vertices[i + 1];
       vertices[i + 2] = Math.sin(x) * Math.cos(y) * 0.5;
     }
-    
+
     geom.attributes.position.needsUpdate = true;
     geom.computeVertexNormals();
     return geom;
@@ -189,11 +174,11 @@ function FunctionGraph3D({ position }: { position: [number, number, number] }) {
 function MathParticles() {
   const count = 50;
   const meshRef = useRef<THREE.InstancedMesh>(null);
-  
+
   const particles = useMemo(() => {
     const temp = new THREE.Object3D();
     const positions = [];
-    
+
     for (let i = 0; i < count; i++) {
       temp.position.set(
         (Math.random() - 0.5) * 30,
@@ -203,7 +188,7 @@ function MathParticles() {
       temp.updateMatrix();
       positions.push(temp.matrix.clone());
     }
-    
+
     return positions;
   }, []);
 
@@ -252,8 +237,8 @@ function InteractiveMathObject({ position }: { position: [number, number, number
         onPointerLeave={() => setHovered(false)}
       >
         <meshStandardMaterial
-          color={hovered ? "#FFE66D" : "#FF6B6B"}
-          emissive={hovered ? "#FFE66D" : "#FF6B6B"}
+          color={hovered ? '#FFE66D' : '#FF6B6B'}
+          emissive={hovered ? '#FFE66D' : '#FF6B6B'}
           emissiveIntensity={hovered ? 0.4 : 0.2}
           transparent
           opacity={0.8}
@@ -278,37 +263,37 @@ export default function MathScene3D() {
     <div className="w-full h-96">
       <Canvas
         camera={{ position: [0, 0, 12], fov: 75 }}
-        style={{ 
-          background: 'linear-gradient(135deg, #2A3B4E 0%, #1a2332 50%, #0f1419 100%)' 
+        style={{
+          background: 'linear-gradient(135deg, #2A3B4E 0%, #1a2332 50%, #0f1419 100%)',
         }}
       >
         <color attach="background" args={['#2A3B4E']} />
         <fog attach="fog" args={['#2A3B4E', 15, 40]} />
-        
+
         {/* Lighting */}
         <ambientLight intensity={0.4} />
         <pointLight position={[10, 10, 10]} intensity={1.2} color="#4ECDC4" />
         <pointLight position={[-10, -10, -10]} intensity={0.8} color="#FF6B6B" />
         <spotLight position={[0, 20, 0]} intensity={1} color="#FFE66D" />
-        
+
         {/* Environment */}
         <Stars radius={100} depth={50} count={3000} factor={4} saturation={0} fade speed={1} />
-        
+
         {/* 3D Mathematical Objects */}
         <MathCube3D position={[-5, 1, 0]} />
         <MathSphere3D position={[5, -1, 0]} />
         <FunctionGraph3D position={[0, -3, -2]} />
         <InteractiveMathObject position={[0, 2, 0]} />
-        
+
         {/* Floating Equations */}
         <MathEquation3D position={[-7, 0, 2]} text="∫₀^∞ e^(-x²)dx = √π/2" color="#4ECDC4" />
         <MathEquation3D position={[7, 3, -1]} text="∇·E = ρ/ε₀" color="#FF6B6B" />
         <MathEquation3D position={[0, 5, 1]} text="e^(iπ) + 1 = 0" color="#FFE66D" />
         <MathEquation3D position={[-3, -2, 3]} text="∂²u/∂t² = c²∇²u" color="#95E1D3" />
-        
+
         {/* Floating Particles */}
         <MathParticles />
-        
+
         {/* Controls */}
         <OrbitControls
           enablePan={true}
@@ -325,16 +310,16 @@ export default function MathScene3D() {
 }
 
 // 3D Information Panel Component
-export function Info3DPanel({ 
-  position, 
-  title, 
-  content, 
-  color = '#4ECDC4' 
-}: { 
-  position: [number, number, number], 
-  title: string, 
-  content: string[],
-  color?: string 
+export function Info3DPanel({
+  position,
+  title,
+  content,
+  color = '#4ECDC4',
+}: {
+  position: [number, number, number];
+  title: string;
+  content: string[];
+  color?: string;
 }) {
   return (
     <group position={position}>

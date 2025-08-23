@@ -14,7 +14,7 @@ const AuthInitializer = dynamic(() => import('./AuthInitializer'), {
         <p className="text-gray-600">Loading...</p>
       </div>
     </div>
-  )
+  ),
 });
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {

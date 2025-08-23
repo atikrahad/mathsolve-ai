@@ -9,7 +9,7 @@ const api = axios.create({
 });
 
 // Types
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   message: string;
   data?: T;
@@ -53,25 +53,29 @@ api.interceptors.response.use(
     return response;
   },
   async (error: AxiosError) => {
-    const originalRequest = error.config as any;
+    const originalRequest = error.config as typeof error.config & { _retry?: boolean };
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
         // Try to refresh token
-        const response = await axios.post(`${api.defaults.baseURL}/auth/refresh`, {}, {
-          withCredentials: true
-        });
+        const response = await axios.post(
+          `${api.defaults.baseURL}/auth/refresh`,
+          {},
+          {
+            withCredentials: true,
+          }
+        );
 
         if (response.data.success && response.data.data.accessToken) {
           const { accessToken } = response.data.data;
-          
+
           // Update cookie
-          Cookies.set('accessToken', accessToken, { 
-            expires: 1/96, // 15 minutes
+          Cookies.set('accessToken', accessToken, {
+            expires: 1 / 96, // 15 minutes
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict'
+            sameSite: 'strict',
           });
 
           // Retry original request

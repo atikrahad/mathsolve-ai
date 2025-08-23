@@ -11,11 +11,11 @@ interface AnimatedCardProps {
   whileHover?: object;
 }
 
-export const AnimatedCard = ({ 
-  children, 
-  className = "", 
+export const AnimatedCard = ({
+  children,
+  className = '',
   delay = 0,
-  whileHover = { y: -5, scale: 1.02 }
+  whileHover = { y: -5, scale: 1.02 },
 }: AnimatedCardProps) => {
   return (
     <motion.div
