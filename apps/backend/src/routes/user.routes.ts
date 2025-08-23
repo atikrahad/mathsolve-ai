@@ -77,6 +77,8 @@ router.post(
 // Following system routes
 router.post('/:id/follow', authenticate, followRateLimit, UserController.followUser);
 router.delete('/:id/follow', authenticate, followRateLimit, UserController.unfollowUser);
+router.get('/:id/followers', userRateLimit, UserController.getFollowers);
+router.get('/:id/following', userRateLimit, UserController.getFollowing);
 
 // Health check / info endpoint
 router.get('/', (req, res) => {
@@ -95,6 +97,8 @@ router.get('/', (req, res) => {
         'POST /users/profile/avatar - Upload user avatar',
         'POST /users/:id/follow - Follow a user',
         'DELETE /users/:id/follow - Unfollow a user',
+        'GET /users/:id/followers - Get user followers',
+        'GET /users/:id/following - Get user following',
       ],
     },
     features: {

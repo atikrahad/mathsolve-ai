@@ -1,4 +1,4 @@
-import { API_BASE_URL } from '@/lib/config';
+import api from '@/lib/api';
 
 export interface UserProfile {
   id: string;
@@ -75,131 +75,50 @@ export interface FollowersFollowingResult {
 }
 
 class UserService {
-  private async getAuthHeaders(): Promise<HeadersInit> {
-    const token = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('accessToken='))
-      ?.split('=')[1];
-
-    return {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-    };
-  }
-
   /**
    * Get current user profile
    */
   async getProfile(): Promise<UserProfile> {
-    const headers = await this.getAuthHeaders();
-
-    const response = await fetch(`${API_BASE_URL}/users/profile/me`, {
-      method: 'GET',
-      headers,
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch profile: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data.data;
+    const response = await api.get('/users/profile/me');
+    return response.data.data;
   }
 
   /**
    * Update user profile
    */
   async updateProfile(updateData: UserUpdateData): Promise<UserProfile> {
-    const headers = await this.getAuthHeaders();
-
-    const response = await fetch(`${API_BASE_URL}/users/profile/me`, {
-      method: 'PUT',
-      headers,
-      credentials: 'include',
-      body: JSON.stringify(updateData),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to update profile: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data.data;
+    const response = await api.put('/users/profile/me', updateData);
+    return response.data.data;
   }
 
   /**
    * Get user by ID (public profile)
    */
   async getUserById(id: string): Promise<UserPublicProfile> {
-    const response = await fetch(`${API_BASE_URL}/users/${id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch user: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data.data;
+    const response = await api.get(`/users/${id}`);
+    return response.data.data;
   }
 
   /**
    * Get user statistics
    */
   async getUserStats(id: string): Promise<UserStatistics> {
-    const response = await fetch(`${API_BASE_URL}/users/${id}/stats`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch user stats: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data.data;
+    const response = await api.get(`/users/${id}/stats`);
+    return response.data.data;
   }
 
   /**
    * Follow a user
    */
   async followUser(id: string): Promise<void> {
-    const headers = await this.getAuthHeaders();
-
-    const response = await fetch(`${API_BASE_URL}/users/${id}/follow`, {
-      method: 'POST',
-      headers,
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to follow user: ${response.statusText}`);
-    }
+    await api.post(`/users/${id}/follow`);
   }
 
   /**
    * Unfollow a user
    */
   async unfollowUser(id: string): Promise<void> {
-    const headers = await this.getAuthHeaders();
-
-    const response = await fetch(`${API_BASE_URL}/users/${id}/follow`, {
-      method: 'DELETE',
-      headers,
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to unfollow user: ${response.statusText}`);
-    }
+    await api.delete(`/users/${id}/follow`);
   }
 
   /**
@@ -212,57 +131,23 @@ class UserService {
     sortBy?: 'username' | 'rankPoints' | 'createdAt';
     sortOrder?: 'asc' | 'desc';
   }): Promise<UserSearchResult> {
-    const queryParams = new URLSearchParams();
-
-    if (params.searchTerm) queryParams.append('searchTerm', params.searchTerm);
-    if (params.page) queryParams.append('page', params.page.toString());
-    if (params.limit) queryParams.append('limit', params.limit.toString());
-    if (params.sortBy) queryParams.append('sortBy', params.sortBy);
-    if (params.sortOrder) queryParams.append('sortOrder', params.sortOrder);
-
-    const response = await fetch(`${API_BASE_URL}/users/search?${queryParams}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to search users: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data.data;
+    const response = await api.get('/users/search', { params });
+    return response.data.data;
   }
 
   /**
    * Upload avatar
    */
   async uploadAvatar(file: File): Promise<string> {
-    const token = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('accessToken='))
-      ?.split('=')[1];
-
     const formData = new FormData();
     formData.append('avatar', file);
 
-    const response = await fetch(`${API_BASE_URL}/users/profile/avatar`, {
-      method: 'POST',
+    const response = await api.post('/users/profile/avatar', formData, {
       headers: {
-        ...(token && { Authorization: `Bearer ${token}` }),
+        'Content-Type': 'multipart/form-data',
       },
-      credentials: 'include',
-      body: formData,
     });
-
-    if (!response.ok) {
-      throw new Error(`Failed to upload avatar: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data.data.avatarUrl;
+    return response.data.data.avatarUrl;
   }
 
   /**
@@ -275,24 +160,8 @@ class UserService {
       limit?: number;
     }
   ): Promise<FollowersFollowingResult> {
-    const queryParams = new URLSearchParams();
-    if (params?.page) queryParams.append('page', params.page.toString());
-    if (params?.limit) queryParams.append('limit', params.limit.toString());
-
-    const response = await fetch(`${API_BASE_URL}/users/${userId}/followers?${queryParams}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch followers: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data.data;
+    const response = await api.get(`/users/${userId}/followers`, { params });
+    return response.data.data;
   }
 
   /**
@@ -305,24 +174,8 @@ class UserService {
       limit?: number;
     }
   ): Promise<FollowersFollowingResult> {
-    const queryParams = new URLSearchParams();
-    if (params?.page) queryParams.append('page', params.page.toString());
-    if (params?.limit) queryParams.append('limit', params.limit.toString());
-
-    const response = await fetch(`${API_BASE_URL}/users/${userId}/following?${queryParams}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch following: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data.data;
+    const response = await api.get(`/users/${userId}/following`, { params });
+    return response.data.data;
   }
 }
 
