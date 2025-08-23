@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { JWTUtils } from '../utils/jwt-simple';
+import { JWTUtils } from '../utils/jwt';
 import { ApiError } from '../utils/errors/ApiError';
 import { logger } from '../config/logger';
 import prisma from '../config/database';

@@ -1,8 +1,9 @@
 import { UserRepository } from '../repositories/user.repository';
-import { JWTUtils } from '../utils/jwt-simple';
+import { JWTUtils } from '../utils/jwt';
 import { PasswordUtils } from '../utils/password';
 import { ApiError } from '../utils/errors/ApiError';
 import { AuthServiceErrors } from '../utils/errors/service-errors';
+import prisma from '../config/database';
 import { 
   RegisterInput, 
   LoginInput, 

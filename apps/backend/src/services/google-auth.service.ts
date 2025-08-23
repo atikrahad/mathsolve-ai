@@ -1,7 +1,7 @@
 import { OAuth2Client } from 'google-auth-library';
 import prisma from '../config/database';
 import { config } from '../config/constants';
-import { JWTUtils } from '../utils/jwt-simple';
+import { JWTUtils } from '../utils/jwt';
 import { ApiError } from '../utils/errors/ApiError';
 import { logger } from '../config/logger';
 
