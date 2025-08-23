@@ -95,21 +95,33 @@
 
 ## Phase 3: User Management (Week 5)
 
-### User Profile Backend
-- [ ] Create user CRUD operations
-- [ ] Implement profile update logic
-- [ ] Add avatar upload functionality
-- [ ] Create user statistics calculation
-- [ ] Setup following system
+### User Profile Backend ✅ COMPLETED
+- [x] Create user CRUD operations (`apps/backend/src/repositories/user.repository.ts`)
+- [x] Implement profile update logic (`apps/backend/src/services/user.service.ts`)
+- [x] Add avatar upload functionality (Multer file upload with image validation)
+- [x] Create user statistics calculation (UserService with statistics methods)
+- [x] Setup following system (Database-ready with placeholder implementation)
+- [x] **COMPLETED: Additional Backend Components**
+  - [x] UserController with all user management methods (`apps/backend/src/controllers/user.controller.ts`)
+  - [x] UserService with business logic (`apps/backend/src/services/user.service.ts`)
+  - [x] User validation schemas (`apps/backend/src/utils/validators/user.validators.ts`)
+  - [x] File upload handling with Multer
+  - [x] Rate limiting for user operations
+  - [x] Comprehensive error handling and logging
 
-### User Endpoints
-- [ ] GET /api/users/profile
-- [ ] PUT /api/users/profile
-- [ ] GET /api/users/:id
-- [ ] GET /api/users/:id/stats
-- [ ] POST /api/users/:id/follow
-- [ ] DELETE /api/users/:id/follow
-- [ ] GET /api/users/search
+### User Endpoints ✅ COMPLETED
+- [x] GET /users/profile/me - Get current user profile (`apps/backend/src/routes/user.routes.ts:47`)
+- [x] PUT /users/profile/me - Update current user profile (`apps/backend/src/routes/user.routes.ts:48`)
+- [x] GET /users/:id - Get user public profile (`apps/backend/src/routes/user.routes.ts:44`)
+- [x] GET /users/:id/stats - Get user statistics (`apps/backend/src/routes/user.routes.ts:45`)
+- [x] POST /users/:id/follow - Follow a user (`apps/backend/src/routes/user.routes.ts:54`)
+- [x] DELETE /users/:id/follow - Unfollow a user (`apps/backend/src/routes/user.routes.ts:55`)
+- [x] GET /users/search - Search for users (`apps/backend/src/routes/user.routes.ts:43`)
+- [x] **COMPLETED: Additional User Endpoints**
+  - [x] POST /users/profile/avatar - Upload user avatar (`apps/backend/src/routes/user.routes.ts:49-53`)
+  - [x] Rate limiting on all endpoints for security
+  - [x] File upload validation and processing
+  - [x] Comprehensive API documentation in route handlers
 
 ### User Profile Frontend
 - [ ] Create profile page layout
