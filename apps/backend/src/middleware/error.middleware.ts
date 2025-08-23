@@ -20,13 +20,13 @@ export const errorHandler = (
     url: req.originalUrl,
     method: req.method,
     body: req.body,
-    user: req.user?.id || 'anonymous'
+    user: (req as any).user?.userId || 'anonymous'
   });
 
   // Mongoose bad ObjectId
   if (error.name === 'CastError') {
     const message = 'Resource not found';
-    error = new ApiError(message, 404);
+    error = new ApiError(404, message);
   }
 
   // Prisma errors
@@ -34,36 +34,44 @@ export const errorHandler = (
     if (error.code === 'P2002') {
       // Unique constraint violation
       const message = 'Duplicate field value entered';
-      error = new ApiError(message, 400);
+      error = new ApiError(400, message);
     } else if (error.code === 'P2025') {
       // Record not found
       const message = 'Resource not found';
-      error = new ApiError(message, 404);
+      error = new ApiError(404, message);
     }
+  }
+
+  // Zod validation errors
+  if (error.name === 'ZodError') {
+    const zodError = error as any;
+    const messages = zodError.errors.map((err: any) => `${err.path.join('.')}: ${err.message}`);
+    const message = messages.join(', ');
+    error = new ApiError(400, message);
   }
 
   // Validation errors
   if (error instanceof ValidationError) {
     const message = Object.values(error.errors).join(', ');
-    error = new ApiError(message, 400);
+    error = new ApiError(400, message);
   }
 
   // JWT errors
   if (error.name === 'JsonWebTokenError') {
     const message = 'Invalid token';
-    error = new ApiError(message, 401);
+    error = new ApiError(401, message);
   }
 
   if (error.name === 'TokenExpiredError') {
     const message = 'Token expired';
-    error = new ApiError(message, 401);
+    error = new ApiError(401, message);
   }
 
   // Multer errors
   if (error.name === 'MulterError') {
-    if (error.code === 'LIMIT_FILE_SIZE') {
+    if ((error as any).code === 'LIMIT_FILE_SIZE') {
       const message = 'File too large';
-      error = new ApiError(message, 400);
+      error = new ApiError(400, message);
     }
   }
 
@@ -72,15 +80,16 @@ export const errorHandler = (
     const message = process.env.NODE_ENV === 'production' 
       ? 'Internal server error' 
       : error.message;
-    error = new ApiError(message, 500);
+    error = new ApiError(500, message);
   }
 
+  // Ensure we always send JSON response
   res.status((error as ApiError).statusCode || 500).json({
     success: false,
     message: error.message,
-    ...(process.env.NODE_ENV === 'development' && { 
-      stack: error.stack,
-      details: error 
-    })
+    error: process.env.NODE_ENV === 'development' ? {
+      name: error.name,
+      stack: error.stack
+    } : undefined
   });
 };

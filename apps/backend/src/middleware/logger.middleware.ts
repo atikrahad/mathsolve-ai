@@ -17,7 +17,7 @@ export const requestLogger = (req: Request, res: Response, next: NextFunction) =
 
   // Override res.end to log response
   const originalEnd = res.end;
-  res.end = function(chunk, encoding) {
+  res.end = function(chunk?: any, encoding?: BufferEncoding | (() => void)) {
     const duration = Date.now() - start;
     const { statusCode } = res;
     
@@ -40,7 +40,11 @@ export const requestLogger = (req: Request, res: Response, next: NextFunction) =
     });
     
     // Call original end method
-    originalEnd.call(this, chunk, encoding);
+    if (typeof encoding === 'function') {
+      return originalEnd.call(this, chunk, encoding);
+    } else {
+      return originalEnd.call(this, chunk, encoding);
+    }
   };
 
   next();

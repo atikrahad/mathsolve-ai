@@ -1,7 +1,8 @@
-import { PrismaClient } from '@prisma/client';
-import { JWTUtils } from '../utils/jwt';
+import { UserRepository } from '../repositories/user.repository';
+import { JWTUtils } from '../utils/jwt-simple';
 import { PasswordUtils } from '../utils/password';
 import { ApiError } from '../utils/errors/ApiError';
+import { AuthServiceErrors } from '../utils/errors/service-errors';
 import { 
   RegisterInput, 
   LoginInput, 
@@ -12,8 +13,6 @@ import {
 import { logger } from '../config/logger';
 import nodemailer from 'nodemailer';
 import { config } from '../config/constants';
-
-const prisma = new PrismaClient();
 
 export interface AuthTokens {
   accessToken: string;
@@ -34,7 +33,9 @@ export interface UserResponse {
 }
 
 export class AuthService {
-  private static emailTransporter = nodemailer.createTransporter({
+  private static userRepository = new UserRepository();
+  
+  private static emailTransporter = nodemailer.createTransport({
     host: config.SMTP_HOST,
     port: config.SMTP_PORT,
     secure: false,
@@ -50,36 +51,26 @@ export class AuthService {
   static async register(input: RegisterInput): Promise<{ user: UserResponse; tokens: AuthTokens }> {
     try {
       // Check if user already exists
-      const existingUser = await prisma.user.findFirst({
-        where: {
-          OR: [
-            { email: input.email },
-            { username: input.username }
-          ]
-        }
-      });
+      const emailExists = await this.userRepository.emailExists(input.email);
+      const usernameExists = await this.userRepository.usernameExists(input.username);
 
-      if (existingUser) {
-        if (existingUser.email === input.email) {
-          throw new ApiError(409, 'User with this email already exists');
-        }
-        if (existingUser.username === input.username) {
-          throw new ApiError(409, 'Username is already taken');
-        }
+      if (emailExists) {
+        throw AuthServiceErrors.userAlreadyExists('email', input.email);
+      }
+      if (usernameExists) {
+        throw AuthServiceErrors.userAlreadyExists('username', input.username);
       }
 
       // Hash password
       const passwordHash = await PasswordUtils.hashPassword(input.password);
 
       // Create user
-      const user = await prisma.user.create({
-        data: {
-          username: input.username,
-          email: input.email,
-          passwordHash,
-          bio: input.bio || null,
-          lastActiveAt: new Date()
-        }
+      const user = await this.userRepository.createUser({
+        username: input.username,
+        email: input.email,
+        passwordHash,
+        provider: 'local',
+        bio: input.bio || undefined
       });
 
       // Generate tokens
@@ -106,25 +97,25 @@ export class AuthService {
   static async login(input: LoginInput): Promise<{ user: UserResponse; tokens: AuthTokens }> {
     try {
       // Find user by email
-      const user = await prisma.user.findUnique({
-        where: { email: input.email }
-      });
+      const user = await this.userRepository.findByEmail(input.email);
 
       if (!user) {
-        throw new ApiError(401, 'Invalid email or password');
+        throw AuthServiceErrors.invalidCredentials();
+      }
+
+      // Check if user is OAuth-only (no password set)
+      if (!user.passwordHash) {
+        throw AuthServiceErrors.oauthAccountOnly();
       }
 
       // Verify password
       const isValidPassword = await PasswordUtils.comparePassword(input.password, user.passwordHash);
       if (!isValidPassword) {
-        throw new ApiError(401, 'Invalid email or password');
+        throw AuthServiceErrors.invalidCredentials();
       }
 
       // Update last active
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { lastActiveAt: new Date() }
-      });
+      await this.userRepository.updateLastActive(user.id);
 
       // Generate tokens
       const tokens = JWTUtils.generateTokenPair(user);
@@ -246,6 +237,11 @@ export class AuthService {
 
       if (!user) {
         throw new ApiError(404, 'User not found');
+      }
+
+      // Check if user has a password (OAuth users might not have one)
+      if (!user.passwordHash) {
+        throw new ApiError(400, 'This account was created with Google. Password change not available.');
       }
 
       // Verify current password

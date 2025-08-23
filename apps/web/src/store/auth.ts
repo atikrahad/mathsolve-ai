@@ -17,6 +17,7 @@ export interface AuthState {
     email: string; 
     password: string; 
   }) => Promise<void>;
+  googleAuth: (token: string) => Promise<{ user: User; isNewUser: boolean }>;
   logout: () => Promise<void>;
   refreshToken: () => Promise<void>;
   clearError: () => void;
@@ -104,6 +105,48 @@ export const useAuthStore = create<AuthState>()(
           }
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || 'Registration failed';
+          set({
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+            error: errorMessage,
+          });
+          throw new Error(errorMessage);
+        }
+      },
+
+      googleAuth: async (token: string) => {
+        set({ isLoading: true, error: null });
+        
+        try {
+          const response = await api.post<ApiResponse<{ user: User; accessToken: string; isNewUser: boolean }>>(
+            '/auth/google/token',
+            { token }
+          );
+
+          if (response.data.success && response.data.data) {
+            const { user, accessToken, isNewUser } = response.data.data;
+            
+            // Store access token in cookie
+            Cookies.set('accessToken', accessToken, {
+              expires: 1/96, // 15 minutes
+              secure: process.env.NODE_ENV === 'production',
+              sameSite: 'strict'
+            });
+
+            set({
+              user,
+              isAuthenticated: true,
+              isLoading: false,
+              error: null,
+            });
+
+            return { user, isNewUser };
+          }
+
+          throw new Error('Invalid response from server');
+        } catch (error: any) {
+          const errorMessage = error.response?.data?.message || 'Google authentication failed';
           set({
             user: null,
             isAuthenticated: false,

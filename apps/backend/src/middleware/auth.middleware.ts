@@ -1,10 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { JWTUtils } from '../utils/jwt';
+import { JWTUtils } from '../utils/jwt-simple';
 import { ApiError } from '../utils/errors/ApiError';
 import { logger } from '../config/logger';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../config/database';
 
 // Extend Request interface to include user
 declare global {

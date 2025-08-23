@@ -22,6 +22,11 @@ export const config = {
   
   // Frontend URL
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
+  
+  // Google OAuth
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
+  GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/google/callback',
 } as const;
 
 // Authentication constants
@@ -113,4 +118,25 @@ export const EMAIL_CONSTANTS = {
   SUPPORT_ADDRESS: process.env.SUPPORT_EMAIL || 'support@mathsolve-ai.com',
   VERIFICATION_EXPIRE: 24 * 60 * 60 * 1000, // 24 hours
   RESET_PASSWORD_EXPIRE: 60 * 60 * 1000, // 1 hour
+} as const;
+
+// Cookie constants
+export const COOKIE_CONSTANTS = {
+  REFRESH_TOKEN_NAME: 'refreshToken',
+  ACCESS_TOKEN_NAME: 'accessToken',
+  REFRESH_TOKEN_MAX_AGE: 7 * 24 * 60 * 60 * 1000, // 7 days
+  ACCESS_TOKEN_MAX_AGE: 15 * 60 * 1000, // 15 minutes
+  SAME_SITE: 'strict' as const,
+  HTTP_ONLY: true,
+  SECURE: config.NODE_ENV === 'production',
+  PATH: '/',
+} as const;
+
+// Server constants
+export const SERVER_CONSTANTS = {
+  DEFAULT_PORT: 3001,
+  BODY_LIMIT: '10mb',
+  REQUEST_TIMEOUT: 30000, // 30 seconds
+  GRACEFUL_SHUTDOWN_TIMEOUT: 30000, // 30 seconds
+  COMPRESSION_THRESHOLD: 1024, // 1KB
 } as const;

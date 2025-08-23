@@ -1,67 +1,20 @@
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
 import dotenv from 'dotenv';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-
+import app from './app';
 import { logger } from './config/logger';
 import { corsOptions } from './config/cors';
-import { rateLimitConfig } from './middleware/rateLimit.middleware';
-import { errorHandler } from './middleware/error.middleware';
-import { requestLogger } from './middleware/logger.middleware';
-import routes from './routes';
 
 // Load environment variables
 dotenv.config();
 
-const app = express();
 const server = createServer(app);
 const io = new Server(server, {
   cors: corsOptions
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3001;
 const NODE_ENV = process.env.NODE_ENV || 'development';
-
-// Security middleware
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "https:"],
-    },
-  },
-  crossOriginEmbedderPolicy: false,
-}));
-
-// CORS
-app.use(cors(corsOptions));
-
-// Body parsing middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// Request logging
-app.use(requestLogger);
-
-// Rate limiting
-app.use(rateLimitConfig);
-
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.status(200).json({
-    status: 'OK',
-    timestamp: new Date().toISOString(),
-    environment: NODE_ENV,
-    version: process.env.npm_package_version || '1.0.0'
-  });
-});
-
-// API routes
-app.use('/api', routes);
 
 // Socket.IO connection handling
 io.on('connection', (socket) => {
@@ -73,18 +26,6 @@ io.on('connection', (socket) => {
   
   // Add more socket event handlers here as needed
 });
-
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'API endpoint not found',
-    path: req.originalUrl
-  });
-});
-
-// Error handling middleware (must be last)
-app.use(errorHandler);
 
 // Graceful shutdown handler
 const gracefulShutdown = () => {
@@ -108,7 +49,23 @@ process.on('SIGINT', gracefulShutdown);
 // Start server
 server.listen(PORT, () => {
   logger.info(`🚀 MathSolve AI Backend running on port ${PORT} in ${NODE_ENV} mode`);
-  logger.info(`📊 Health check available at http://localhost:${PORT}/health`);
+  logger.info(`📊 Health check: http://localhost:${PORT}/health`);
+  logger.info(`🔧 API info: http://localhost:${PORT}/api`);
+  logger.info('');
+  logger.info('Google OAuth Configuration Status:');
+  logger.info(`- GOOGLE_CLIENT_ID: ${process.env.GOOGLE_CLIENT_ID ? '✅ Configured' : '❌ NOT CONFIGURED'}`);
+  logger.info(`- GOOGLE_CLIENT_SECRET: ${process.env.GOOGLE_CLIENT_SECRET ? '✅ Configured' : '❌ NOT CONFIGURED'}`);
+  logger.info(`- GOOGLE_REDIRECT_URI: ${process.env.GOOGLE_REDIRECT_URI || '⚠️  Using default'}`);
+  
+  if (!process.env.GOOGLE_CLIENT_ID) {
+    logger.info('');
+    logger.info('⚠️  To enable real Google OAuth:');
+    logger.info('1. Get credentials from Google Cloud Console');
+    logger.info('2. Add to .env file:');
+    logger.info('   GOOGLE_CLIENT_ID=your-client-id');
+    logger.info('   GOOGLE_CLIENT_SECRET=your-client-secret');
+    logger.info('   GOOGLE_REDIRECT_URI=http://localhost:3002/auth/google/callback');
+  }
 });
 
 export { app, io };
