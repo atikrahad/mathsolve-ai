@@ -66,3 +66,33 @@ export const aiRateLimit = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+// Helper function to create custom rate limiters
+export function createRateLimiter(options: { windowMs: number; max: number; message: string }) {
+  return rateLimit({
+    windowMs: options.windowMs,
+    max: options.max,
+    message: {
+      success: false,
+      message: options.message,
+      retryAfter: Math.ceil(options.windowMs / 1000 / 60), // minutes
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+    handler: (req, res) => {
+      logger.warn('Rate limit exceeded', {
+        ip: req.ip,
+        userAgent: req.get('User-Agent'),
+        url: req.originalUrl,
+        limit: options.max,
+        window: options.windowMs,
+      });
+
+      res.status(429).json({
+        success: false,
+        message: options.message,
+        retryAfter: Math.ceil(options.windowMs / 1000 / 60),
+      });
+    },
+  });
+}

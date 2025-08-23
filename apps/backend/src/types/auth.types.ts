@@ -1,3 +1,5 @@
+import { Request } from 'express';
+
 // Authentication tokens
 export interface AuthTokens {
   accessToken: string;
@@ -113,4 +115,15 @@ export interface AuthMiddlewareOptions {
   required?: boolean;
   roles?: UserRole[];
   skipPaths?: string[];
+}
+
+// Extended Request interface for authenticated requests
+export interface AuthRequest extends Request {
+  user?: {
+    userId: string;
+    username: string;
+    email: string;
+    role?: string;
+  };
+  userId?: string;
 }

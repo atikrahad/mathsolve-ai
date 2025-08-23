@@ -132,6 +132,58 @@ export class ValidationServiceErrors {
   }
 }
 
+// Standard error classes for common use cases
+export class ValidationError extends ServiceError {
+  constructor(message: string, details?: any) {
+    super(400, message, 'Validation', 'validate', details);
+    this.name = 'ValidationError';
+  }
+}
+
+export class NotFoundError extends ServiceError {
+  constructor(
+    message: string = 'Resource not found',
+    service: string = 'Unknown',
+    operation: string = 'find'
+  ) {
+    super(404, message, service, operation);
+    this.name = 'NotFoundError';
+  }
+}
+
+export class ForbiddenError extends ServiceError {
+  constructor(
+    message: string = 'Access forbidden',
+    service: string = 'Unknown',
+    operation: string = 'access'
+  ) {
+    super(403, message, service, operation);
+    this.name = 'ForbiddenError';
+  }
+}
+
+export class UnauthorizedError extends ServiceError {
+  constructor(
+    message: string = 'Unauthorized access',
+    service: string = 'Unknown',
+    operation: string = 'authenticate'
+  ) {
+    super(401, message, service, operation);
+    this.name = 'UnauthorizedError';
+  }
+}
+
+export class ConflictError extends ServiceError {
+  constructor(
+    message: string = 'Resource conflict',
+    service: string = 'Unknown',
+    operation: string = 'create'
+  ) {
+    super(409, message, service, operation);
+    this.name = 'ConflictError';
+  }
+}
+
 // Generic service error factory
 export class ServiceErrorFactory {
   static create(

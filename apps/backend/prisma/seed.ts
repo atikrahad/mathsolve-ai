@@ -1,4 +1,4 @@
-import { PrismaClient, Difficulty, ResourceType } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -17,7 +17,7 @@ interface SeedUser {
 interface SeedProblem {
   title: string;
   description: string;
-  difficulty: keyof typeof Difficulty;
+  difficulty: string;
   category: string;
   tags: string[];
   solution?: string;
@@ -26,7 +26,7 @@ interface SeedProblem {
 interface SeedResource {
   title: string;
   content: string;
-  type: keyof typeof ResourceType;
+  type: string;
   category: string;
   difficulty?: string | null;
 }
@@ -91,9 +91,9 @@ async function main() {
       data: {
         title: problemData.title,
         description: problemData.description,
-        difficulty: Difficulty[problemData.difficulty],
+        difficulty: problemData.difficulty,
         category: problemData.category,
-        tags: problemData.tags,
+        tags: JSON.stringify(problemData.tags),
         solution: problemData.solution,
         creatorId: randomUser.id,
         qualityScore: Math.random() * 5, // Random quality score 0-5
@@ -114,7 +114,7 @@ async function main() {
       data: {
         title: resourceData.title,
         content: resourceData.content,
-        type: ResourceType[resourceData.type],
+        type: resourceData.type,
         category: resourceData.category,
         difficulty: resourceData.difficulty,
         authorId: randomUser.id,
