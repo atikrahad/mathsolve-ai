@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MathRenderer, MathText } from '@/components/ui/math-renderer';
-import { MathEditor } from '@/components/ui/math-editor';
 import { Skeleton } from '@/components/ui/skeleton';
 import problemService from '@/services/problemService';
 import Header from '@/components/layout/Header';
@@ -31,21 +30,14 @@ import {
   Edit,
   Eye,
   Calculator,
-  Send,
   Trophy,
-  Timer,
-  BookOpen
+  BookOpen,
+  GraduationCap,
+  FileText,
+  Award,
+  Sparkles
 } from 'lucide-react';
 
-interface SolutionAttempt {
-  id?: string;
-  answer: string;
-  isCorrect?: boolean;
-  feedback?: string;
-  timeSpent?: number;
-  hintsUsed?: number;
-  submittedAt?: string;
-}
 
 export default function ProblemDetailPage() {
   const params = useParams();
@@ -54,12 +46,6 @@ export default function ProblemDetailPage() {
 
   const [problem, setProblem] = useState<Problem | null>(null);
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [userAnswer, setUserAnswer] = useState('');
-  const [attempts, setAttempts] = useState<SolutionAttempt[]>([]);
-  const [currentAttempt, setCurrentAttempt] = useState<SolutionAttempt | null>(null);
-  const [startTime] = useState(Date.now());
-  const [showSolution, setShowSolution] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
 
@@ -82,62 +68,6 @@ export default function ProblemDetailPage() {
     }
   };
 
-  const handleSubmitAnswer = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!userAnswer.trim() || submitting) return;
-
-    setSubmitting(true);
-    const timeSpent = Math.floor((Date.now() - startTime) / 1000);
-    
-    try {
-      // For now, we'll simulate solution checking
-      // TODO: Implement actual API endpoint for solution checking
-      const isCorrect = checkSolution(userAnswer.trim(), problem?.solution);
-      
-      const attempt: SolutionAttempt = {
-        id: Date.now().toString(),
-        answer: userAnswer.trim(),
-        isCorrect,
-        feedback: isCorrect 
-          ? "Excellent work! Your solution is correct." 
-          : "That's not quite right. Try reviewing the problem and your approach.",
-        timeSpent,
-        hintsUsed: 0,
-        submittedAt: new Date().toISOString()
-      };
-
-      setCurrentAttempt(attempt);
-      setAttempts(prev => [attempt, ...prev]);
-      
-      // If correct, show the solution
-      if (isCorrect) {
-        setShowSolution(true);
-      }
-    } catch (error) {
-      console.error('Failed to submit answer:', error);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  // Simple solution checking (in production, this would be done on the server)
-  const checkSolution = (userAnswer: string, correctSolution?: string): boolean => {
-    if (!correctSolution) return false;
-    
-    // Normalize both answers for comparison
-    const normalize = (str: string) => 
-      str.toLowerCase()
-         .replace(/\s+/g, '')
-         .replace(/[{}]/g, '')
-         .trim();
-    
-    return normalize(userAnswer) === normalize(correctSolution);
-  };
-
-  const handleNewAttempt = () => {
-    setUserAnswer('');
-    setCurrentAttempt(null);
-  };
 
   const handleToggleFavorite = () => {
     setIsFavorited(!isFavorited);
@@ -149,11 +79,6 @@ export default function ProblemDetailPage() {
     // TODO: Implement API call
   };
 
-  const formatTimeSpent = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
 
   if (loading) {
     return (
@@ -311,104 +236,150 @@ export default function ProblemDetailPage() {
               </CardContent>
             </Card>
 
-            {/* Solution Input */}
+            {/* Extended Problem Content */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Calculator className="w-5 h-5" />
-                  Your Solution
-                  {currentAttempt?.isCorrect && (
-                    <Badge className="bg-green-100 text-green-800">Correct!</Badge>
-                  )}
+                  <FileText className="w-5 h-5" />
+                  Detailed Analysis
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {!currentAttempt ? (
-                  <form onSubmit={handleSubmitAnswer} className="space-y-4">
-                    <MathEditor
-                      value={userAnswer}
-                      onChange={setUserAnswer}
-                      placeholder="Enter your solution using mathematical notation..."
-                      showPreview={true}
-                      showShortcuts={true}
-                      rows={6}
-                    />
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Timer className="w-4 h-4" />
-                        <span>Time: {formatTimeSpent(Math.floor((Date.now() - startTime) / 1000))}</span>
-                      </div>
-                      <Button 
-                        type="submit" 
-                        disabled={submitting || !userAnswer.trim()}
-                        className="flex items-center gap-2"
-                      >
-                        <Send className="w-4 h-4" />
-                        {submitting ? 'Submitting...' : 'Submit Solution'}
-                      </Button>
-                    </div>
-                  </form>
-                ) : (
-                  <div className="space-y-4">
-                    {/* Attempt Result */}
-                    <div className={`p-4 rounded-lg border ${
-                      currentAttempt.isCorrect 
-                        ? 'bg-green-50 border-green-200' 
-                        : 'bg-red-50 border-red-200'
-                    }`}>
-                      <div className="flex items-center gap-2 mb-2">
-                        {currentAttempt.isCorrect ? (
-                          <CheckCircle className="w-5 h-5 text-green-600" />
-                        ) : (
-                          <XCircle className="w-5 h-5 text-red-600" />
-                        )}
-                        <span className={`font-semibold ${
-                          currentAttempt.isCorrect ? 'text-green-800' : 'text-red-800'
-                        }`}>
-                          {currentAttempt.isCorrect ? 'Correct!' : 'Incorrect'}
-                        </span>
-                      </div>
-                      <p className={`text-sm ${
-                        currentAttempt.isCorrect ? 'text-green-700' : 'text-red-700'
-                      }`}>
-                        {currentAttempt.feedback}
-                      </p>
-                    </div>
-
-                    {/* Your Answer */}
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <h4 className="font-medium text-gray-900 mb-2">Your Answer:</h4>
-                      <MathText className="text-lg">{currentAttempt.answer}</MathText>
-                    </div>
-
-                    {/* Try Again Button */}
-                    {!currentAttempt.isCorrect && (
-                      <Button onClick={handleNewAttempt} className="w-full">
-                        Try Again
-                      </Button>
-                    )}
+                <div className="space-y-4">
+                  <div className="prose max-w-none">
+                    <h4 className="font-semibold text-gray-900 mb-3">Problem Context</h4>
+                    <MathText className="text-base leading-relaxed">{problem.description}</MathText>
                   </div>
-                )}
+                  
+                  <div className="grid md:grid-cols-3 gap-4 pt-4 border-t">
+                    <div className="text-center p-3 bg-blue-50 rounded-lg">
+                      <div className="text-2xl font-bold text-blue-600">{difficultyInfo?.level || 'N/A'}</div>
+                      <div className="text-sm text-blue-700">Difficulty Level</div>
+                    </div>
+                    <div className="text-center p-3 bg-green-50 rounded-lg">
+                      <div className="text-2xl font-bold text-green-600">{problem.viewCount || 0}</div>
+                      <div className="text-sm text-green-700">Total Views</div>
+                    </div>
+                    <div className="text-center p-3 bg-purple-50 rounded-lg">
+                      <div className="text-2xl font-bold text-purple-600">{problem.attemptCount || 0}</div>
+                      <div className="text-sm text-purple-700">Attempts Made</div>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
-            {/* Official Solution */}
-            {(showSolution || currentAttempt?.isCorrect) && problem.solution && (
+            {/* Learning Objectives */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="w-5 h-5" />
+                  Learning Objectives
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-medium text-gray-900">Understanding Concepts</h4>
+                      <p className="text-gray-600 text-sm">Grasp the fundamental mathematical concepts underlying this {categoryInfo?.name.toLowerCase()} problem.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 rounded-full bg-green-500 mt-2 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-medium text-gray-900">Problem-Solving Skills</h4>
+                      <p className="text-gray-600 text-sm">Develop systematic approaches to analyze and solve similar problems.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 rounded-full bg-purple-500 mt-2 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-medium text-gray-900">Mathematical Reasoning</h4>
+                      <p className="text-gray-600 text-sm">Strengthen logical thinking and mathematical proof techniques.</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Solution Explanation */}
+            {problem.solution && (
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Trophy className="w-5 h-5 text-yellow-600" />
-                    Official Solution
+                    <GraduationCap className="w-5 h-5 text-blue-600" />
+                    Solution & Explanation
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <MathText className="text-lg leading-relaxed">{problem.solution}</MathText>
+                  <div className="space-y-4">
+                    <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
+                      <h4 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
+                        <Sparkles className="w-4 h-4" />
+                        Complete Solution
+                      </h4>
+                      <MathText className="text-lg leading-relaxed">{problem.solution}</MathText>
+                    </div>
+                    
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <h5 className="font-semibold text-green-800 mb-2">Key Concepts</h5>
+                        <ul className="text-sm text-green-700 space-y-1">
+                          <li>• {categoryInfo?.name} fundamentals</li>
+                          <li>• Step-by-step methodology</li>
+                          <li>• Mathematical reasoning</li>
+                        </ul>
+                      </div>
+                      <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <h5 className="font-semibold text-yellow-800 mb-2">Difficulty Level</h5>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className={`${difficultyInfo?.color} border-current`}>
+                            {difficultyInfo?.name}
+                          </Badge>
+                          <span className="text-sm text-yellow-700">
+                            Requires {problem.difficulty.toLowerCase()} level understanding
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
             )}
+
+            {/* Hints & Tips */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Lightbulb className="w-5 h-5 text-amber-600" />
+                  Helpful Hints & Tips
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="p-4 bg-amber-50 border-l-4 border-amber-400 rounded-r-lg">
+                    <h4 className="font-medium text-amber-800 mb-2">Approach Strategy</h4>
+                    <p className="text-amber-700 text-sm">
+                      Start by identifying the key elements in the problem statement and organize the given information systematically.
+                    </p>
+                  </div>
+                  <div className="p-4 bg-indigo-50 border-l-4 border-indigo-400 rounded-r-lg">
+                    <h4 className="font-medium text-indigo-800 mb-2">Common Mistakes</h4>
+                    <p className="text-indigo-700 text-sm">
+                      Pay attention to units, signs, and boundary conditions. Double-check your calculations and verify your answer makes sense.
+                    </p>
+                  </div>
+                  <div className="p-4 bg-emerald-50 border-l-4 border-emerald-400 rounded-r-lg">
+                    <h4 className="font-medium text-emerald-800 mb-2">Extension Ideas</h4>
+                    <p className="text-emerald-700 text-sm">
+                      Consider how this problem relates to other {categoryInfo?.name.toLowerCase()} concepts and explore variations or generalizations.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Sidebar */}
@@ -436,53 +407,41 @@ export default function ProblemDetailPage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Star className="w-4 h-4 text-gray-500" />
-                      <span className="text-sm">Quality Score</span>
+                      <TrendingUp className="w-4 h-4 text-gray-500" />
+                      <span className="text-sm">Success Rate</span>
                     </div>
-                    <span className="font-semibold">{problem.qualityScore?.toFixed(1) || 'N/A'}</span>
+                    <span className="font-semibold">{problem.qualityScore ? `${(problem.qualityScore * 10).toFixed(0)}%` : 'N/A'}</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Your Attempts */}
-            {attempts.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Your Attempts</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3 max-h-64 overflow-y-auto">
-                    {attempts.map((attempt) => (
-                      <div key={attempt.id} className="p-3 border rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            {attempt.isCorrect ? (
-                              <CheckCircle className="w-4 h-4 text-green-600" />
-                            ) : (
-                              <XCircle className="w-4 h-4 text-red-600" />
-                            )}
-                            <span className={`text-sm font-medium ${
-                              attempt.isCorrect ? 'text-green-800' : 'text-red-800'
-                            }`}>
-                              {attempt.isCorrect ? 'Correct' : 'Incorrect'}
-                            </span>
-                          </div>
-                          {attempt.timeSpent && (
-                            <span className="text-xs text-gray-500">
-                              {formatTimeSpent(attempt.timeSpent)}
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-xs text-gray-600">
-                          <MathText>{attempt.answer}</MathText>
-                        </div>
+            {/* Related Topics */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Award className="w-5 h-5 text-purple-600" />
+                  Related Topics
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-2 gap-3">
+                  {[
+                    `Advanced ${categoryInfo?.name}`,
+                    'Problem Solving Strategies',
+                    'Mathematical Proofs',
+                    'Real-World Applications'
+                  ].map((topic, index) => (
+                    <div key={index} className="p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-purple-500" />
+                        <span className="text-sm font-medium text-gray-800">{topic}</span>
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

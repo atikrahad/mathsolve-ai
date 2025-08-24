@@ -8,6 +8,8 @@ import {
   ProblemDifficulty,
   PROBLEM_CATEGORIES,
   PROBLEM_DIFFICULTIES,
+  PROBLEM_CATEGORY_INFO,
+  PROBLEM_DIFFICULTY_INFO,
   CreateProblemData
 } from '@/types/problem';
 import problemService from '@/services/problemService';
@@ -20,6 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { MathText } from '@/components/ui/math-renderer';
+import { MathEditor } from '@/components/ui/math-editor';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import {
@@ -43,7 +46,8 @@ import {
   Info,
   Star,
   TrendingUp,
-  Users
+  Users,
+  Calculator
 } from 'lucide-react';
 
 export default function CreateProblemPage() {
@@ -87,7 +91,20 @@ export default function CreateProblemPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('Form submission attempt:', {
+      title: title.length,
+      description: description.length,
+      content: content.length,
+      category,
+      difficulty,
+      tagsCount: tags.length,
+      tags
+    });
+    
     if (!validateForm()) {
+      console.log('Form validation failed:', errors);
+      alert('Please fill out all required fields:\n' + 
+        Object.entries(errors).map(([field, error]) => `• ${field}: ${error}`).join('\n'));
       return;
     }
     
@@ -109,11 +126,40 @@ export default function CreateProblemPage() {
       
       console.log('Problem created successfully:', createdProblem);
       
-      // Redirect to the created problem page
-      router.push(`/problems/${createdProblem.id}`);
-    } catch (error) {
+      // Show success message
+      alert(`✅ Problem Created Successfully!\\n\\nTitle: ${problemData.title}\\nCategory: ${PROBLEM_CATEGORY_INFO[problemData.category]?.name}\\nDifficulty: ${PROBLEM_DIFFICULTY_INFO[problemData.difficulty]?.name}\\nProblem ID: ${createdProblem.id}\\n\\n✨ Your problem has been saved to the database!`);
+      
+      // Reset form or redirect
+      const shouldReset = confirm('Would you like to create another problem?');
+      if (shouldReset) {
+        // Reset form
+        setTitle('');
+        setDescription('');
+        setContent('');
+        setCategory('');
+        setDifficulty('');
+        setTags([]);
+        setSolution('');
+        setNewTag('');
+      } else {
+        // Redirect to the created problem page
+        router.push(`/problems/${createdProblem.id}`);
+      }
+    } catch (error: any) {
       console.error('Failed to create problem:', error);
-      alert('Failed to create problem. Please check the console for details.');
+      let errorMessage = 'Failed to create problem. ';
+      
+      if (error.response?.status === 401) {
+        errorMessage += 'Please log in to create problems.';
+      } else if (error.response?.status === 400) {
+        errorMessage += 'Invalid problem data. Please check all fields.';
+      } else if (error.code === 'NETWORK_ERROR' || error.message?.includes('Network Error')) {
+        errorMessage += 'Backend server is not running. Please start the backend server.';
+      } else {
+        errorMessage += `Error: ${error.message || 'Unknown error occurred'}`;
+      }
+      
+      alert('❌ ' + errorMessage);
     } finally {
       setSubmitting(false);
     }
@@ -168,9 +214,9 @@ export default function CreateProblemPage() {
   const progressPercentage = ((steps.filter(step => step.completed).length) / steps.length) * 100;
 
   return (
-    <div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
       <Header />
-      <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Header */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-8 mb-8 shadow-xl">
@@ -232,6 +278,19 @@ export default function CreateProblemPage() {
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
           {/* Main Form */}
           <div className="xl:col-span-3">
+            {/* Backend Integration Notice */}
+            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl">
+              <div className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5" />
+                <div className="text-sm">
+                  <p className="font-semibold text-green-900 mb-1">✨ Backend Integrated</p>
+                  <p className="text-green-700">
+                    Problems will be saved to the database. Fill out required fields marked with <Star className="w-3 h-3 text-amber-500 inline mx-1" /> to create.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Step 1: Problem Information */}
               <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
@@ -280,15 +339,17 @@ export default function CreateProblemPage() {
 
                   {/* Description */}
                   <div className="space-y-2">
-                    <Label htmlFor="description" className="text-lg font-semibold text-gray-900">
-                      Problem Description
+                    <Label htmlFor="description" className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                      Problem Description 
+                      <Star className="w-4 h-4 text-amber-500" />
                     </Label>
-                    <Textarea
-                      id="description"
+                    <MathEditor
                       value={description}
-                      onChange={(e) => setDescription(e.target.value)}
+                      onChange={setDescription}
                       placeholder="Provide context, background, and what students should know before attempting this problem..."
-                      className="min-h-[120px] bg-white border-2 focus:border-blue-400 focus:ring-4 focus:ring-blue-100 transition-all resize-none"
+                      showPreview={true}
+                      showShortcuts={false}
+                      rows={4}
                     />
                     <div className="flex justify-between items-center">
                       {errors.description ? (
@@ -311,25 +372,31 @@ export default function CreateProblemPage() {
                   {/* Category and Difficulty */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <Label className="text-lg font-semibold text-gray-900">Category</Label>
+                      <Label className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                      Category 
+                      <Star className="w-4 h-4 text-amber-500" />
+                    </Label>
                       <Select value={category} onValueChange={(value) => setCategory(value as ProblemCategory)}>
                         <SelectTrigger className="h-12 bg-white border-2 focus:border-blue-400 focus:ring-4 focus:ring-blue-100">
                           <SelectValue placeholder="Choose a mathematics category" />
                         </SelectTrigger>
                         <SelectContent>
-                          {Object.entries(PROBLEM_CATEGORIES).map(([key, cat]) => (
-                            <SelectItem key={key} value={key} className="py-3">
-                              <div className="flex items-center gap-3">
-                                <div className={`w-8 h-8 rounded-lg ${cat.color} flex items-center justify-center`}>
-                                  <span className="text-white text-lg">{cat.icon}</span>
+                          {PROBLEM_CATEGORIES.map((cat) => {
+                            const info = PROBLEM_CATEGORY_INFO[cat];
+                            return (
+                              <SelectItem key={cat} value={cat} className="py-3">
+                                <div className="flex items-center gap-3">
+                                  <div className={`w-8 h-8 rounded-lg ${info.color} flex items-center justify-center`}>
+                                    <span className="text-white text-lg">{info.icon}</span>
+                                  </div>
+                                  <div>
+                                    <div className="font-medium">{info.name}</div>
+                                    <div className="text-xs text-gray-500">{info.description}</div>
+                                  </div>
                                 </div>
-                                <div>
-                                  <div className="font-medium">{cat.name}</div>
-                                  <div className="text-xs text-gray-500">{cat.description}</div>
-                                </div>
-                              </div>
-                            </SelectItem>
-                          ))}
+                              </SelectItem>
+                            );
+                          })}
                         </SelectContent>
                       </Select>
                       {errors.category && (
@@ -341,30 +408,36 @@ export default function CreateProblemPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label className="text-lg font-semibold text-gray-900">Difficulty Level</Label>
+                      <Label className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                      Difficulty Level 
+                      <Star className="w-4 h-4 text-amber-500" />
+                    </Label>
                       <Select value={difficulty} onValueChange={(value) => setDifficulty(value as ProblemDifficulty)}>
                         <SelectTrigger className="h-12 bg-white border-2 focus:border-blue-400 focus:ring-4 focus:ring-blue-100">
                           <SelectValue placeholder="Select difficulty level" />
                         </SelectTrigger>
                         <SelectContent>
-                          {Object.entries(PROBLEM_DIFFICULTIES).map(([key, diff]) => (
-                            <SelectItem key={key} value={key} className="py-3">
-                              <div className="flex items-center gap-3">
-                                <div className="flex">
-                                  {[...Array(diff.level)].map((_, i) => (
-                                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                                  ))}
-                                  {[...Array(5 - diff.level)].map((_, i) => (
-                                    <Star key={i} className="w-4 h-4 text-gray-300" />
-                                  ))}
+                          {PROBLEM_DIFFICULTIES.map((diff) => {
+                            const info = PROBLEM_DIFFICULTY_INFO[diff];
+                            return (
+                              <SelectItem key={diff} value={diff} className="py-3">
+                                <div className="flex items-center gap-3">
+                                  <div className="flex">
+                                    {[...Array(info.level)].map((_, i) => (
+                                      <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                                    ))}
+                                    {[...Array(3 - info.level)].map((_, i) => (
+                                      <Star key={i + info.level} className="w-4 h-4 text-gray-300" />
+                                    ))}
+                                  </div>
+                                  <div>
+                                    <div className="font-medium">{info.name}</div>
+                                    <div className="text-xs text-gray-500">{info.description}</div>
+                                  </div>
                                 </div>
-                                <div>
-                                  <div className="font-medium">{diff.name}</div>
-                                  <div className="text-xs text-gray-500">{diff.description}</div>
-                                </div>
-                              </div>
-                            </SelectItem>
-                          ))}
+                              </SelectItem>
+                            );
+                          })}
                         </SelectContent>
                       </Select>
                       {errors.difficulty && (
@@ -388,7 +461,7 @@ export default function CreateProblemPage() {
                       </div>
                       <div>
                         <CardTitle className="text-xl text-gray-900">Problem Statement</CardTitle>
-                        <p className="text-sm text-gray-600 mt-1">Write the actual problem and add relevant tags</p>
+                        <p className="text-sm text-gray-600 mt-1">Write the actual mathematical problem with full LaTeX support</p>
                       </div>
                     </div>
                     <Badge variant={steps[1].completed ? "default" : "outline"} className="px-3">
@@ -399,15 +472,17 @@ export default function CreateProblemPage() {
                 
                 <CardContent className="p-8 space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="content" className="text-lg font-semibold text-gray-900">
-                      Problem Content
+                    <Label htmlFor="content" className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                      Problem Content 
+                      <Star className="w-4 h-4 text-amber-500" />
                     </Label>
-                    <Textarea
-                      id="content"
+                    <MathEditor
                       value={content}
-                      onChange={(e) => setContent(e.target.value)}
+                      onChange={setContent}
                       placeholder="Write the mathematical problem here. Use LaTeX for formulas: $f(x) = x^2 + 2x + 1$"
-                      className="min-h-[200px] font-mono bg-white border-2 focus:border-green-400 focus:ring-4 focus:ring-green-100 transition-all resize-none"
+                      showPreview={true}
+                      showShortcuts={true}
+                      rows={8}
                     />
                     {errors.content && (
                       <div className="flex items-center gap-2 text-red-600">
@@ -415,39 +490,14 @@ export default function CreateProblemPage() {
                         <span className="text-sm">{errors.content}</span>
                       </div>
                     )}
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <div className="flex items-start gap-3">
-                        <Info className="w-5 h-5 text-blue-600 mt-0.5" />
-                        <div className="text-sm">
-                          <p className="font-medium text-blue-900 mb-1">LaTeX Examples:</p>
-                          <div className="space-y-1 text-blue-700 font-mono">
-                            <p>• Inline: $x^2 + y^2 = r^2$</p>
-                            <p>• Display: $$\int_0^1 x^2 dx = \frac{'{1}{3}'}$$</p>
-                            <p>• Fraction: $\frac{'{a}{b}'}$, Square root: $\sqrt{'{x}'}$</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
                   </div>
-
-                  {/* Live Preview */}
-                  {content && (
-                    <div className="space-y-2">
-                      <Label className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                        Live Preview
-                        <Eye className="w-4 h-4 text-blue-500" />
-                      </Label>
-                      <div className="p-6 border-2 border-dashed border-gray-200 rounded-xl bg-gradient-to-r from-gray-50 to-blue-50/30">
-                        <div className="text-lg">
-                          <MathText>{content}</MathText>
-                        </div>
-                      </div>
-                    </div>
-                  )}
 
                   {/* Tags */}
                   <div className="space-y-4">
-                    <Label className="text-lg font-semibold text-gray-900">Tags</Label>
+                    <Label className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                      Tags 
+                      <Star className="w-4 h-4 text-amber-500" />
+                    </Label>
                     <div className="flex gap-3">
                       <Input
                         value={newTag}
@@ -500,7 +550,7 @@ export default function CreateProblemPage() {
                 </CardContent>
               </Card>
 
-              {/* Step 3: Enhancement (Hints & Solution) */}
+              {/* Step 3: Solution */}
               <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
                 <CardHeader className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-b border-purple-100">
                   <div className="flex items-center justify-between">
@@ -509,8 +559,8 @@ export default function CreateProblemPage() {
                         <Lightbulb className="w-5 h-5 text-purple-600" />
                       </div>
                       <div>
-                        <CardTitle className="text-xl text-gray-900">Enhance Learning</CardTitle>
-                        <p className="text-sm text-gray-600 mt-1">Add hints and solutions to help learners (optional)</p>
+                        <CardTitle className="text-xl text-gray-900">Solution</CardTitle>
+                        <p className="text-sm text-gray-600 mt-1">Provide the complete step-by-step solution (optional)</p>
                       </div>
                     </div>
                     <Badge variant="outline" className="px-3">
@@ -519,184 +569,26 @@ export default function CreateProblemPage() {
                   </div>
                 </CardHeader>
                 
-                <CardContent className="p-8 space-y-8">
-                  {/* Hints */}
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <Label className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                        Progressive Hints
-                        <Zap className="w-4 h-4 text-purple-500" />
-                      </Label>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={addHint}
-                        className="border-purple-200 text-purple-700 hover:bg-purple-50"
-                      >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Hint
-                      </Button>
-                    </div>
-
-                    <div className="space-y-4">
-                      {hints.map((hint, index) => (
-                        <div key={index} className="group p-4 border-2 border-purple-100 rounded-xl hover:border-purple-200 transition-colors">
-                          <div className="flex gap-4">
-                            <div className="flex-1 space-y-3">
-                              <div className="flex items-center gap-2">
-                                <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
-                                  Hint #{index + 1}
-                                </Badge>
-                              </div>
-                              <Textarea
-                                value={hint}
-                                onChange={(e) => updateHint(index, e.target.value)}
-                                placeholder="Enter a helpful hint..."
-                                className="bg-white border-purple-200 focus:border-purple-400 focus:ring-purple-100 resize-none"
-                                rows={3}
-                              />
-                              {hint && (
-                                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                                  <div className="text-xs font-medium text-yellow-800 mb-1">Preview:</div>
-                                  <div className="text-sm">
-                                    <MathText>{hint}</MathText>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                            {hints.length > 1 && (
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                onClick={() => removeHint(index)}
-                                className="self-start text-red-600 hover:text-red-700 hover:bg-red-50"
-                              >
-                                <X className="w-4 h-4" />
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Solution */}
+                <CardContent className="p-8 space-y-6">
                   <div className="space-y-4">
                     <Label className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                       Official Solution
                       <CheckCircle2 className="w-4 h-4 text-green-500" />
                     </Label>
-                    <Textarea
+                    <MathEditor
                       value={solution}
-                      onChange={(e) => setSolution(e.target.value)}
+                      onChange={setSolution}
                       placeholder="Provide a complete step-by-step solution..."
-                      className="min-h-[150px] font-mono bg-white border-2 focus:border-green-400 focus:ring-4 focus:ring-green-100 resize-none"
+                      showPreview={true}
+                      showShortcuts={true}
+                      rows={6}
                     />
-                    {solution && (
-                      <div className="p-6 bg-green-50 border border-green-200 rounded-xl">
-                        <div className="text-sm font-medium text-green-800 mb-3 flex items-center gap-2">
-                          <CheckCircle2 className="w-4 h-4" />
-                          Solution Preview
-                        </div>
-                        <div className="prose">
-                          <MathText>{solution}</MathText>
-                        </div>
-                      </div>
-                    )}
                   </div>
-                </CardContent>
-              </Card>
-
-              {/* Step 4: Publishing Options */}
-              <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-                <CardHeader className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-b border-amber-100">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-amber-100 rounded-lg">
-                        <Globe className="w-5 h-5 text-amber-600" />
-                      </div>
-                      <div>
-                        <CardTitle className="text-xl text-gray-900">Publishing Options</CardTitle>
-                        <p className="text-sm text-gray-600 mt-1">Choose how to share your problem with the community</p>
-                      </div>
-                    </div>
-                    <Badge variant="outline" className="px-3">
-                      Step 4
-                    </Badge>
-                  </div>
-                </CardHeader>
-                
-                <CardContent className="p-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Draft Option */}
-                    <div className={`p-6 rounded-xl border-2 transition-all cursor-pointer ${
-                      !isPublished 
-                        ? 'border-blue-400 bg-blue-50 ring-4 ring-blue-100' 
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`} onClick={() => setIsPublished(false)}>
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                          <Lock className="w-5 h-5 text-gray-600" />
-                          <span className="font-semibold text-gray-900">Save as Draft</span>
-                        </div>
-                        <div className={`w-4 h-4 rounded-full border-2 ${
-                          !isPublished ? 'border-blue-400 bg-blue-400' : 'border-gray-300'
-                        }`}></div>
-                      </div>
-                      <p className="text-sm text-gray-600 mb-3">
-                        Keep your problem private while you perfect it. You can publish it later.
-                      </p>
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <Users className="w-3 h-3" />
-                        Only visible to you
-                      </div>
-                    </div>
-
-                    {/* Publish Option */}
-                    <div className={`p-6 rounded-xl border-2 transition-all cursor-pointer ${
-                      isPublished 
-                        ? 'border-green-400 bg-green-50 ring-4 ring-green-100' 
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`} onClick={() => setIsPublished(true)}>
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                          <Globe className="w-5 h-5 text-green-600" />
-                          <span className="font-semibold text-gray-900">Publish Now</span>
-                        </div>
-                        <div className={`w-4 h-4 rounded-full border-2 ${
-                          isPublished ? 'border-green-400 bg-green-400' : 'border-gray-300'
-                        }`}></div>
-                      </div>
-                      <p className="text-sm text-gray-600 mb-3">
-                        Share immediately with the community. Others can discover and solve your problem.
-                      </p>
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <TrendingUp className="w-3 h-3" />
-                        Public and discoverable
-                      </div>
-                    </div>
-                  </div>
-
-                  {!isPublished && (
-                    <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-                      <div className="flex items-start gap-3">
-                        <Info className="w-5 h-5 text-blue-600 mt-0.5" />
-                        <div className="text-sm">
-                          <p className="font-medium text-blue-900 mb-1">Draft Mode Benefits</p>
-                          <ul className="text-blue-700 space-y-1 text-xs">
-                            <li>• Review and edit before sharing</li>
-                            <li>• Test with friends first</li>
-                            <li>• Perfect the difficulty level</li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
 
               {/* Submit Section */}
-              <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 p-6 -mx-4 rounded-t-2xl shadow-lg">
+              <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 p-6 rounded-t-2xl shadow-lg">
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Link href="/problems" className="sm:w-auto">
                     <Button type="button" variant="outline" className="w-full sm:w-auto border-gray-300 text-gray-700 hover:bg-gray-50">
@@ -707,11 +599,7 @@ export default function CreateProblemPage() {
                   <Button
                     type="submit"
                     disabled={submitting}
-                    className={`flex-1 h-12 text-lg font-semibold ${
-                      isPublished 
-                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700' 
-                        : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700'
-                    } shadow-lg hover:shadow-xl transition-all`}
+                    className="flex-1 h-12 text-lg font-semibold bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl transition-all"
                   >
                     {submitting ? (
                       <div className="flex items-center gap-3">
@@ -720,8 +608,8 @@ export default function CreateProblemPage() {
                       </div>
                     ) : (
                       <div className="flex items-center gap-3">
-                        {isPublished ? <Globe className="w-5 h-5" /> : <Save className="w-5 h-5" />}
-                        {isPublished ? 'Publish Problem' : 'Save as Draft'}
+                        <Save className="w-5 h-5" />
+                        Create Problem
                         <Sparkles className="w-4 h-4" />
                       </div>
                     )}
@@ -764,14 +652,14 @@ export default function CreateProblemPage() {
                     <div className="flex gap-2">
                       {category ? (
                         <Badge variant="outline" className="bg-white/80">
-                          {PROBLEM_CATEGORIES[category]?.name}
+                          {PROBLEM_CATEGORY_INFO[category]?.name}
                         </Badge>
                       ) : (
                         <div className="h-5 w-16 bg-gray-200 rounded animate-pulse"></div>
                       )}
                       {difficulty && (
-                        <Badge variant="outline" className={`${PROBLEM_DIFFICULTIES[difficulty]?.color} border-current bg-white/80`}>
-                          {PROBLEM_DIFFICULTIES[difficulty]?.name}
+                        <Badge variant="outline" className={`${PROBLEM_DIFFICULTY_INFO[difficulty]?.color} border-current bg-white/80`}>
+                          {PROBLEM_DIFFICULTY_INFO[difficulty]?.name}
                         </Badge>
                       )}
                     </div>
@@ -811,7 +699,7 @@ export default function CreateProblemPage() {
               </CardContent>
             </Card>
 
-            {/* Enhanced Tips */}
+            {/* Pro Tips */}
             <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
@@ -832,10 +720,10 @@ export default function CreateProblemPage() {
 
                 <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl">
                   <div className="flex items-start gap-3">
-                    <Lightbulb className="w-5 h-5 text-green-600 mt-0.5" />
+                    <Calculator className="w-5 h-5 text-green-600 mt-0.5" />
                     <div className="text-sm">
-                      <p className="font-semibold text-green-900 mb-1">Progressive Hints</p>
-                      <p className="text-green-700">Start with gentle nudges, get more specific with each hint.</p>
+                      <p className="font-semibold text-green-900 mb-1">LaTeX Math Editor</p>
+                      <p className="text-green-700">Use the math editor with shortcuts like Ctrl+/ for division, Ctrl+Shift+6 for powers.</p>
                     </div>
                   </div>
                 </div>
@@ -844,18 +732,8 @@ export default function CreateProblemPage() {
                   <div className="flex items-start gap-3">
                     <Star className="w-5 h-5 text-purple-600 mt-0.5" />
                     <div className="text-sm">
-                      <p className="font-semibold text-purple-900 mb-1">LaTeX Magic</p>
-                      <p className="text-purple-700">Use LaTeX for beautiful math. Try $\frac{'{a}{b}'}$ or $\sqrt{'{x}'}$</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl">
-                  <div className="flex items-start gap-3">
-                    <TrendingUp className="w-5 h-5 text-amber-600 mt-0.5" />
-                    <div className="text-sm">
-                      <p className="font-semibold text-amber-900 mb-1">Engaging Content</p>
-                      <p className="text-amber-700">Add context or real-world applications to make it interesting.</p>
+                      <p className="font-semibold text-purple-900 mb-1">Preview Feature</p>
+                      <p className="text-purple-700">Always check the preview to see how your math formulas will render.</p>
                     </div>
                   </div>
                 </div>
@@ -864,7 +742,6 @@ export default function CreateProblemPage() {
           </div>
         </div>
       </div>
-      </main>
     </div>
   );
 }
