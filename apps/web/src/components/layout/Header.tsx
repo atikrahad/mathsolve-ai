@@ -107,7 +107,7 @@ export default function Header() {
                       <Avatar className="h-10 w-10">
                         <AvatarImage src={user.profileImage || undefined} alt={user.username} />
                         <AvatarFallback className="bg-blue-100 text-blue-600">
-                          {user.username.charAt(0).toUpperCase()}
+                          {user.username?.charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                     </Button>
