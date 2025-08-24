@@ -184,6 +184,60 @@ export class UserController {
   }
 
   /**
+   * Get user followers
+   */
+  static async getFollowers(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 20;
+
+      const followers = await UserController.userService.getFollowers(id, { page, limit });
+
+      ResponseUtil.success(res, {
+        message: 'Followers retrieved successfully',
+        data: followers,
+      });
+    } catch (error) {
+      logger.error('Error getting followers:', error);
+
+      if (error instanceof ApiError) {
+        ResponseUtil.error(res, error.message, error.statusCode);
+        return;
+      }
+
+      ResponseUtil.error(res, 'Failed to get followers', 500);
+    }
+  }
+
+  /**
+   * Get user following
+   */
+  static async getFollowing(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 20;
+
+      const following = await UserController.userService.getFollowing(id, { page, limit });
+
+      ResponseUtil.success(res, {
+        message: 'Following retrieved successfully',
+        data: following,
+      });
+    } catch (error) {
+      logger.error('Error getting following:', error);
+
+      if (error instanceof ApiError) {
+        ResponseUtil.error(res, error.message, error.statusCode);
+        return;
+      }
+
+      ResponseUtil.error(res, 'Failed to get following', 500);
+    }
+  }
+
+  /**
    * Search users
    */
   static async searchUsers(req: Request, res: Response): Promise<void> {

@@ -228,6 +228,46 @@ export class UserService {
   }
 
   /**
+   * Get user followers
+   */
+  async getFollowers(userId: string, options: { page: number; limit: number }) {
+    const { page = 1, limit = 20 } = options;
+    const skip = (page - 1) * limit;
+
+    // Placeholder implementation - will implement when following system database schema is ready
+    // For now, return empty results with proper structure
+    return {
+      users: [] as any[],
+      pagination: {
+        page,
+        limit,
+        total: 0,
+        totalPages: 0,
+      },
+    };
+  }
+
+  /**
+   * Get user following
+   */
+  async getFollowing(userId: string, options: { page: number; limit: number }) {
+    const { page = 1, limit = 20 } = options;
+    const skip = (page - 1) * limit;
+
+    // Placeholder implementation - will implement when following system database schema is ready
+    // For now, return empty results with proper structure
+    return {
+      users: [] as any[],
+      pagination: {
+        page,
+        limit,
+        total: 0,
+        totalPages: 0,
+      },
+    };
+  }
+
+  /**
    * Search users
    */
   async searchUsers(query: UserSearchQuery): Promise<UserSearchResult> {
