@@ -7,8 +7,10 @@ import {
   ProblemCategory,
   ProblemDifficulty,
   PROBLEM_CATEGORIES,
-  PROBLEM_DIFFICULTIES
+  PROBLEM_DIFFICULTIES,
+  CreateProblemData
 } from '@/types/problem';
+import problemService from '@/services/problemService';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -91,31 +93,27 @@ export default function CreateProblemPage() {
     
     setSubmitting(true);
     try {
-      // Filter out empty hints
-      const filteredHints = hints.filter(hint => hint.trim());
-      
-      const problemData = {
+      const problemData: CreateProblemData = {
         title,
         description,
-        content,
         category: category as ProblemCategory,
         difficulty: difficulty as ProblemDifficulty,
         tags,
         solution: solution.trim() || undefined,
-        hints: filteredHints,
-        isPublished,
       };
 
-      // Here you would normally call the API
-      console.log('Problem data:', problemData);
-      alert('Problem would be created here! Check console for data.');
+      console.log('Creating problem with data:', problemData);
       
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Call the API to create the problem
+      const createdProblem = await problemService.createProblem(problemData);
       
-      // router.push('/problems');
+      console.log('Problem created successfully:', createdProblem);
+      
+      // Redirect to the created problem page
+      router.push(`/problems/${createdProblem.id}`);
     } catch (error) {
       console.error('Failed to create problem:', error);
+      alert('Failed to create problem. Please check the console for details.');
     } finally {
       setSubmitting(false);
     }

@@ -90,32 +90,37 @@ export default function ProblemsPage() {
     try {
       const currentSearchTerm = searchTermParam !== undefined ? searchTermParam : searchTerm;
       const params: ProblemSearchParams = {
-        searchTerm: currentSearchTerm,
         page: currentPage,
         limit: 12,
         sortBy: sortBy as any,
         sortOrder,
-        ...(selectedCategory !== 'all' && { category: selectedCategory as ProblemCategory }),
+        ...(selectedCategory !== 'all' && { category: selectedCategory as string }),
         ...(selectedDifficulty !== 'all' && { difficulty: selectedDifficulty as ProblemDifficulty }),
         ...(selectedTags.length > 0 && { tags: selectedTags }),
       };
 
       try {
-        const result = await problemService.searchProblems(params);
+        let result: ProblemSearchResult;
+        if (currentSearchTerm && currentSearchTerm.trim()) {
+          // Use search endpoint when there's a search term
+          result = await problemService.searchProblems({ ...params, q: currentSearchTerm.trim() });
+        } else {
+          // Use regular getProblems when no search term
+          result = await problemService.getProblems(params);
+        }
         setSearchResult(result);
       } catch (error) {
         console.error('Failed to load problems:', error);
         // Set empty result to show "no problems found" state
         setSearchResult({
           problems: [],
-          pagination: { page: 1, limit: 12, total: 0, totalPages: 0 },
-          facets: { categories: {}, difficulties: {}, popularTags: [] }
+          pagination: { page: 1, limit: 12, total: 0, totalPages: 0, hasNext: false, hasPrev: false }
         });
       }
 
       // Update URL with search params
       const urlParams = new URLSearchParams();
-      if (params.searchTerm) urlParams.set('search', params.searchTerm);
+      if (currentSearchTerm) urlParams.set('search', currentSearchTerm);
       if (selectedCategory !== 'all') urlParams.set('category', selectedCategory);
       if (selectedDifficulty !== 'all') urlParams.set('difficulty', selectedDifficulty);
       if (currentPage > 1) urlParams.set('page', currentPage.toString());

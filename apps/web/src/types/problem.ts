@@ -1,33 +1,57 @@
+// Problem categories - matching seed data
+export const PROBLEM_CATEGORIES = [
+  'Algebra',
+  'Calculus',
+  'Geometry',
+  'Trigonometry',
+  'Statistics',
+  'Number Theory',
+  'Linear Algebra',
+  'Differential Equations',
+  'Combinatorics',
+  'Logic'
+] as const;
+
+export type ProblemCategory = typeof PROBLEM_CATEGORIES[number];
+
+// Problem difficulties - matching seed data
+export const PROBLEM_DIFFICULTY_LEVELS = [
+  'LOW',
+  'MEDIUM',
+  'HIGH'
+] as const;
+
+export type ProblemDifficulty = typeof PROBLEM_DIFFICULTY_LEVELS[number];
+
+// Backward compatibility alias
+export const PROBLEM_DIFFICULTIES = PROBLEM_DIFFICULTY_LEVELS;
+
 export interface Problem {
   id: string;
   title: string;
   description: string;
-  content: string; // Mathematical problem content with LaTeX/MathML
-  category: ProblemCategory;
   difficulty: ProblemDifficulty;
+  category: ProblemCategory;
   tags: string[];
-  author: {
+  solution?: string;
+  qualityScore: number;
+  viewCount: number;
+  attemptCount: number;
+  createdAt: string;
+  updatedAt: string;
+  creator: {
     id: string;
     username: string;
     profileImage?: string;
   };
-  solution?: ProblemSolution;
-  hints: ProblemHint[];
-  rating: {
-    average: number;
-    count: number;
-    userRating?: number;
+  _count?: {
+    ratings: number;
+    solutions: number;
+    comments: number;
   };
-  statistics: {
-    totalAttempts: number;
-    successfulAttempts: number;
-    successRate: number;
-  };
-  createdAt: string;
-  updatedAt: string;
-  isPublished: boolean;
-  isFavorited?: boolean;
-  isBookmarked?: boolean;
+  avgRating?: number;
+  parsedTags?: string[];
+  userRating?: number | null;
 }
 
 export interface ProblemSolution {
@@ -51,40 +75,17 @@ export interface ProblemHint {
   isUnlocked?: boolean;
 }
 
-export enum ProblemCategory {
-  ARITHMETIC = 'arithmetic',
-  ALGEBRA = 'algebra',
-  GEOMETRY = 'geometry',
-  TRIGONOMETRY = 'trigonometry',
-  CALCULUS = 'calculus',
-  STATISTICS = 'statistics',
-  PROBABILITY = 'probability',
-  DISCRETE_MATH = 'discrete_math',
-  LINEAR_ALGEBRA = 'linear_algebra',
-  DIFFERENTIAL_EQUATIONS = 'differential_equations',
-  NUMBER_THEORY = 'number_theory',
-  COMBINATORICS = 'combinatorics',
-}
-
-export enum ProblemDifficulty {
-  BEGINNER = 'beginner',
-  ELEMENTARY = 'elementary',
-  INTERMEDIATE = 'intermediate',
-  ADVANCED = 'advanced',
-  EXPERT = 'expert',
-}
-
 export interface ProblemSearchParams {
-  searchTerm?: string;
-  category?: ProblemCategory;
-  difficulty?: ProblemDifficulty;
-  tags?: string[];
-  authorId?: string;
-  sortBy?: 'title' | 'difficulty' | 'rating' | 'createdAt' | 'popularity';
-  sortOrder?: 'asc' | 'desc';
+  q?: string; // search query
   page?: number;
   limit?: number;
-  includeUnpublished?: boolean;
+  category?: string;
+  difficulty?: ProblemDifficulty;
+  search?: string;
+  tags?: string[];
+  sortBy?: 'createdAt' | 'qualityScore' | 'viewCount' | 'attemptCount' | 'title';
+  sortOrder?: 'asc' | 'desc';
+  creatorId?: string;
 }
 
 export interface ProblemSearchResult {
@@ -94,36 +95,27 @@ export interface ProblemSearchResult {
     limit: number;
     total: number;
     totalPages: number;
-  };
-  facets: {
-    categories: { [key in ProblemCategory]?: number };
-    difficulties: { [key in ProblemDifficulty]?: number };
-    popularTags: Array<{ tag: string; count: number }>;
+    hasNext: boolean;
+    hasPrev: boolean;
   };
 }
 
 export interface CreateProblemData {
   title: string;
   description: string;
-  content: string;
-  category: ProblemCategory;
   difficulty: ProblemDifficulty;
+  category: string;
   tags: string[];
   solution?: string;
-  hints?: string[];
-  isPublished: boolean;
 }
 
 export interface UpdateProblemData {
   title?: string;
   description?: string;
-  content?: string;
-  category?: ProblemCategory;
   difficulty?: ProblemDifficulty;
+  category?: string;
   tags?: string[];
   solution?: string;
-  hints?: string[];
-  isPublished?: boolean;
 }
 
 export interface ProblemAttempt {
@@ -144,111 +136,87 @@ export interface ProblemRating {
 }
 
 // Category display information
-export const PROBLEM_CATEGORIES = {
-  [ProblemCategory.ARITHMETIC]: {
-    name: 'Arithmetic',
-    description: 'Basic math operations, fractions, decimals',
-    icon: '🔢',
-    color: 'bg-blue-500',
-  },
-  [ProblemCategory.ALGEBRA]: {
+export const PROBLEM_CATEGORY_INFO = {
+  'Algebra': {
     name: 'Algebra',
     description: 'Equations, polynomials, functions',
     icon: '📈',
     color: 'bg-green-500',
   },
-  [ProblemCategory.GEOMETRY]: {
-    name: 'Geometry',
-    description: 'Shapes, angles, area, volume',
-    icon: '📐',
-    color: 'bg-purple-500',
-  },
-  [ProblemCategory.TRIGONOMETRY]: {
-    name: 'Trigonometry',
-    description: 'Sin, cos, tan, and triangle relationships',
-    icon: '📊',
-    color: 'bg-red-500',
-  },
-  [ProblemCategory.CALCULUS]: {
+  'Calculus': {
     name: 'Calculus',
     description: 'Derivatives, integrals, limits',
     icon: '∫',
     color: 'bg-indigo-500',
   },
-  [ProblemCategory.STATISTICS]: {
+  'Geometry': {
+    name: 'Geometry',
+    description: 'Shapes, angles, area, volume',
+    icon: '📐',
+    color: 'bg-purple-500',
+  },
+  'Trigonometry': {
+    name: 'Trigonometry',
+    description: 'Sin, cos, tan, and triangle relationships',
+    icon: '📊',
+    color: 'bg-red-500',
+  },
+  'Statistics': {
     name: 'Statistics',
     description: 'Data analysis, distributions, hypothesis testing',
     icon: '📊',
     color: 'bg-yellow-500',
   },
-  [ProblemCategory.PROBABILITY]: {
-    name: 'Probability',
-    description: 'Random events, combinations, permutations',
-    icon: '🎲',
-    color: 'bg-pink-500',
-  },
-  [ProblemCategory.DISCRETE_MATH]: {
-    name: 'Discrete Math',
-    description: 'Logic, sets, graphs, algorithms',
-    icon: '🔗',
-    color: 'bg-teal-500',
-  },
-  [ProblemCategory.LINEAR_ALGEBRA]: {
-    name: 'Linear Algebra',
-    description: 'Matrices, vectors, eigenvalues',
-    icon: '⬜',
-    color: 'bg-cyan-500',
-  },
-  [ProblemCategory.DIFFERENTIAL_EQUATIONS]: {
-    name: 'Differential Equations',
-    description: 'ODEs, PDEs, systems of equations',
-    icon: '🌊',
-    color: 'bg-orange-500',
-  },
-  [ProblemCategory.NUMBER_THEORY]: {
+  'Number Theory': {
     name: 'Number Theory',
     description: 'Prime numbers, modular arithmetic, cryptography',
     icon: '🔐',
     color: 'bg-gray-600',
   },
-  [ProblemCategory.COMBINATORICS]: {
+  'Linear Algebra': {
+    name: 'Linear Algebra',
+    description: 'Matrices, vectors, eigenvalues',
+    icon: '⬜',
+    color: 'bg-cyan-500',
+  },
+  'Differential Equations': {
+    name: 'Differential Equations',
+    description: 'ODEs, PDEs, systems of equations',
+    icon: '🌊',
+    color: 'bg-orange-500',
+  },
+  'Combinatorics': {
     name: 'Combinatorics',
     description: 'Counting, arrangements, graph theory',
     icon: '🧮',
     color: 'bg-emerald-500',
   },
+  'Logic': {
+    name: 'Logic',
+    description: 'Truth tables, proofs, logical reasoning',
+    icon: '🧠',
+    color: 'bg-teal-500',
+  },
 } as const;
 
 // Difficulty display information
-export const PROBLEM_DIFFICULTIES = {
-  [ProblemDifficulty.BEGINNER]: {
-    name: 'Beginner',
+export const PROBLEM_DIFFICULTY_INFO = {
+  'LOW': {
+    name: 'Low',
     description: 'Basic concepts and simple problems',
     color: 'bg-green-100 text-green-800',
     level: 1,
   },
-  [ProblemDifficulty.ELEMENTARY]: {
-    name: 'Elementary',
-    description: 'Elementary to middle school level',
-    color: 'bg-blue-100 text-blue-800',
+  'MEDIUM': {
+    name: 'Medium',
+    description: 'Intermediate level problems',
+    color: 'bg-yellow-100 text-yellow-800',
     level: 2,
   },
-  [ProblemDifficulty.INTERMEDIATE]: {
-    name: 'Intermediate',
-    description: 'High school to early college level',
-    color: 'bg-yellow-100 text-yellow-800',
-    level: 3,
-  },
-  [ProblemDifficulty.ADVANCED]: {
-    name: 'Advanced',
-    description: 'College level and beyond',
-    color: 'bg-orange-100 text-orange-800',
-    level: 4,
-  },
-  [ProblemDifficulty.EXPERT]: {
-    name: 'Expert',
-    description: 'Graduate level and research problems',
+  'HIGH': {
+    name: 'High',
+    description: 'Advanced and challenging problems',
     color: 'bg-red-100 text-red-800',
-    level: 5,
+    level: 3,
   },
 } as const;

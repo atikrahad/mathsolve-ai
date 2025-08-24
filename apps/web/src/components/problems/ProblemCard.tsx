@@ -1,6 +1,6 @@
 'use client';
 
-import { Problem, PROBLEM_CATEGORIES, PROBLEM_DIFFICULTIES } from '@/types/problem';
+import { Problem, PROBLEM_CATEGORY_INFO, PROBLEM_DIFFICULTY_INFO } from '@/types/problem';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -17,7 +17,6 @@ import {
   Eye 
 } from 'lucide-react';
 import { useState } from 'react';
-import problemService from '@/services/problemService';
 
 interface ProblemCardProps {
   problem: Problem;
@@ -38,12 +37,12 @@ export function ProblemCard({
   onFavoriteToggle,
   onBookmarkToggle,
 }: ProblemCardProps) {
-  const [isFavorited, setIsFavorited] = useState(problem.isFavorited || false);
-  const [isBookmarked, setIsBookmarked] = useState(problem.isBookmarked || false);
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const categoryInfo = PROBLEM_CATEGORIES[problem.category];
-  const difficultyInfo = PROBLEM_DIFFICULTIES[problem.difficulty];
+  const categoryInfo = PROBLEM_CATEGORY_INFO[problem.category];
+  const difficultyInfo = PROBLEM_DIFFICULTY_INFO[problem.difficulty];
 
   const handleFavoriteToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -51,16 +50,21 @@ export function ProblemCard({
     
     if (loading) return;
     
-    setLoading(true);
-    try {
-      const result = await problemService.toggleFavorite(problem.id);
-      setIsFavorited(result.isFavorited);
-      onFavoriteToggle?.(problem.id, result.isFavorited);
-    } catch (error) {
-      console.error('Failed to toggle favorite:', error);
-    } finally {
-      setLoading(false);
-    }
+    // Toggle favorite state locally for now (until API is implemented)
+    setIsFavorited(!isFavorited);
+    onFavoriteToggle?.(problem.id, !isFavorited);
+    
+    // TODO: Implement API call when toggleFavorite method is available
+    // setLoading(true);
+    // try {
+    //   const result = await problemService.toggleFavorite(problem.id);
+    //   setIsFavorited(result.isFavorited);
+    //   onFavoriteToggle?.(problem.id, result.isFavorited);
+    // } catch (error) {
+    //   console.error('Failed to toggle favorite:', error);
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
   const handleBookmarkToggle = async (e: React.MouseEvent) => {
@@ -69,16 +73,21 @@ export function ProblemCard({
     
     if (loading) return;
     
-    setLoading(true);
-    try {
-      const result = await problemService.toggleBookmark(problem.id);
-      setIsBookmarked(result.isBookmarked);
-      onBookmarkToggle?.(problem.id, result.isBookmarked);
-    } catch (error) {
-      console.error('Failed to toggle bookmark:', error);
-    } finally {
-      setLoading(false);
-    }
+    // Toggle bookmark state locally for now (until API is implemented)
+    setIsBookmarked(!isBookmarked);
+    onBookmarkToggle?.(problem.id, !isBookmarked);
+    
+    // TODO: Implement API call when toggleBookmark method is available  
+    // setLoading(true);
+    // try {
+    //   const result = await problemService.toggleBookmark(problem.id);
+    //   setIsBookmarked(result.isBookmarked);
+    //   onBookmarkToggle?.(problem.id, result.isBookmarked);
+    // } catch (error) {
+    //   console.error('Failed to toggle bookmark:', error);
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
   const truncateDescription = (text: string, maxLength: number) => {
@@ -96,21 +105,23 @@ export function ProblemCard({
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-2">
                 <div 
-                  className={`w-2 h-2 rounded-full ${categoryInfo.color}`}
-                  title={categoryInfo.name}
+                  className={`w-2 h-2 rounded-full ${categoryInfo?.color}`}
+                  title={categoryInfo?.name}
                 />
                 <Badge 
                   variant="outline" 
-                  className={`text-xs ${difficultyInfo.color} border-current`}
+                  className={`text-xs ${difficultyInfo?.color} border-current`}
                 >
-                  {difficultyInfo.name}
+                  {difficultyInfo?.name}
                 </Badge>
-                <div className="flex items-center gap-1 text-yellow-500">
-                  <Star className="w-3 h-3 fill-current" />
-                  <span className="text-xs text-gray-600">
-                    {problem.rating.average.toFixed(1)} ({problem.rating.count})
-                  </span>
-                </div>
+                {problem.avgRating && (
+                  <div className="flex items-center gap-1 text-yellow-500">
+                    <Star className="w-3 h-3 fill-current" />
+                    <span className="text-xs text-gray-600">
+                      {problem.avgRating.toFixed(1)} ({problem._count?.ratings || 0})
+                    </span>
+                  </div>
+                )}
               </div>
               
               <h3 className={`font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2 ${
@@ -163,10 +174,10 @@ export function ProblemCard({
             </div>
 
             {/* Tags */}
-            {problem.tags.length > 0 && (
+            {problem.tags && Array.isArray(problem.tags) && problem.tags.length > 0 && (
               <div className="flex flex-wrap gap-1">
-                {problem.tags.slice(0, compact ? 2 : 3).map((tag) => (
-                  <Badge key={tag} variant="secondary" className="text-xs">
+                {problem.tags.slice(0, compact ? 2 : 3).map((tag, index) => (
+                  <Badge key={`${tag}-${index}`} variant="secondary" className="text-xs">
                     {tag}
                   </Badge>
                 ))}
@@ -184,25 +195,25 @@ export function ProblemCard({
                 {showStats && (
                   <>
                     <div className="flex items-center gap-1">
-                      <Users className="w-3 h-3" />
-                      <span>{problem.statistics.totalAttempts}</span>
+                      <Eye className="w-3 h-3" />
+                      <span>{problem.viewCount}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <TrendingUp className="w-3 h-3" />
-                      <span>{Math.round(problem.statistics.successRate)}%</span>
+                      <Users className="w-3 h-3" />
+                      <span>{problem.attemptCount}</span>
                     </div>
                   </>
                 )}
                 
-                {showAuthor && (
+                {showAuthor && problem.creator && (
                   <div className="flex items-center gap-2">
                     <Avatar className="w-5 h-5">
-                      <AvatarImage src={problem.author.profileImage} />
+                      <AvatarImage src={problem.creator.profileImage} />
                       <AvatarFallback className="text-xs">
-                        {problem.author.username.charAt(0).toUpperCase()}
+                        {problem.creator.username.charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-xs">{problem.author.username}</span>
+                    <span className="text-xs">{problem.creator.username}</span>
                   </div>
                 )}
               </div>

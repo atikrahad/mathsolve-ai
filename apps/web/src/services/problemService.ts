@@ -7,25 +7,22 @@ import {
   UpdateProblemData,
   ProblemAttempt,
   ProblemRating,
-  ProblemCategory,
 } from '@/types/problem';
 
 class ProblemService {
   /**
-   * Get all problems with search and filtering
+   * Get all problems with pagination, filtering, and sorting
    */
-  async searchProblems(params: ProblemSearchParams = {}): Promise<ProblemSearchResult> {
-    const response = await api.get('/problems/search', { params });
+  async getProblems(params: ProblemSearchParams = {}): Promise<ProblemSearchResult> {
+    const response = await api.get('/problems', { params });
     return response.data.data;
   }
 
   /**
-   * Get featured/popular problems for homepage
+   * Search problems with query string
    */
-  async getFeaturedProblems(limit: number = 10): Promise<Problem[]> {
-    const response = await api.get('/problems/featured', {
-      params: { limit },
-    });
+  async searchProblems(params: ProblemSearchParams & { q: string }): Promise<ProblemSearchResult> {
+    const response = await api.get('/problems/search', { params });
     return response.data.data;
   }
 
@@ -48,8 +45,8 @@ class ProblemService {
   /**
    * Update an existing problem
    */
-  async updateProblem(id: string, updateData: UpdateProblemData): Promise<Problem> {
-    const response = await api.put(`/problems/${id}`, updateData);
+  async updateProblem(id: string, problemData: UpdateProblemData): Promise<Problem> {
+    const response = await api.put(`/problems/${id}`, problemData);
     return response.data.data;
   }
 
@@ -64,209 +61,109 @@ class ProblemService {
    * Get problems by category
    */
   async getProblemsByCategory(
-    category: ProblemCategory,
-    params: { page?: number; limit?: number; sortBy?: string; sortOrder?: 'asc' | 'desc' } = {}
+    category: string,
+    params: Omit<ProblemSearchParams, 'category'> = {}
   ): Promise<ProblemSearchResult> {
-    const response = await api.get(`/problems/category/${category}`, { params });
-    return response.data.data;
-  }
-
-  /**
-   * Get user's created problems
-   */
-  async getUserProblems(
-    userId?: string,
-    params: { page?: number; limit?: number; includeUnpublished?: boolean } = {}
-  ): Promise<ProblemSearchResult> {
-    const endpoint = userId ? `/problems/user/${userId}` : '/problems/my-problems';
-    const response = await api.get(endpoint, { params });
-    return response.data.data;
-  }
-
-  /**
-   * Submit a problem attempt
-   */
-  async submitAttempt(problemId: string, answer: string, hintsUsed: number = 0): Promise<{
-    isCorrect: boolean;
-    attempt: ProblemAttempt;
-    feedback?: string;
-  }> {
-    const response = await api.post(`/problems/${problemId}/attempt`, {
-      answer,
-      hintsUsed,
+    const response = await api.get('/problems', {
+      params: { ...params, category },
     });
     return response.data.data;
   }
 
   /**
-   * Get problem attempts for a user
+   * Get current user's problems
    */
-  async getUserAttempts(
-    problemId?: string,
-    params: { page?: number; limit?: number } = {}
-  ): Promise<{
-    attempts: ProblemAttempt[];
-    pagination: {
-      page: number;
-      limit: number;
-      total: number;
-      totalPages: number;
-    };
-  }> {
-    const endpoint = problemId ? `/problems/${problemId}/attempts` : '/problems/attempts';
-    const response = await api.get(endpoint, { params });
+  async getUserProblems(params: { page?: number; limit?: number } = {}): Promise<{ problems: Problem[]; total: number }> {
+    const response = await api.get('/problems/my', { params });
     return response.data.data;
   }
 
   /**
    * Rate a problem
    */
-  async rateProblem(problemId: string, rating: number, comment?: string): Promise<void> {
-    await api.post(`/problems/${problemId}/rating`, { rating, comment });
-  }
-
-  /**
-   * Get problem ratings
-   */
-  async getProblemRatings(
-    problemId: string,
-    params: { page?: number; limit?: number } = {}
-  ): Promise<{
-    ratings: Array<ProblemRating & { user: { username: string; profileImage?: string } }>;
-    pagination: {
-      page: number;
-      limit: number;
-      total: number;
-      totalPages: number;
-    };
-  }> {
-    const response = await api.get(`/problems/${problemId}/ratings`, { params });
+  async rateProblem(problemId: string, rating: number): Promise<ProblemRating> {
+    const response = await api.post(`/problems/${problemId}/rate`, { rating });
     return response.data.data;
   }
 
   /**
-   * Bookmark/unbookmark a problem
+   * Get problem categories
    */
-  async toggleBookmark(problemId: string): Promise<{ isBookmarked: boolean }> {
-    const response = await api.post(`/problems/${problemId}/bookmark`);
+  async getCategories(includeCount: boolean = false): Promise<{ categories: string[] | Array<{ category: string; count: number }> }> {
+    const response = await api.get('/problems/categories', {
+      params: { includeCount: includeCount.toString() },
+    });
     return response.data.data;
   }
 
   /**
-   * Favorite/unfavorite a problem
+   * Get featured problems (highest quality score)
    */
-  async toggleFavorite(problemId: string): Promise<{ isFavorited: boolean }> {
-    const response = await api.post(`/problems/${problemId}/favorite`);
-    return response.data.data;
+  async getFeaturedProblems(limit: number = 10): Promise<Problem[]> {
+    const response = await api.get('/problems', {
+      params: {
+        sortBy: 'qualityScore',
+        sortOrder: 'desc',
+        limit,
+      },
+    });
+    return response.data.data.problems;
   }
 
   /**
-   * Get bookmarked problems
+   * Get popular problems (most views)
    */
-  async getBookmarkedProblems(
-    params: { page?: number; limit?: number } = {}
+  async getPopularProblems(limit: number = 10): Promise<Problem[]> {
+    const response = await api.get('/problems', {
+      params: {
+        sortBy: 'viewCount',
+        sortOrder: 'desc',
+        limit,
+      },
+    });
+    return response.data.data.problems;
+  }
+
+  /**
+   * Get recent problems
+   */
+  async getRecentProblems(limit: number = 10): Promise<Problem[]> {
+    const response = await api.get('/problems', {
+      params: {
+        sortBy: 'createdAt',
+        sortOrder: 'desc',
+        limit,
+      },
+    });
+    return response.data.data.problems;
+  }
+
+  /**
+   * Get problems by difficulty
+   */
+  async getProblemsByDifficulty(
+    difficulty: 'LOW' | 'MEDIUM' | 'HIGH',
+    params: Omit<ProblemSearchParams, 'difficulty'> = {}
   ): Promise<ProblemSearchResult> {
-    const response = await api.get('/problems/bookmarked', { params });
+    const response = await api.get('/problems', {
+      params: { ...params, difficulty },
+    });
     return response.data.data;
   }
 
   /**
-   * Get favorited problems
+   * Get problems with specific tags
    */
-  async getFavoritedProblems(
-    params: { page?: number; limit?: number } = {}
+  async getProblemsByTags(
+    tags: string[],
+    params: Omit<ProblemSearchParams, 'tags'> = {}
   ): Promise<ProblemSearchResult> {
-    const response = await api.get('/problems/favorited', { params });
-    return response.data.data;
-  }
-
-  /**
-   * Get problem statistics
-   */
-  async getProblemStatistics(problemId: string): Promise<{
-    totalAttempts: number;
-    successfulAttempts: number;
-    successRate: number;
-    averageTime: number;
-    hintsUsedAverage: number;
-    difficultyRating: number;
-    popularHints: number[];
-  }> {
-    const response = await api.get(`/problems/${problemId}/statistics`);
-    return response.data.data;
-  }
-
-  /**
-   * Get problem categories with counts
-   */
-  async getCategories(): Promise<Array<{
-    category: ProblemCategory;
-    count: number;
-    recentCount: number; // problems added in last 30 days
-  }>> {
-    const response = await api.get('/problems/categories');
-    return response.data.data;
-  }
-
-  /**
-   * Get popular tags
-   */
-  async getPopularTags(limit: number = 20): Promise<Array<{ tag: string; count: number }>> {
-    const response = await api.get('/problems/tags/popular', {
-      params: { limit },
+    const response = await api.get('/problems', {
+      params: { ...params, tags: tags.join(',') },
     });
     return response.data.data;
-  }
-
-  /**
-   * Get problem hints
-   */
-  async getProblemHints(problemId: string): Promise<{
-    hints: Array<{ id: string; content: string; order: number }>;
-    unlockedCount: number;
-  }> {
-    const response = await api.get(`/problems/${problemId}/hints`);
-    return response.data.data;
-  }
-
-  /**
-   * Unlock next hint for a problem
-   */
-  async unlockHint(problemId: string): Promise<{
-    hint: { id: string; content: string; order: number };
-    remainingHints: number;
-  }> {
-    const response = await api.post(`/problems/${problemId}/hints/unlock`);
-    return response.data.data;
-  }
-
-  /**
-   * Get similar problems (recommendations)
-   */
-  async getSimilarProblems(
-    problemId: string,
-    limit: number = 5
-  ): Promise<Problem[]> {
-    const response = await api.get(`/problems/${problemId}/similar`, {
-      params: { limit },
-    });
-    return response.data.data;
-  }
-
-  /**
-   * Report a problem
-   */
-  async reportProblem(
-    problemId: string,
-    reason: string,
-    description?: string
-  ): Promise<void> {
-    await api.post(`/problems/${problemId}/report`, {
-      reason,
-      description,
-    });
   }
 }
 
-export const problemService = new ProblemService();
+const problemService = new ProblemService();
 export default problemService;
