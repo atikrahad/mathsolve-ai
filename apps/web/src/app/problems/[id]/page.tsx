@@ -1,19 +1,17 @@
 'use client';
 
-// @ts-nocheck - Temporary fix for React component type compatibility issues
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Problem, ProblemAttempt, PROBLEM_CATEGORIES, PROBLEM_DIFFICULTIES } from '@/types/problem';
+import { Problem, PROBLEM_CATEGORY_INFO, PROBLEM_DIFFICULTY_INFO } from '@/types/problem';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MathRenderer, MathText } from '@/components/ui/math-renderer';
-import { Textarea } from '@/components/ui/textarea';
+import { MathEditor } from '@/components/ui/math-editor';
 import { Skeleton } from '@/components/ui/skeleton';
 import problemService from '@/services/problemService';
-import { ProblemRatingComponent } from '@/components/problems/ProblemRatingComponent';
 import Header from '@/components/layout/Header';
 import Link from 'next/link';
 import {
@@ -30,12 +28,23 @@ import {
   CheckCircle,
   XCircle,
   ArrowLeft,
-  Edit
+  Edit,
+  Eye,
+  Calculator,
+  Send,
+  Trophy,
+  Timer,
+  BookOpen
 } from 'lucide-react';
 
-interface ProblemSolutionAttempt {
+interface SolutionAttempt {
+  id?: string;
   answer: string;
+  isCorrect?: boolean;
   feedback?: string;
+  timeSpent?: number;
+  hintsUsed?: number;
+  submittedAt?: string;
 }
 
 export default function ProblemDetailPage() {
@@ -47,11 +56,12 @@ export default function ProblemDetailPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [userAnswer, setUserAnswer] = useState('');
-  const [attempts, setAttempts] = useState<ProblemAttempt[]>([]);
-  const [lastAttempt, setLastAttempt] = useState<ProblemSolutionAttempt | null>(null);
-  const [hintsUnlocked, setHintsUnlocked] = useState(0);
-  const [similarProblems, setSimilarProblems] = useState<Problem[]>([]);
-  const [showHintUnlock, setShowHintUnlock] = useState(false);
+  const [attempts, setAttempts] = useState<SolutionAttempt[]>([]);
+  const [currentAttempt, setCurrentAttempt] = useState<SolutionAttempt | null>(null);
+  const [startTime] = useState(Date.now());
+  const [showSolution, setShowSolution] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
 
   useEffect(() => {
     if (problemId) {
@@ -62,17 +72,8 @@ export default function ProblemDetailPage() {
   const loadProblemDetails = async () => {
     setLoading(true);
     try {
-      const [problemData, attemptsData, hintsData, similarData] = await Promise.all([
-        problemService.getProblemById(problemId),
-        problemService.getUserAttempts(problemId).catch(() => ({ attempts: [] })),
-        problemService.getProblemHints(problemId).catch(() => ({ hints: [], unlockedCount: 0 })),
-        problemService.getSimilarProblems(problemId).catch(() => [])
-      ]);
-
+      const problemData = await problemService.getProblemById(problemId);
       setProblem(problemData);
-      setAttempts(attemptsData.attempts || []);
-      setHintsUnlocked(hintsData.unlockedCount);
-      setSimilarProblems(similarData);
     } catch (error) {
       console.error('Failed to load problem details:', error);
       router.push('/problems');
@@ -86,28 +87,32 @@ export default function ProblemDetailPage() {
     if (!userAnswer.trim() || submitting) return;
 
     setSubmitting(true);
+    const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+    
     try {
-      const result = await problemService.submitAttempt(
-        problemId,
-        userAnswer.trim(),
-        hintsUnlocked
-      );
+      // For now, we'll simulate solution checking
+      // TODO: Implement actual API endpoint for solution checking
+      const isCorrect = checkSolution(userAnswer.trim(), problem?.solution);
       
-      setLastAttempt({
-        answer: userAnswer,
-        feedback: result.feedback
-      });
+      const attempt: SolutionAttempt = {
+        id: Date.now().toString(),
+        answer: userAnswer.trim(),
+        isCorrect,
+        feedback: isCorrect 
+          ? "Excellent work! Your solution is correct." 
+          : "That's not quite right. Try reviewing the problem and your approach.",
+        timeSpent,
+        hintsUsed: 0,
+        submittedAt: new Date().toISOString()
+      };
+
+      setCurrentAttempt(attempt);
+      setAttempts(prev => [attempt, ...prev]);
       
-      setAttempts([result.attempt, ...attempts]);
-      
-      if (result.isCorrect) {
-        // Problem solved successfully
-        setUserAnswer('');
+      // If correct, show the solution
+      if (isCorrect) {
+        setShowSolution(true);
       }
-      
-      // Refresh problem data to update statistics
-      const updatedProblem = await problemService.getProblemById(problemId);
-      setProblem(updatedProblem);
     } catch (error) {
       console.error('Failed to submit answer:', error);
     } finally {
@@ -115,95 +120,51 @@ export default function ProblemDetailPage() {
     }
   };
 
-  const handleUnlockHint = async () => {
-    try {
-      setShowHintUnlock(true);
-      await problemService.unlockHint(problemId);
-      setHintsUnlocked(prev => prev + 1);
-      
-      // Refresh problem hints
-      const hintsData = await problemService.getProblemHints(problemId);
-      setHintsUnlocked(hintsData.unlockedCount);
-    } catch (error) {
-      console.error('Failed to unlock hint:', error);
-    } finally {
-      setShowHintUnlock(false);
-    }
+  // Simple solution checking (in production, this would be done on the server)
+  const checkSolution = (userAnswer: string, correctSolution?: string): boolean => {
+    if (!correctSolution) return false;
+    
+    // Normalize both answers for comparison
+    const normalize = (str: string) => 
+      str.toLowerCase()
+         .replace(/\s+/g, '')
+         .replace(/[{}]/g, '')
+         .trim();
+    
+    return normalize(userAnswer) === normalize(correctSolution);
   };
 
-  const handleToggleFavorite = async () => {
-    if (!problem) return;
-    try {
-      const result = await problemService.toggleFavorite(problemId);
-      setProblem({ ...problem, isFavorited: result.isFavorited });
-    } catch (error) {
-      console.error('Failed to toggle favorite:', error);
-    }
+  const handleNewAttempt = () => {
+    setUserAnswer('');
+    setCurrentAttempt(null);
   };
 
-  const handleToggleBookmark = async () => {
-    if (!problem) return;
-    try {
-      const result = await problemService.toggleBookmark(problemId);
-      setProblem({ ...problem, isBookmarked: result.isBookmarked });
-    } catch (error) {
-      console.error('Failed to toggle bookmark:', error);
-    }
+  const handleToggleFavorite = () => {
+    setIsFavorited(!isFavorited);
+    // TODO: Implement API call
   };
 
-  const handleShare = async () => {
-    if (navigator.share) {
-      await navigator.share({
-        title: problem?.title,
-        text: problem?.description,
-        url: window.location.href
-      });
-    } else {
-      await navigator.clipboard.writeText(window.location.href);
-      // You could show a toast notification here
-    }
+  const handleToggleBookmark = () => {
+    setIsBookmarked(!isBookmarked);
+    // TODO: Implement API call
+  };
+
+  const formatTimeSpent = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex items-center gap-4 mb-6">
-          <Skeleton className="h-10 w-24" />
-          <Skeleton className="h-8 w-48" />
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-6">
-            <Card>
-              <CardHeader>
-                <Skeleton className="h-8 w-3/4" />
-                <div className="flex gap-2">
-                  <Skeleton className="h-6 w-20" />
-                  <Skeleton className="h-6 w-16" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-32 w-full" />
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <Skeleton className="h-6 w-32" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-24 w-full mb-4" />
-                <Skeleton className="h-10 w-full" />
-              </CardContent>
-            </Card>
-          </div>
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
           <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <Skeleton className="h-6 w-24" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-16 w-full" />
-              </CardContent>
-            </Card>
+            <Skeleton className="h-8 w-3/4" />
+            <Skeleton className="h-4 w-1/2" />
+            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-48 w-full" />
           </div>
         </div>
       </div>
@@ -212,393 +173,319 @@ export default function ProblemDetailPage() {
 
   if (!problem) {
     return (
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Card className="p-8 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Problem Not Found</h1>
-          <p className="text-gray-600 mb-6">The problem you're looking for doesn't exist or has been removed.</p>
-          <Link href="/problems">
-            <Button>
-              <ArrowLeft className="w-4 h-4 mr-2" />
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Problem not found</h1>
+            <Button onClick={() => router.push('/problems')}>
               Back to Problems
             </Button>
-          </Link>
-        </Card>
+          </div>
+        </div>
       </div>
     );
   }
 
-  const categoryInfo = PROBLEM_CATEGORIES[problem.category];
-  const difficultyInfo = PROBLEM_DIFFICULTIES[problem.difficulty];
-  const isCorrectlySolved = attempts.some(attempt => attempt.isCorrect);
-  const visibleHints = problem.hints.slice(0, hintsUnlocked);
-  const hasMoreHints = problem.hints.length > hintsUnlocked;
+  const categoryInfo = PROBLEM_CATEGORY_INFO[problem.category];
+  const difficultyInfo = PROBLEM_DIFFICULTY_INFO[problem.difficulty];
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50">
       <Header />
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
-        <Link href="/problems">
-          <Button variant="ghost" size="sm">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Button>
-        </Link>
-        <div className="flex items-center gap-2">
-          <div className={`w-3 h-3 rounded-full ${categoryInfo.color}`} />
-          <Badge variant="outline" className={`${difficultyInfo.color} border-current`}>
-            {difficultyInfo.name}
-          </Badge>
-        </div>
-      </div>
+      
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        {/* Header */}
+        <div className="mb-6">
+          <div className="flex items-center gap-4 mb-4">
+            <Button
+              variant="ghost"
+              onClick={() => router.push('/problems')}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Problems
+            </Button>
+          </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Problem Details */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <CardTitle className="text-2xl mb-3">{problem.title}</CardTitle>
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
-                    <div className="flex items-center gap-2">
-                      <Avatar className="w-6 h-6">
-                        <AvatarImage src={problem.author.profileImage} />
-                        <AvatarFallback className="text-xs">
-                          {problem.author.username.charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <Link 
-                        href={`/users/${problem.author.id}`}
-                        className="hover:text-blue-600"
-                      >
-                        {problem.author.username}
-                      </Link>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
-                      <span>{new Date(problem.createdAt).toLocaleDateString()}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      <span>{problem.rating.average.toFixed(1)} ({problem.rating.count})</span>
-                    </div>
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-3">
+                <div 
+                  className={`w-3 h-3 rounded-full ${categoryInfo?.color || 'bg-gray-400'}`}
+                  title={categoryInfo?.name}
+                />
+                <Badge variant="outline" className={`${difficultyInfo?.color} border-current`}>
+                  {difficultyInfo?.name || problem.difficulty}
+                </Badge>
+                {problem.avgRating && (
+                  <div className="flex items-center gap-1 text-yellow-500">
+                    <Star className="w-4 h-4 fill-current" />
+                    <span className="text-sm text-gray-600">
+                      {problem.avgRating.toFixed(1)} ({problem._count?.ratings || 0})
+                    </span>
                   </div>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleToggleFavorite}
-                    className="p-2"
-                  >
-                    <Heart 
-                      className={`w-5 h-5 ${
-                        problem.isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-400'
-                      }`}
-                    />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleToggleBookmark}
-                    className="p-2"
-                  >
-                    <Bookmark 
-                      className={`w-5 h-5 ${
-                        problem.isBookmarked ? 'fill-blue-500 text-blue-500' : 'text-gray-400'
-                      }`}
-                    />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleShare}
-                    className="p-2"
-                  >
-                    <Share2 className="w-5 h-5" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="p-2 text-red-600"
-                  >
-                    <Flag className="w-5 h-5" />
-                  </Button>
-                </div>
+                )}
               </div>
-            </CardHeader>
-            
-            <CardContent className="space-y-6">
-              {/* Problem Description */}
-              <div>
-                <h3 className="font-semibold text-lg mb-3">Description</h3>
-                <div className="prose max-w-none">
-                  <MathText>{problem.description}</MathText>
-                </div>
-              </div>
-
-              {/* Problem Content */}
-              <div>
-                <h3 className="font-semibold text-lg mb-3">Problem</h3>
-                <div className="bg-gray-50 p-6 rounded-lg border-l-4 border-blue-500">
-                  <MathText>{problem.content}</MathText>
-                </div>
-              </div>
-
-              {/* Tags */}
-              {problem.tags.length > 0 && (
-                <div>
-                  <h3 className="font-semibold text-lg mb-3">Tags</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {problem.tags.map((tag) => (
-                      <Badge key={tag} variant="secondary">
-                        {tag}
-                      </Badge>
-                    ))}
+              
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">{problem.title}</h1>
+              
+              {problem.creator && (
+                <div className="flex items-center gap-3 text-sm text-gray-600">
+                  <div className="flex items-center gap-2">
+                    <Avatar className="w-6 h-6">
+                      <AvatarImage src={problem.creator.profileImage} />
+                      <AvatarFallback className="text-xs">
+                        {problem.creator.username.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span>by {problem.creator.username}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    <span>{new Date(problem.createdAt).toLocaleDateString()}</span>
                   </div>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Solution Input */}
-          {!isCorrectlySolved && (
+            <div className="flex items-center gap-2">
+              <Link href={`/problems/${problemId}/solve`}>
+                <Button className="flex items-center gap-2">
+                  <Calculator className="w-4 h-4" />
+                  Solve Problem
+                </Button>
+              </Link>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleToggleFavorite}
+                className="flex items-center gap-2"
+              >
+                <Heart className={`w-4 h-4 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
+                Favorite
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleToggleBookmark}
+                className="flex items-center gap-2"
+              >
+                <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-blue-500 text-blue-500' : 'text-gray-400'}`} />
+                Bookmark
+              </Button>
+              <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                <Share2 className="w-4 h-4" />
+                Share
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Problem Statement */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Target className="w-5 h-5" />
-                  Your Solution
+                  <BookOpen className="w-5 h-5" />
+                  Problem Statement
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleSubmitAnswer} className="space-y-4">
-                  <Textarea
-                    value={userAnswer}
-                    onChange={(e) => setUserAnswer(e.target.value)}
-                    placeholder="Enter your answer here... You can use LaTeX notation like $x = 2$ or $$\int x dx$$"
-                    className="min-h-[120px] resize-y"
-                  />
-                  
-                  {lastAttempt && (
-                    <div className={`p-4 rounded-lg border ${
-                      attempts[0]?.isCorrect 
-                        ? 'bg-green-50 border-green-200' 
-                        : 'bg-red-50 border-red-200'
-                    }`}>
-                      <div className="flex items-start gap-2">
-                        {attempts[0]?.isCorrect ? (
-                          <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
-                        ) : (
-                          <XCircle className="w-5 h-5 text-red-600 mt-0.5" />
-                        )}
-                        <div className="flex-1">
-                          <p className="font-medium">
-                            {attempts[0]?.isCorrect ? 'Correct!' : 'Incorrect'}
-                          </p>
-                          {lastAttempt.feedback && (
-                            <p className="text-sm mt-1">
-                              <MathText>{lastAttempt.feedback}</MathText>
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <Button type="submit" disabled={submitting || !userAnswer.trim()}>
-                    {submitting ? 'Submitting...' : 'Submit Answer'}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Hints */}
-          {problem.hints.length > 0 && (
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <Lightbulb className="w-5 h-5" />
-                    Hints ({hintsUnlocked}/{problem.hints.length})
-                  </CardTitle>
-                  {hasMoreHints && !isCorrectlySolved && (
-                    <Button
-                      variant="outline"
-                      onClick={handleUnlockHint}
-                      disabled={showHintUnlock}
-                    >
-                      {showHintUnlock ? 'Unlocking...' : 'Unlock Next Hint'}
-                    </Button>
-                  )}
+                <div className="prose max-w-none">
+                  <MathText className="text-lg leading-relaxed">{problem.description}</MathText>
                 </div>
-              </CardHeader>
-              <CardContent>
-                {hintsUnlocked === 0 ? (
-                  <p className="text-gray-600 italic">
-                    No hints unlocked yet. Try solving the problem first!
-                  </p>
-                ) : (
-                  <div className="space-y-3">
-                    {visibleHints.map((hint, index) => (
-                      <div key={hint.id} className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                        <div className="flex items-start gap-2">
-                          <Badge variant="outline" className="text-xs">
-                            Hint {index + 1}
-                          </Badge>
-                          <div className="flex-1">
-                            <MathText>{hint.content}</MathText>
-                          </div>
-                        </div>
-                      </div>
+                
+                {/* Tags */}
+                {problem.tags && Array.isArray(problem.tags) && problem.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t">
+                    {problem.tags.map((tag, index) => (
+                      <Badge key={`${tag}-${index}`} variant="secondary" className="text-sm">
+                        {tag}
+                      </Badge>
                     ))}
                   </div>
                 )}
               </CardContent>
             </Card>
-          )}
 
-          {/* Solution (if available and user has solved it) */}
-          {problem.solution && isCorrectlySolved && (
+            {/* Solution Input */}
             <Card>
               <CardHeader>
-                <CardTitle>Official Solution</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="prose max-w-none">
-                  <MathText>{problem.solution.content}</MathText>
-                  {problem.solution.explanation && (
-                    <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                      <h4 className="font-semibold mb-2">Explanation</h4>
-                      <MathText>{problem.solution.explanation}</MathText>
-                    </div>
+                <CardTitle className="flex items-center gap-2">
+                  <Calculator className="w-5 h-5" />
+                  Your Solution
+                  {currentAttempt?.isCorrect && (
+                    <Badge className="bg-green-100 text-green-800">Correct!</Badge>
                   )}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* My Attempts */}
-          {attempts.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Your Attempts</CardTitle>
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {attempts.slice(0, 5).map((attempt, index) => (
-                    <div key={attempt.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        {attempt.isCorrect ? (
+                {!currentAttempt ? (
+                  <form onSubmit={handleSubmitAnswer} className="space-y-4">
+                    <MathEditor
+                      value={userAnswer}
+                      onChange={setUserAnswer}
+                      placeholder="Enter your solution using mathematical notation..."
+                      showPreview={true}
+                      showShortcuts={true}
+                      rows={6}
+                    />
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Timer className="w-4 h-4" />
+                        <span>Time: {formatTimeSpent(Math.floor((Date.now() - startTime) / 1000))}</span>
+                      </div>
+                      <Button 
+                        type="submit" 
+                        disabled={submitting || !userAnswer.trim()}
+                        className="flex items-center gap-2"
+                      >
+                        <Send className="w-4 h-4" />
+                        {submitting ? 'Submitting...' : 'Submit Solution'}
+                      </Button>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="space-y-4">
+                    {/* Attempt Result */}
+                    <div className={`p-4 rounded-lg border ${
+                      currentAttempt.isCorrect 
+                        ? 'bg-green-50 border-green-200' 
+                        : 'bg-red-50 border-red-200'
+                    }`}>
+                      <div className="flex items-center gap-2 mb-2">
+                        {currentAttempt.isCorrect ? (
                           <CheckCircle className="w-5 h-5 text-green-600" />
                         ) : (
                           <XCircle className="w-5 h-5 text-red-600" />
                         )}
-                        <div className="flex-1">
-                          <MathText>{attempt.answer}</MathText>
-                          <p className="text-xs text-gray-500 mt-1">
-                            {new Date(attempt.createdAt).toLocaleString()}
-                          </p>
-                        </div>
+                        <span className={`font-semibold ${
+                          currentAttempt.isCorrect ? 'text-green-800' : 'text-red-800'
+                        }`}>
+                          {currentAttempt.isCorrect ? 'Correct!' : 'Incorrect'}
+                        </span>
                       </div>
-                      <div className="text-sm text-gray-600">
-                        {attempt.timeSpent}s
-                      </div>
+                      <p className={`text-sm ${
+                        currentAttempt.isCorrect ? 'text-green-700' : 'text-red-700'
+                      }`}>
+                        {currentAttempt.feedback}
+                      </p>
                     </div>
-                  ))}
-                  {attempts.length > 5 && (
-                    <p className="text-sm text-gray-600 text-center">
-                      ... and {attempts.length - 5} more attempts
-                    </p>
-                  )}
-                </div>
+
+                    {/* Your Answer */}
+                    <div className="p-4 bg-gray-50 rounded-lg">
+                      <h4 className="font-medium text-gray-900 mb-2">Your Answer:</h4>
+                      <MathText className="text-lg">{currentAttempt.answer}</MathText>
+                    </div>
+
+                    {/* Try Again Button */}
+                    {!currentAttempt.isCorrect && (
+                      <Button onClick={handleNewAttempt} className="w-full">
+                        Try Again
+                      </Button>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
-          )}
-        </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Problem Statistics */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Statistics</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-gray-600" />
-                  <span className="text-sm">Attempts</span>
-                </div>
-                <span className="font-semibold">{problem.statistics.totalAttempts}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-green-600" />
-                  <span className="text-sm">Success Rate</span>
-                </div>
-                <span className="font-semibold text-green-600">
-                  {Math.round(problem.statistics.successRate)}%
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm">Solved</span>
-                </div>
-                <span className="font-semibold text-blue-600">
-                  {problem.statistics.successfulAttempts}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
+            {/* Official Solution */}
+            {(showSolution || currentAttempt?.isCorrect) && problem.solution && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Trophy className="w-5 h-5 text-yellow-600" />
+                    Official Solution
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <MathText className="text-lg leading-relaxed">{problem.solution}</MathText>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
 
-          {/* Problem Rating */}
-          <ProblemRatingComponent 
-            problemId={problemId}
-            currentRating={problem.rating.userRating}
-          />
-
-          {/* Similar Problems */}
-          {similarProblems.length > 0 && (
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Statistics */}
             <Card>
               <CardHeader>
-                <CardTitle>Similar Problems</CardTitle>
+                <CardTitle>Statistics</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {similarProblems.slice(0, 3).map((similarProblem) => (
-                    <Link key={similarProblem.id} href={`/problems/${similarProblem.id}`}>
-                      <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
-                        <h4 className="font-medium text-sm line-clamp-2 mb-1">
-                          {similarProblem.title}
-                        </h4>
-                        <div className="flex items-center gap-2 text-xs text-gray-600">
-                          <Badge 
-                            variant="outline" 
-                            className={`text-xs ${PROBLEM_DIFFICULTIES[similarProblem.difficulty].color} border-current`}
-                          >
-                            {PROBLEM_DIFFICULTIES[similarProblem.difficulty].name}
-                          </Badge>
-                          <div className="flex items-center gap-1">
-                            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                            <span>{similarProblem.rating.average.toFixed(1)}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Eye className="w-4 h-4 text-gray-500" />
+                      <span className="text-sm">Views</span>
+                    </div>
+                    <span className="font-semibold">{problem.viewCount || 0}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Users className="w-4 h-4 text-gray-500" />
+                      <span className="text-sm">Attempts</span>
+                    </div>
+                    <span className="font-semibold">{problem.attemptCount || 0}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Star className="w-4 h-4 text-gray-500" />
+                      <span className="text-sm">Quality Score</span>
+                    </div>
+                    <span className="font-semibold">{problem.qualityScore?.toFixed(1) || 'N/A'}</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
-          )}
+
+            {/* Your Attempts */}
+            {attempts.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Your Attempts</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3 max-h-64 overflow-y-auto">
+                    {attempts.map((attempt) => (
+                      <div key={attempt.id} className="p-3 border rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            {attempt.isCorrect ? (
+                              <CheckCircle className="w-4 h-4 text-green-600" />
+                            ) : (
+                              <XCircle className="w-4 h-4 text-red-600" />
+                            )}
+                            <span className={`text-sm font-medium ${
+                              attempt.isCorrect ? 'text-green-800' : 'text-red-800'
+                            }`}>
+                              {attempt.isCorrect ? 'Correct' : 'Incorrect'}
+                            </span>
+                          </div>
+                          {attempt.timeSpent && (
+                            <span className="text-xs text-gray-500">
+                              {formatTimeSpent(attempt.timeSpent)}
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-xs text-gray-600">
+                          <MathText>{attempt.answer}</MathText>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </div>
       </div>
-      </main>
     </div>
   );
 }
