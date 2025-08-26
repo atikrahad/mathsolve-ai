@@ -2,6 +2,7 @@ import { Router } from 'express';
 import authRoutes from './auth.routes';
 import userRoutes from './user.routes';
 import problemRoutes from './problem.routes';
+import resourceRoutes from './resource.routes';
 
 const router = Router();
 
@@ -15,10 +16,10 @@ router.get('/', (req, res) => {
       auth: '/api/auth',
       users: '/api/users',
       problems: '/api/problems',
+      resources: '/api/resources',
       // solutions: '/api/solutions',
       // ai: '/api/ai',
-      // rankings: '/api/rankings',
-      // resources: '/api/resources'
+      // rankings: '/api/rankings'
     },
   });
 });
@@ -27,9 +28,9 @@ router.get('/', (req, res) => {
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
 router.use('/problems', problemRoutes);
+router.use('/resources', resourceRoutes);
 // router.use('/solutions', solutionRoutes);
 // router.use('/ai', aiRoutes);
 // router.use('/rankings', rankingRoutes);
-// router.use('/resources', resourceRoutes);
 
 export default router;
