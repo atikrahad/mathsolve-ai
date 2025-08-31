@@ -1,0 +1,7 @@
+{
+  "title": "Linear Equations and Systems",
+  "content": "# Linear Equations and Systems\n\n## What is a Linear Equation?\nA linear equation is an equation where the highest power of the variable is 1.\n\nGeneral form: ax + b = c\n\n## Solving Linear Equations\nSteps to solve ax + b = c:\n1. Subtract b from both sides: ax = c - b\n2. Divide both sides by a: x = (c - b) / a\n\n## Example\nSolve: 3x + 7 = 22\n1. Subtract 7: 3x = 15\n2. Divide by 3: x = 5\n\n## Systems of Linear Equations\nTwo or more equations with the same variables:\n- 2x + y = 5\n- x - y = 1\n\n## Solution Methods\n1. **Substitution Method**\n2. **Elimination Method**\n3. **Graphical Method**\n\n## Applications\n- Distance-time problems\n- Mixture problems\n- Age problems\n- Business applications",
+  "type": "TUTORIAL",
+  "category": "Algebra",
+  "difficulty": "LOW"
+}
