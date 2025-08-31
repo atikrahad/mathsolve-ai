@@ -71,7 +71,7 @@ export class ProblemRepository extends BaseRepository {
         : 0;
 
     // Remove ratings array and add avgRating
-    const { ratings, ...problemWithoutRatings } = problem;
+    const { ...problemWithoutRatings } = problem;
     return {
       ...problemWithoutRatings,
       avgRating,
@@ -148,7 +148,7 @@ export class ProblemRepository extends BaseRepository {
             problem.ratings.length
           : 0;
 
-      const { ratings, ...problemWithoutRatings } = problem;
+      const { ...problemWithoutRatings } = problem;
       return {
         ...problemWithoutRatings,
         avgRating,

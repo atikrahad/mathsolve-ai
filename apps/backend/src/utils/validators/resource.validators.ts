@@ -43,9 +43,12 @@ export const createResourceSchema = z.object({
       .min(1, 'Category is required')
       .max(50, 'Category must be less than 50 characters')
       .trim(),
-    difficulty: z.enum(DIFFICULTY_LEVELS, {
-      errorMap: () => ({ message: 'Difficulty must be LOW, MEDIUM, or HIGH' }),
-    }).optional().nullable(),
+    difficulty: z
+      .enum(DIFFICULTY_LEVELS, {
+        errorMap: () => ({ message: 'Difficulty must be LOW, MEDIUM, or HIGH' }),
+      })
+      .optional()
+      .nullable(),
   }),
 });
 
@@ -64,18 +67,23 @@ export const updateResourceSchema = z.object({
       .max(50000, 'Content must be less than 50,000 characters')
       .trim()
       .optional(),
-    type: z.enum(RESOURCE_TYPES, {
-      errorMap: () => ({ message: 'Type must be TUTORIAL, GUIDE, or REFERENCE' }),
-    }).optional(),
+    type: z
+      .enum(RESOURCE_TYPES, {
+        errorMap: () => ({ message: 'Type must be TUTORIAL, GUIDE, or REFERENCE' }),
+      })
+      .optional(),
     category: z
       .string()
       .min(1, 'Category is required')
       .max(50, 'Category must be less than 50 characters')
       .trim()
       .optional(),
-    difficulty: z.enum(DIFFICULTY_LEVELS, {
-      errorMap: () => ({ message: 'Difficulty must be LOW, MEDIUM, or HIGH' }),
-    }).optional().nullable(),
+    difficulty: z
+      .enum(DIFFICULTY_LEVELS, {
+        errorMap: () => ({ message: 'Difficulty must be LOW, MEDIUM, or HIGH' }),
+      })
+      .optional()
+      .nullable(),
   }),
 });
 
@@ -101,10 +109,7 @@ export const resourceQuerySchema = z.object({
     difficulty: z.enum(DIFFICULTY_LEVELS).optional(),
     authorId: z.string().optional(),
     search: z.string().max(100, 'Search term must be less than 100 characters').optional(),
-    sortBy: z
-      .enum(['createdAt', 'viewCount', 'rating', 'title'])
-      .optional()
-      .default('createdAt'),
+    sortBy: z.enum(['createdAt', 'viewCount', 'rating', 'title']).optional().default('createdAt'),
     sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
   }),
 });
@@ -141,10 +146,7 @@ export const resourceSearchSchema = z.object({
     category: z.string().optional(),
     type: z.enum(RESOURCE_TYPES).optional(),
     difficulty: z.enum(DIFFICULTY_LEVELS).optional(),
-    sortBy: z
-      .enum(['createdAt', 'viewCount', 'rating', 'title'])
-      .optional()
-      .default('createdAt'),
+    sortBy: z.enum(['createdAt', 'viewCount', 'rating', 'title']).optional().default('createdAt'),
     sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
   }),
 });

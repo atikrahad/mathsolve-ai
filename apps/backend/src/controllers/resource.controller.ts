@@ -150,12 +150,14 @@ export class ResourceController {
       const bodyValidation = updateResourceSchema.safeParse({ body: req.body });
 
       if (!paramsValidation.success || !bodyValidation.success) {
-        res.status(400).json(
-          createErrorResponse('Validation failed', 400, [
-            ...(paramsValidation.error?.errors || []),
-            ...(bodyValidation.error?.errors || []),
-          ])
-        );
+        res
+          .status(400)
+          .json(
+            createErrorResponse('Validation failed', 400, [
+              ...(paramsValidation.error?.errors || []),
+              ...(bodyValidation.error?.errors || []),
+            ])
+          );
         return;
       }
 

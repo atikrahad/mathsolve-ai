@@ -235,7 +235,7 @@ export function createSuccessResponse<T>(
 
 export function createErrorResponse(
   message: string,
-  statusCode: number = 500,
+  // statusCode: number = 500,
   details?: any
 ): ApiResponse {
   const response: ApiResponse = {

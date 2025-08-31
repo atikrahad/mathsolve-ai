@@ -232,7 +232,7 @@ export class UserService {
    */
   async getFollowers(userId: string, options: { page: number; limit: number }) {
     const { page = 1, limit = 20 } = options;
-    const skip = (page - 1) * limit;
+    // const skip = (page - 1) * limit;
 
     // Placeholder implementation - will implement when following system database schema is ready
     // For now, return empty results with proper structure
@@ -252,7 +252,7 @@ export class UserService {
    */
   async getFollowing(userId: string, options: { page: number; limit: number }) {
     const { page = 1, limit = 20 } = options;
-    const skip = (page - 1) * limit;
+    // const skip = (page - 1) * limit;
 
     // Placeholder implementation - will implement when following system database schema is ready
     // For now, return empty results with proper structure

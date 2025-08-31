@@ -787,7 +787,8 @@ export default function CreateProblemPage() {
                     <div className="text-sm">
                       <p className="font-semibold text-blue-900 mb-1">Clear Problem Statement</p>
                       <p className="text-blue-700">
-                        Be specific about what you're asking. Include all necessary information.
+                        Be specific about what you&apos;re asking. Include all necessary
+                        information.
                       </p>
                     </div>
                   </div>

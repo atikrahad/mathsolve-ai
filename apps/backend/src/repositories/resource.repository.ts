@@ -125,7 +125,7 @@ export class ResourceRepository extends BaseRepository {
     const resourcesWithBookmarkStatus = resources.map((resource: any) => {
       if (userId) {
         const isBookmarked = resource.bookmarks && resource.bookmarks.length > 0;
-        const { bookmarks, ...resourceWithoutBookmarks } = resource;
+        const { ...resourceWithoutBookmarks } = resource;
         return {
           ...resourceWithoutBookmarks,
           isBookmarked,

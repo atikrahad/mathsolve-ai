@@ -141,7 +141,9 @@ export default function CategoryPage() {
         <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Card className="p-8 text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Category Not Found</h1>
-            <p className="text-gray-600 mb-6">The category you're looking for doesn't exist.</p>
+            <p className="text-gray-600 mb-6">
+              The category you&apos;re looking for doesn&apos;t exist.
+            </p>
             <Link href="/problems">
               <Button>
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -221,7 +223,7 @@ export default function CategoryPage() {
                   <div>
                     <p className="text-sm font-medium text-gray-600">Popular</p>
                     <p className="text-2xl font-bold text-gray-900">
-                      {searchResult.problems.filter((p) => p.statistics.totalAttempts > 10).length}
+                      {searchResult.problems.filter((p) => p?.statistics.totalAttempts > 10).length}
                     </p>
                   </div>
                 </div>

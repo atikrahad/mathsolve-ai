@@ -172,11 +172,7 @@ export class ResourceService {
     }
   }
 
-  async updateResource(
-    id: string,
-    userId: string,
-    data: UpdateResourceInput
-  ): Promise<Resource> {
+  async updateResource(id: string, userId: string, data: UpdateResourceInput): Promise<Resource> {
     try {
       // Check if resource exists and user owns it
       const existingResource = await this.resourceRepository.findById(id);
@@ -256,10 +252,7 @@ export class ResourceService {
     } catch (error) {
       logger.error('Failed to delete resource', { error, id, userId });
 
-      if (
-        error instanceof NotFoundError ||
-        error instanceof ForbiddenError
-      ) {
+      if (error instanceof NotFoundError || error instanceof ForbiddenError) {
         throw error;
       }
 
@@ -318,7 +311,12 @@ export class ResourceService {
         throw error;
       }
 
-      throw new ServiceError(500, 'Failed to search resources', 'ResourceService', 'searchResources');
+      throw new ServiceError(
+        500,
+        'Failed to search resources',
+        'ResourceService',
+        'searchResources'
+      );
     }
   }
 
@@ -342,7 +340,12 @@ export class ResourceService {
       // Check if already bookmarked
       const existingBookmark = await this.resourceRepository.findBookmark(resourceId, userId);
       if (existingBookmark) {
-        throw new ServiceError(409, 'Resource is already bookmarked', 'ResourceService', 'bookmarkResource');
+        throw new ServiceError(
+          409,
+          'Resource is already bookmarked',
+          'ResourceService',
+          'bookmarkResource'
+        );
       }
 
       const bookmark = await this.resourceRepository.createBookmark(resourceId, userId);
@@ -357,14 +360,16 @@ export class ResourceService {
     } catch (error) {
       logger.error('Failed to bookmark resource', { error, resourceId, userId });
 
-      if (
-        error instanceof NotFoundError ||
-        error instanceof ServiceError
-      ) {
+      if (error instanceof NotFoundError || error instanceof ServiceError) {
         throw error;
       }
 
-      throw new ServiceError(500, 'Failed to bookmark resource', 'ResourceService', 'bookmarkResource');
+      throw new ServiceError(
+        500,
+        'Failed to bookmark resource',
+        'ResourceService',
+        'bookmarkResource'
+      );
     }
   }
 
@@ -430,7 +435,12 @@ export class ResourceService {
         throw error;
       }
 
-      throw new ServiceError(500, 'Failed to fetch bookmarked resources', 'ResourceService', 'getBookmarkedResources');
+      throw new ServiceError(
+        500,
+        'Failed to fetch bookmarked resources',
+        'ResourceService',
+        'getBookmarkedResources'
+      );
     }
   }
 
@@ -440,7 +450,12 @@ export class ResourceService {
       return stats;
     } catch (error) {
       logger.error('Failed to fetch resource statistics', { error });
-      throw new ServiceError(500, 'Failed to fetch resource statistics', 'ResourceService', 'getResourceStats');
+      throw new ServiceError(
+        500,
+        'Failed to fetch resource statistics',
+        'ResourceService',
+        'getResourceStats'
+      );
     }
   }
 
@@ -465,7 +480,12 @@ export class ResourceService {
         throw error;
       }
 
-      throw new ServiceError(500, 'Failed to fetch resources by author', 'ResourceService', 'getResourcesByAuthor');
+      throw new ServiceError(
+        500,
+        'Failed to fetch resources by author',
+        'ResourceService',
+        'getResourcesByAuthor'
+      );
     }
   }
 }

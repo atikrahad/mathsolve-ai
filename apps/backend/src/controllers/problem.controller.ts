@@ -9,16 +9,10 @@ import {
   rateProblemSchema,
   problemSearchSchema,
   categoryStatsSchema,
-  ProblemQueryParams,
 } from '../utils/validators/problem.validators';
 import { AuthRequest } from '../types/auth.types';
 import { createSuccessResponse, createErrorResponse } from '../utils/response.util';
-import {
-  ValidationError,
-  NotFoundError,
-  ForbiddenError,
-  ServiceError,
-} from '../utils/errors/service-errors';
+import { ValidationError, NotFoundError, ForbiddenError } from '../utils/errors/service-errors';
 import { logger } from '../config/logger';
 
 export class ProblemController {

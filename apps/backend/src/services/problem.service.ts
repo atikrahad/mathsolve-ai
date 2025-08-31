@@ -6,12 +6,7 @@ import {
   ProblemSort,
 } from '../repositories/problem.repository';
 import { CreateProblemInput, UpdateProblemInput } from '../utils/validators/problem.validators';
-import {
-  ServiceError,
-  NotFoundError,
-  ForbiddenError,
-  ValidationError,
-} from '../utils/errors/service-errors';
+import { ServiceError, NotFoundError, ForbiddenError } from '../utils/errors/service-errors';
 import { logger } from '../config/logger';
 
 export interface PaginatedProblems {
@@ -154,10 +149,10 @@ export class ProblemService {
 
     try {
       // Convert tags array to JSON string if provided
-      let updateData: any = {
-        ...data,
-        ...(data.tags && { tags: JSON.stringify(data.tags) }),
-      };
+      // let updateData: any = {
+      //   ...data,
+      //   ...(data.tags && { tags: JSON.stringify(data.tags) }),
+      // };
 
       // Recalculate quality score if content changed
       if (data.title || data.description || data.tags) {
