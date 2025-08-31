@@ -1,10 +1,7 @@
 import { CorsOptions } from 'cors';
 
 const allowedOrigins = [
-  'http://localhost:3000', // Next.js frontend development
-  'http://localhost:3001', // Alternative frontend port
-  'https://mathsolve-ai.com', // Production frontend
-  'https://www.mathsolve-ai.com', // Production frontend with www
+  process.env.ALLOWED_ORIGINS
 ];
 
 export const corsOptions: CorsOptions = {
