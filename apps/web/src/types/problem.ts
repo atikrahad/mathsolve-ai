@@ -9,19 +9,15 @@ export const PROBLEM_CATEGORIES = [
   'Linear Algebra',
   'Differential Equations',
   'Combinatorics',
-  'Logic'
+  'Logic',
 ] as const;
 
-export type ProblemCategory = typeof PROBLEM_CATEGORIES[number];
+export type ProblemCategory = (typeof PROBLEM_CATEGORIES)[number];
 
 // Problem difficulties - matching seed data
-export const PROBLEM_DIFFICULTY_LEVELS = [
-  'LOW',
-  'MEDIUM',
-  'HIGH'
-] as const;
+export const PROBLEM_DIFFICULTY_LEVELS = ['LOW', 'MEDIUM', 'HIGH'] as const;
 
-export type ProblemDifficulty = typeof PROBLEM_DIFFICULTY_LEVELS[number];
+export type ProblemDifficulty = (typeof PROBLEM_DIFFICULTY_LEVELS)[number];
 
 // Backward compatibility alias
 export const PROBLEM_DIFFICULTIES = PROBLEM_DIFFICULTY_LEVELS;
@@ -137,31 +133,31 @@ export interface ProblemRating {
 
 // Category display information
 export const PROBLEM_CATEGORY_INFO = {
-  'Algebra': {
+  Algebra: {
     name: 'Algebra',
     description: 'Equations, polynomials, functions',
     icon: '📈',
     color: 'bg-green-500',
   },
-  'Calculus': {
+  Calculus: {
     name: 'Calculus',
     description: 'Derivatives, integrals, limits',
     icon: '∫',
     color: 'bg-indigo-500',
   },
-  'Geometry': {
+  Geometry: {
     name: 'Geometry',
     description: 'Shapes, angles, area, volume',
     icon: '📐',
     color: 'bg-purple-500',
   },
-  'Trigonometry': {
+  Trigonometry: {
     name: 'Trigonometry',
     description: 'Sin, cos, tan, and triangle relationships',
     icon: '📊',
     color: 'bg-red-500',
   },
-  'Statistics': {
+  Statistics: {
     name: 'Statistics',
     description: 'Data analysis, distributions, hypothesis testing',
     icon: '📊',
@@ -185,13 +181,13 @@ export const PROBLEM_CATEGORY_INFO = {
     icon: '🌊',
     color: 'bg-orange-500',
   },
-  'Combinatorics': {
+  Combinatorics: {
     name: 'Combinatorics',
     description: 'Counting, arrangements, graph theory',
     icon: '🧮',
     color: 'bg-emerald-500',
   },
-  'Logic': {
+  Logic: {
     name: 'Logic',
     description: 'Truth tables, proofs, logical reasoning',
     icon: '🧠',
@@ -201,19 +197,19 @@ export const PROBLEM_CATEGORY_INFO = {
 
 // Difficulty display information
 export const PROBLEM_DIFFICULTY_INFO = {
-  'LOW': {
+  LOW: {
     name: 'Low',
     description: 'Basic concepts and simple problems',
     color: 'bg-green-100 text-green-800',
     level: 1,
   },
-  'MEDIUM': {
+  MEDIUM: {
     name: 'Medium',
     description: 'Intermediate level problems',
     color: 'bg-yellow-100 text-yellow-800',
     level: 2,
   },
-  'HIGH': {
+  HIGH: {
     name: 'High',
     description: 'Advanced and challenging problems',
     color: 'bg-red-100 text-red-800',

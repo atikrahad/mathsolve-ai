@@ -12,7 +12,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { LogOut, User, Settings, Home, Users, Search, Trophy, BookOpen, GraduationCap } from 'lucide-react';
+import {
+  LogOut,
+  User,
+  Settings,
+  Home,
+  Users,
+  Search,
+  Trophy,
+  BookOpen,
+  GraduationCap,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 

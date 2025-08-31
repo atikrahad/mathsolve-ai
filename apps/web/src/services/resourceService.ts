@@ -21,7 +21,9 @@ class ResourceService {
   /**
    * Search resources with query string
    */
-  async searchResources(params: ResourceSearchParams & { query: string }): Promise<ResourceSearchResult> {
+  async searchResources(
+    params: ResourceSearchParams & { query: string }
+  ): Promise<ResourceSearchResult> {
     const response = await api.get('/resources/search', { params });
     return response.data.data;
   }
@@ -29,7 +31,10 @@ class ResourceService {
   /**
    * Get resources by category
    */
-  async getResourcesByCategory(category: string, params: ResourceSearchParams = {}): Promise<ResourceSearchResult> {
+  async getResourcesByCategory(
+    category: string,
+    params: ResourceSearchParams = {}
+  ): Promise<ResourceSearchResult> {
     const response = await api.get(`/resources/category/${category}`, { params });
     return response.data.data;
   }
@@ -37,7 +42,10 @@ class ResourceService {
   /**
    * Get resources by type
    */
-  async getResourcesByType(type: string, params: ResourceSearchParams = {}): Promise<ResourceSearchResult> {
+  async getResourcesByType(
+    type: string,
+    params: ResourceSearchParams = {}
+  ): Promise<ResourceSearchResult> {
     const response = await api.get(`/resources/type/${type}`, { params });
     return response.data.data;
   }
@@ -94,11 +102,11 @@ class ResourceService {
   async getBookmarkedResources(params: ResourceSearchParams = {}): Promise<ResourceSearchResult> {
     // This would be implemented as a user endpoint in the backend
     // For now, we'll get resources and filter by bookmarked status
-    const response = await api.get('/resources', { 
-      params: { 
+    const response = await api.get('/resources', {
+      params: {
         ...params,
         // Add user-specific filtering when user endpoints are available
-      } 
+      },
     });
     return response.data.data;
   }
@@ -143,7 +151,10 @@ class ResourceService {
   /**
    * Get resources by author
    */
-  async getResourcesByAuthor(authorId: string, params: ResourceSearchParams = {}): Promise<ResourceSearchResult> {
+  async getResourcesByAuthor(
+    authorId: string,
+    params: ResourceSearchParams = {}
+  ): Promise<ResourceSearchResult> {
     const response = await api.get('/resources', {
       params: {
         ...params,
@@ -156,7 +167,11 @@ class ResourceService {
   /**
    * Get related resources for a specific resource
    */
-  async getRelatedResources(resourceId: string, category: string, limit: number = 5): Promise<Resource[]> {
+  async getRelatedResources(
+    resourceId: string,
+    category: string,
+    limit: number = 5
+  ): Promise<Resource[]> {
     // Get resources from the same category, excluding the current resource
     const response = await api.get('/resources', {
       params: {
@@ -166,7 +181,7 @@ class ResourceService {
         sortOrder: 'desc',
       },
     });
-    
+
     // Filter out the current resource
     const resources = response.data.data.resources.filter((r: Resource) => r.id !== resourceId);
     return resources.slice(0, limit);
@@ -278,11 +293,11 @@ class ResourceService {
     // Find the last complete word within the limit
     const truncated = plainText.substring(0, maxLength);
     const lastSpace = truncated.lastIndexOf(' ');
-    
+
     if (lastSpace > maxLength * 0.8) {
       return truncated.substring(0, lastSpace) + '...';
     }
-    
+
     return truncated + '...';
   }
 }

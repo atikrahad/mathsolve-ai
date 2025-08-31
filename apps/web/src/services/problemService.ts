@@ -73,7 +73,9 @@ class ProblemService {
   /**
    * Get current user's problems
    */
-  async getUserProblems(params: { page?: number; limit?: number } = {}): Promise<{ problems: Problem[]; total: number }> {
+  async getUserProblems(
+    params: { page?: number; limit?: number } = {}
+  ): Promise<{ problems: Problem[]; total: number }> {
     const response = await api.get('/problems/my', { params });
     return response.data.data;
   }
@@ -89,7 +91,9 @@ class ProblemService {
   /**
    * Get problem categories
    */
-  async getCategories(includeCount: boolean = false): Promise<{ categories: string[] | Array<{ category: string; count: number }> }> {
+  async getCategories(
+    includeCount: boolean = false
+  ): Promise<{ categories: string[] | Array<{ category: string; count: number }> }> {
     const response = await api.get('/problems/categories', {
       params: { includeCount: includeCount.toString() },
     });

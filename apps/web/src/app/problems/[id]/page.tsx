@@ -35,9 +35,8 @@ import {
   GraduationCap,
   FileText,
   Award,
-  Sparkles
+  Sparkles,
 } from 'lucide-react';
-
 
 export default function ProblemDetailPage() {
   const params = useParams();
@@ -68,7 +67,6 @@ export default function ProblemDetailPage() {
     }
   };
 
-
   const handleToggleFavorite = () => {
     setIsFavorited(!isFavorited);
     // TODO: Implement API call
@@ -78,7 +76,6 @@ export default function ProblemDetailPage() {
     setIsBookmarked(!isBookmarked);
     // TODO: Implement API call
   };
-
 
   if (loading) {
     return (
@@ -103,9 +100,7 @@ export default function ProblemDetailPage() {
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Problem not found</h1>
-            <Button onClick={() => router.push('/problems')}>
-              Back to Problems
-            </Button>
+            <Button onClick={() => router.push('/problems')}>Back to Problems</Button>
           </div>
         </div>
       </div>
@@ -118,7 +113,7 @@ export default function ProblemDetailPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      
+
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Header */}
         <div className="mb-6">
@@ -136,7 +131,7 @@ export default function ProblemDetailPage() {
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-3">
-                <div 
+                <div
                   className={`w-3 h-3 rounded-full ${categoryInfo?.color || 'bg-gray-400'}`}
                   title={categoryInfo?.name}
                 />
@@ -152,9 +147,9 @@ export default function ProblemDetailPage() {
                   </div>
                 )}
               </div>
-              
+
               <h1 className="text-3xl font-bold text-gray-900 mb-2">{problem.title}</h1>
-              
+
               {problem.creator && (
                 <div className="flex items-center gap-3 text-sm text-gray-600">
                   <div className="flex items-center gap-2">
@@ -187,7 +182,9 @@ export default function ProblemDetailPage() {
                 onClick={handleToggleFavorite}
                 className="flex items-center gap-2"
               >
-                <Heart className={`w-4 h-4 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
+                <Heart
+                  className={`w-4 h-4 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-400'}`}
+                />
                 Favorite
               </Button>
               <Button
@@ -196,7 +193,9 @@ export default function ProblemDetailPage() {
                 onClick={handleToggleBookmark}
                 className="flex items-center gap-2"
               >
-                <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-blue-500 text-blue-500' : 'text-gray-400'}`} />
+                <Bookmark
+                  className={`w-4 h-4 ${isBookmarked ? 'fill-blue-500 text-blue-500' : 'text-gray-400'}`}
+                />
                 Bookmark
               </Button>
               <Button variant="ghost" size="sm" className="flex items-center gap-2">
@@ -222,7 +221,7 @@ export default function ProblemDetailPage() {
                 <div className="prose max-w-none">
                   <MathText className="text-lg leading-relaxed">{problem.description}</MathText>
                 </div>
-                
+
                 {/* Tags */}
                 {problem.tags && Array.isArray(problem.tags) && problem.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t">
@@ -250,18 +249,24 @@ export default function ProblemDetailPage() {
                     <h4 className="font-semibold text-gray-900 mb-3">Problem Context</h4>
                     <MathText className="text-base leading-relaxed">{problem.description}</MathText>
                   </div>
-                  
+
                   <div className="grid md:grid-cols-3 gap-4 pt-4 border-t">
                     <div className="text-center p-3 bg-blue-50 rounded-lg">
-                      <div className="text-2xl font-bold text-blue-600">{difficultyInfo?.level || 'N/A'}</div>
+                      <div className="text-2xl font-bold text-blue-600">
+                        {difficultyInfo?.level || 'N/A'}
+                      </div>
                       <div className="text-sm text-blue-700">Difficulty Level</div>
                     </div>
                     <div className="text-center p-3 bg-green-50 rounded-lg">
-                      <div className="text-2xl font-bold text-green-600">{problem.viewCount || 0}</div>
+                      <div className="text-2xl font-bold text-green-600">
+                        {problem.viewCount || 0}
+                      </div>
                       <div className="text-sm text-green-700">Total Views</div>
                     </div>
                     <div className="text-center p-3 bg-purple-50 rounded-lg">
-                      <div className="text-2xl font-bold text-purple-600">{problem.attemptCount || 0}</div>
+                      <div className="text-2xl font-bold text-purple-600">
+                        {problem.attemptCount || 0}
+                      </div>
                       <div className="text-sm text-purple-700">Attempts Made</div>
                     </div>
                   </div>
@@ -283,21 +288,28 @@ export default function ProblemDetailPage() {
                     <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 flex-shrink-0" />
                     <div>
                       <h4 className="font-medium text-gray-900">Understanding Concepts</h4>
-                      <p className="text-gray-600 text-sm">Grasp the fundamental mathematical concepts underlying this {categoryInfo?.name.toLowerCase()} problem.</p>
+                      <p className="text-gray-600 text-sm">
+                        Grasp the fundamental mathematical concepts underlying this{' '}
+                        {categoryInfo?.name.toLowerCase()} problem.
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="w-2 h-2 rounded-full bg-green-500 mt-2 flex-shrink-0" />
                     <div>
                       <h4 className="font-medium text-gray-900">Problem-Solving Skills</h4>
-                      <p className="text-gray-600 text-sm">Develop systematic approaches to analyze and solve similar problems.</p>
+                      <p className="text-gray-600 text-sm">
+                        Develop systematic approaches to analyze and solve similar problems.
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="w-2 h-2 rounded-full bg-purple-500 mt-2 flex-shrink-0" />
                     <div>
                       <h4 className="font-medium text-gray-900">Mathematical Reasoning</h4>
-                      <p className="text-gray-600 text-sm">Strengthen logical thinking and mathematical proof techniques.</p>
+                      <p className="text-gray-600 text-sm">
+                        Strengthen logical thinking and mathematical proof techniques.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -322,7 +334,7 @@ export default function ProblemDetailPage() {
                       </h4>
                       <MathText className="text-lg leading-relaxed">{problem.solution}</MathText>
                     </div>
-                    
+
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
                         <h5 className="font-semibold text-green-800 mb-2">Key Concepts</h5>
@@ -335,7 +347,10 @@ export default function ProblemDetailPage() {
                       <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                         <h5 className="font-semibold text-yellow-800 mb-2">Difficulty Level</h5>
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline" className={`${difficultyInfo?.color} border-current`}>
+                          <Badge
+                            variant="outline"
+                            className={`${difficultyInfo?.color} border-current`}
+                          >
                             {difficultyInfo?.name}
                           </Badge>
                           <span className="text-sm text-yellow-700">
@@ -362,19 +377,22 @@ export default function ProblemDetailPage() {
                   <div className="p-4 bg-amber-50 border-l-4 border-amber-400 rounded-r-lg">
                     <h4 className="font-medium text-amber-800 mb-2">Approach Strategy</h4>
                     <p className="text-amber-700 text-sm">
-                      Start by identifying the key elements in the problem statement and organize the given information systematically.
+                      Start by identifying the key elements in the problem statement and organize
+                      the given information systematically.
                     </p>
                   </div>
                   <div className="p-4 bg-indigo-50 border-l-4 border-indigo-400 rounded-r-lg">
                     <h4 className="font-medium text-indigo-800 mb-2">Common Mistakes</h4>
                     <p className="text-indigo-700 text-sm">
-                      Pay attention to units, signs, and boundary conditions. Double-check your calculations and verify your answer makes sense.
+                      Pay attention to units, signs, and boundary conditions. Double-check your
+                      calculations and verify your answer makes sense.
                     </p>
                   </div>
                   <div className="p-4 bg-emerald-50 border-l-4 border-emerald-400 rounded-r-lg">
                     <h4 className="font-medium text-emerald-800 mb-2">Extension Ideas</h4>
                     <p className="text-emerald-700 text-sm">
-                      Consider how this problem relates to other {categoryInfo?.name.toLowerCase()} concepts and explore variations or generalizations.
+                      Consider how this problem relates to other {categoryInfo?.name.toLowerCase()}{' '}
+                      concepts and explore variations or generalizations.
                     </p>
                   </div>
                 </div>
@@ -410,7 +428,9 @@ export default function ProblemDetailPage() {
                       <TrendingUp className="w-4 h-4 text-gray-500" />
                       <span className="text-sm">Success Rate</span>
                     </div>
-                    <span className="font-semibold">{problem.qualityScore ? `${(problem.qualityScore * 10).toFixed(0)}%` : 'N/A'}</span>
+                    <span className="font-semibold">
+                      {problem.qualityScore ? `${(problem.qualityScore * 10).toFixed(0)}%` : 'N/A'}
+                    </span>
                   </div>
                 </div>
               </CardContent>
@@ -430,9 +450,12 @@ export default function ProblemDetailPage() {
                     `Advanced ${categoryInfo?.name}`,
                     'Problem Solving Strategies',
                     'Mathematical Proofs',
-                    'Real-World Applications'
+                    'Real-World Applications',
                   ].map((topic, index) => (
-                    <div key={index} className="p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors">
+                    <div
+                      key={index}
+                      className="p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
+                    >
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-purple-500" />
                         <span className="text-sm font-medium text-gray-800">{topic}</span>

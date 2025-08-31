@@ -3,18 +3,18 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  ArrowLeft, 
-  Eye, 
-  Star, 
-  Bookmark, 
-  Check, 
-  Share2, 
+import {
+  ArrowLeft,
+  Eye,
+  Star,
+  Bookmark,
+  Check,
+  Share2,
   Edit,
   Calendar,
   User,
   Tag,
-  Clock
+  Clock,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -107,7 +107,7 @@ export default function ResourceDetailPage() {
   const handleShare = async () => {
     const url = window.location.href;
     const title = resource?.title || 'Learning Resource';
-    
+
     if (navigator.share) {
       try {
         await navigator.share({
@@ -160,11 +160,7 @@ export default function ResourceDetailPage() {
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
         <div className="mb-8">
-          <Button 
-            variant="outline" 
-            className="mb-4"
-            onClick={() => router.back()}
-          >
+          <Button variant="outline" className="mb-4" onClick={() => router.back()}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Resources
           </Button>
@@ -177,9 +173,7 @@ export default function ResourceDetailPage() {
                   {formatResourceType(resource.type)}
                 </Badge>
                 {resource.difficulty && (
-                  <Badge className={difficultyInfo.color}>
-                    {difficultyInfo.label}
-                  </Badge>
+                  <Badge className={difficultyInfo.color}>{difficultyInfo.label}</Badge>
                 )}
               </div>
 
@@ -191,24 +185,24 @@ export default function ResourceDetailPage() {
               <div className="flex flex-wrap items-center gap-6 text-gray-600 mb-6">
                 <div className="flex items-center gap-2">
                   <User className="w-4 h-4" />
-                  <Link 
+                  <Link
                     href={`/users/${resource.author.id}`}
                     className="hover:text-blue-600 transition-colors"
                   >
                     {resource.author.username}
                   </Link>
                 </div>
-                
+
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
                   <span>{formattedDate}</span>
                 </div>
-                
+
                 <div className="flex items-center gap-2">
                   <Eye className="w-4 h-4" />
                   <span>{resource.viewCount} views</span>
                 </div>
-                
+
                 <div className="flex items-center gap-2">
                   <Star className="w-4 h-4" />
                   <span>{resource.rating.toFixed(1)} rating</span>
@@ -226,8 +220,8 @@ export default function ResourceDetailPage() {
               <Button
                 onClick={handleBookmarkToggle}
                 disabled={bookmarkLoading}
-                variant={isBookmarked ? "default" : "outline"}
-                className={isBookmarked ? "bg-yellow-500 hover:bg-yellow-600" : ""}
+                variant={isBookmarked ? 'default' : 'outline'}
+                className={isBookmarked ? 'bg-yellow-500 hover:bg-yellow-600' : ''}
               >
                 {isBookmarked ? (
                   <Check className="w-4 h-4 mr-2" />
@@ -280,7 +274,7 @@ export default function ResourceDetailPage() {
               </Avatar>
               <div>
                 <h3 className="text-lg font-semibold">About the Author</h3>
-                <Link 
+                <Link
                   href={`/users/${resource.author.id}`}
                   className="text-blue-600 hover:text-blue-700 transition-colors"
                 >
@@ -313,10 +307,7 @@ export default function ResourceDetailPage() {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {relatedResources.map((relatedResource) => (
-                  <RelatedResourceCard 
-                    key={relatedResource.id} 
-                    resource={relatedResource} 
-                  />
+                  <RelatedResourceCard key={relatedResource.id} resource={relatedResource} />
                 ))}
               </div>
             </CardContent>
@@ -373,7 +364,7 @@ function ResourceDetailSkeleton() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <Skeleton className="h-10 w-32 mb-4" />
-        
+
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-8">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-4">

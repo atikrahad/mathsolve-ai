@@ -10,7 +10,7 @@ import {
   PROBLEM_DIFFICULTIES,
   PROBLEM_CATEGORY_INFO,
   PROBLEM_DIFFICULTY_INFO,
-  CreateProblemData
+  CreateProblemData,
 } from '@/types/problem';
 import problemService from '@/services/problemService';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,7 +18,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { MathText } from '@/components/ui/math-renderer';
@@ -47,7 +53,7 @@ import {
   Star,
   TrendingUp,
   Users,
-  Calculator
+  Calculator,
 } from 'lucide-react';
 
 export default function CreateProblemPage() {
@@ -55,7 +61,7 @@ export default function CreateProblemPage() {
   const [submitting, setSubmitting] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [activeStep, setActiveStep] = useState(1);
-  
+
   // Form state
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -67,30 +73,32 @@ export default function CreateProblemPage() {
   const [solution, setSolution] = useState('');
   const [hints, setHints] = useState<string[]>(['']);
   const [isPublished, setIsPublished] = useState(false);
-  
+
   // Validation errors
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    
+
     if (title.length < 5) newErrors.title = 'Title must be at least 5 characters';
     if (title.length > 200) newErrors.title = 'Title must be less than 200 characters';
-    if (description.length < 20) newErrors.description = 'Description must be at least 20 characters';
-    if (description.length > 1000) newErrors.description = 'Description must be less than 1000 characters';
+    if (description.length < 20)
+      newErrors.description = 'Description must be at least 20 characters';
+    if (description.length > 1000)
+      newErrors.description = 'Description must be less than 1000 characters';
     if (content.length < 10) newErrors.content = 'Problem content must be at least 10 characters';
     if (!category) newErrors.category = 'Please select a category';
     if (!difficulty) newErrors.difficulty = 'Please select a difficulty';
     if (tags.length === 0) newErrors.tags = 'At least one tag is required';
     if (tags.length > 10) newErrors.tags = 'Maximum 10 tags allowed';
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     console.log('Form submission attempt:', {
       title: title.length,
       description: description.length,
@@ -98,16 +106,20 @@ export default function CreateProblemPage() {
       category,
       difficulty,
       tagsCount: tags.length,
-      tags
+      tags,
     });
-    
+
     if (!validateForm()) {
       console.log('Form validation failed:', errors);
-      alert('Please fill out all required fields:\n' + 
-        Object.entries(errors).map(([field, error]) => `• ${field}: ${error}`).join('\n'));
+      alert(
+        'Please fill out all required fields:\n' +
+          Object.entries(errors)
+            .map(([field, error]) => `• ${field}: ${error}`)
+            .join('\n')
+      );
       return;
     }
-    
+
     setSubmitting(true);
     try {
       const problemData: CreateProblemData = {
@@ -120,15 +132,17 @@ export default function CreateProblemPage() {
       };
 
       console.log('Creating problem with data:', problemData);
-      
+
       // Call the API to create the problem
       const createdProblem = await problemService.createProblem(problemData);
-      
+
       console.log('Problem created successfully:', createdProblem);
-      
+
       // Show success message
-      alert(`✅ Problem Created Successfully!\\n\\nTitle: ${problemData.title}\\nCategory: ${PROBLEM_CATEGORY_INFO[problemData.category]?.name}\\nDifficulty: ${PROBLEM_DIFFICULTY_INFO[problemData.difficulty]?.name}\\nProblem ID: ${createdProblem.id}\\n\\n✨ Your problem has been saved to the database!`);
-      
+      alert(
+        `✅ Problem Created Successfully!\\n\\nTitle: ${problemData.title}\\nCategory: ${PROBLEM_CATEGORY_INFO[problemData.category]?.name}\\nDifficulty: ${PROBLEM_DIFFICULTY_INFO[problemData.difficulty]?.name}\\nProblem ID: ${createdProblem.id}\\n\\n✨ Your problem has been saved to the database!`
+      );
+
       // Reset form or redirect
       const shouldReset = confirm('Would you like to create another problem?');
       if (shouldReset) {
@@ -148,7 +162,7 @@ export default function CreateProblemPage() {
     } catch (error: any) {
       console.error('Failed to create problem:', error);
       let errorMessage = 'Failed to create problem. ';
-      
+
       if (error.response?.status === 401) {
         errorMessage += 'Please log in to create problems.';
       } else if (error.response?.status === 400) {
@@ -158,7 +172,7 @@ export default function CreateProblemPage() {
       } else {
         errorMessage += `Error: ${error.message || 'Unknown error occurred'}`;
       }
-      
+
       alert('❌ ' + errorMessage);
     } finally {
       setSubmitting(false);
@@ -177,7 +191,7 @@ export default function CreateProblemPage() {
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
-    setTags(tags.filter(tag => tag !== tagToRemove));
+    setTags(tags.filter((tag) => tag !== tagToRemove));
   };
 
   const addTagFromButton = () => {
@@ -205,18 +219,23 @@ export default function CreateProblemPage() {
   };
 
   const steps = [
-    { id: 1, name: 'Problem Info', icon: BookOpen, completed: title && description && category && difficulty },
+    {
+      id: 1,
+      name: 'Problem Info',
+      icon: BookOpen,
+      completed: title && description && category && difficulty,
+    },
     { id: 2, name: 'Content', icon: FileText, completed: content && tags.length > 0 },
     { id: 3, name: 'Enhance', icon: Lightbulb, completed: false },
     { id: 4, name: 'Publish', icon: Globe, completed: false },
   ];
 
-  const progressPercentage = ((steps.filter(step => step.completed).length) / steps.length) * 100;
+  const progressPercentage = (steps.filter((step) => step.completed).length / steps.length) * 100;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
       <Header />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Header */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-8 mb-8 shadow-xl">
@@ -224,13 +243,17 @@ export default function CreateProblemPage() {
           <div className="relative">
             <div className="flex items-center gap-4 mb-6">
               <Link href="/problems">
-                <Button variant="outline" size="sm" className="bg-white/20 border-white/30 text-white hover:bg-white/30">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-white/20 border-white/30 text-white hover:bg-white/30"
+                >
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Back to Problems
                 </Button>
               </Link>
             </div>
-            
+
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
               <div className="flex-1">
                 <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
@@ -238,10 +261,11 @@ export default function CreateProblemPage() {
                   <Sparkles className="inline-block w-8 h-8 ml-2 text-yellow-300" />
                 </h1>
                 <p className="text-xl text-blue-100 max-w-2xl">
-                  Share your mathematical creativity with the world. Design problems that challenge, educate, and inspire learners everywhere.
+                  Share your mathematical creativity with the world. Design problems that challenge,
+                  educate, and inspire learners everywhere.
                 </p>
               </div>
-              
+
               <div className="lg:w-80">
                 {/* Progress Card */}
                 <div className="bg-white/20 backdrop-blur-sm rounded-xl p-6 border border-white/20">
@@ -250,7 +274,7 @@ export default function CreateProblemPage() {
                     <span className="text-white/80 text-sm">{Math.round(progressPercentage)}%</span>
                   </div>
                   <div className="w-full bg-white/20 rounded-full h-2 mb-4">
-                    <div 
+                    <div
                       className="bg-gradient-to-r from-yellow-300 to-orange-400 h-2 rounded-full transition-all duration-500"
                       style={{ width: `${progressPercentage}%` }}
                     />
@@ -260,8 +284,8 @@ export default function CreateProblemPage() {
                       <div
                         key={step.id}
                         className={`flex-1 flex items-center justify-center p-2 rounded-lg transition-all ${
-                          step.completed 
-                            ? 'bg-green-500/30 text-green-200' 
+                          step.completed
+                            ? 'bg-green-500/30 text-green-200'
                             : 'bg-white/10 text-white/60'
                         }`}
                       >
@@ -285,12 +309,13 @@ export default function CreateProblemPage() {
                 <div className="text-sm">
                   <p className="font-semibold text-green-900 mb-1">✨ Backend Integrated</p>
                   <p className="text-green-700">
-                    Problems will be saved to the database. Fill out required fields marked with <Star className="w-3 h-3 text-amber-500 inline mx-1" /> to create.
+                    Problems will be saved to the database. Fill out required fields marked with{' '}
+                    <Star className="w-3 h-3 text-amber-500 inline mx-1" /> to create.
                   </p>
                 </div>
               </div>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Step 1: Problem Information */}
               <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
@@ -302,20 +327,25 @@ export default function CreateProblemPage() {
                       </div>
                       <div>
                         <CardTitle className="text-xl text-gray-900">Problem Information</CardTitle>
-                        <p className="text-sm text-gray-600 mt-1">Start with the basics - title, description, and classification</p>
+                        <p className="text-sm text-gray-600 mt-1">
+                          Start with the basics - title, description, and classification
+                        </p>
                       </div>
                     </div>
-                    <Badge variant={steps[0].completed ? "default" : "outline"} className="px-3">
+                    <Badge variant={steps[0].completed ? 'default' : 'outline'} className="px-3">
                       Step 1
                     </Badge>
                   </div>
                 </CardHeader>
-                
+
                 <CardContent className="p-8 space-y-6">
                   {/* Title */}
                   <div className="space-y-2">
-                    <Label htmlFor="title" className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                      Problem Title 
+                    <Label
+                      htmlFor="title"
+                      className="text-lg font-semibold text-gray-900 flex items-center gap-2"
+                    >
+                      Problem Title
                       <Star className="w-4 h-4 text-amber-500" />
                     </Label>
                     <Input
@@ -339,8 +369,11 @@ export default function CreateProblemPage() {
 
                   {/* Description */}
                   <div className="space-y-2">
-                    <Label htmlFor="description" className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                      Problem Description 
+                    <Label
+                      htmlFor="description"
+                      className="text-lg font-semibold text-gray-900 flex items-center gap-2"
+                    >
+                      Problem Description
                       <Star className="w-4 h-4 text-amber-500" />
                     </Label>
                     <MathEditor
@@ -363,9 +396,7 @@ export default function CreateProblemPage() {
                           You can use LaTeX math notation like $x^2$ or $$\int x dx$$
                         </div>
                       )}
-                      <span className="text-xs text-gray-400">
-                        {description.length}/1000
-                      </span>
+                      <span className="text-xs text-gray-400">{description.length}/1000</span>
                     </div>
                   </div>
 
@@ -373,10 +404,13 @@ export default function CreateProblemPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                      Category 
-                      <Star className="w-4 h-4 text-amber-500" />
-                    </Label>
-                      <Select value={category} onValueChange={(value) => setCategory(value as ProblemCategory)}>
+                        Category
+                        <Star className="w-4 h-4 text-amber-500" />
+                      </Label>
+                      <Select
+                        value={category}
+                        onValueChange={(value) => setCategory(value as ProblemCategory)}
+                      >
                         <SelectTrigger className="h-12 bg-white border-2 focus:border-blue-400 focus:ring-4 focus:ring-blue-100">
                           <SelectValue placeholder="Choose a mathematics category" />
                         </SelectTrigger>
@@ -386,7 +420,9 @@ export default function CreateProblemPage() {
                             return (
                               <SelectItem key={cat} value={cat} className="py-3">
                                 <div className="flex items-center gap-3">
-                                  <div className={`w-8 h-8 rounded-lg ${info.color} flex items-center justify-center`}>
+                                  <div
+                                    className={`w-8 h-8 rounded-lg ${info.color} flex items-center justify-center`}
+                                  >
                                     <span className="text-white text-lg">{info.icon}</span>
                                   </div>
                                   <div>
@@ -409,10 +445,13 @@ export default function CreateProblemPage() {
 
                     <div className="space-y-2">
                       <Label className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                      Difficulty Level 
-                      <Star className="w-4 h-4 text-amber-500" />
-                    </Label>
-                      <Select value={difficulty} onValueChange={(value) => setDifficulty(value as ProblemDifficulty)}>
+                        Difficulty Level
+                        <Star className="w-4 h-4 text-amber-500" />
+                      </Label>
+                      <Select
+                        value={difficulty}
+                        onValueChange={(value) => setDifficulty(value as ProblemDifficulty)}
+                      >
                         <SelectTrigger className="h-12 bg-white border-2 focus:border-blue-400 focus:ring-4 focus:ring-blue-100">
                           <SelectValue placeholder="Select difficulty level" />
                         </SelectTrigger>
@@ -424,10 +463,16 @@ export default function CreateProblemPage() {
                                 <div className="flex items-center gap-3">
                                   <div className="flex">
                                     {[...Array(info.level)].map((_, i) => (
-                                      <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                                      <Star
+                                        key={i}
+                                        className="w-4 h-4 fill-amber-400 text-amber-400"
+                                      />
                                     ))}
                                     {[...Array(3 - info.level)].map((_, i) => (
-                                      <Star key={i + info.level} className="w-4 h-4 text-gray-300" />
+                                      <Star
+                                        key={i + info.level}
+                                        className="w-4 h-4 text-gray-300"
+                                      />
                                     ))}
                                   </div>
                                   <div>
@@ -461,19 +506,24 @@ export default function CreateProblemPage() {
                       </div>
                       <div>
                         <CardTitle className="text-xl text-gray-900">Problem Statement</CardTitle>
-                        <p className="text-sm text-gray-600 mt-1">Write the actual mathematical problem with full LaTeX support</p>
+                        <p className="text-sm text-gray-600 mt-1">
+                          Write the actual mathematical problem with full LaTeX support
+                        </p>
                       </div>
                     </div>
-                    <Badge variant={steps[1].completed ? "default" : "outline"} className="px-3">
+                    <Badge variant={steps[1].completed ? 'default' : 'outline'} className="px-3">
                       Step 2
                     </Badge>
                   </div>
                 </CardHeader>
-                
+
                 <CardContent className="p-8 space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="content" className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                      Problem Content 
+                    <Label
+                      htmlFor="content"
+                      className="text-lg font-semibold text-gray-900 flex items-center gap-2"
+                    >
+                      Problem Content
                       <Star className="w-4 h-4 text-amber-500" />
                     </Label>
                     <MathEditor
@@ -495,7 +545,7 @@ export default function CreateProblemPage() {
                   {/* Tags */}
                   <div className="space-y-4">
                     <Label className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                      Tags 
+                      Tags
                       <Star className="w-4 h-4 text-amber-500" />
                     </Label>
                     <div className="flex gap-3">
@@ -509,14 +559,18 @@ export default function CreateProblemPage() {
                       <Button
                         type="button"
                         onClick={addTagFromButton}
-                        disabled={!newTag.trim() || tags.includes(newTag.trim().toLowerCase()) || tags.length >= 10}
+                        disabled={
+                          !newTag.trim() ||
+                          tags.includes(newTag.trim().toLowerCase()) ||
+                          tags.length >= 10
+                        }
                         className="bg-green-600 hover:bg-green-700 px-6"
                       >
                         <Plus className="w-4 h-4 mr-2" />
                         Add
                       </Button>
                     </div>
-                    
+
                     {tags.length > 0 && (
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
@@ -525,7 +579,11 @@ export default function CreateProblemPage() {
                         </div>
                         <div className="flex flex-wrap gap-2">
                           {tags.map((tag) => (
-                            <Badge key={tag} variant="secondary" className="gap-2 px-3 py-1.5 bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border border-blue-200">
+                            <Badge
+                              key={tag}
+                              variant="secondary"
+                              className="gap-2 px-3 py-1.5 bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border border-blue-200"
+                            >
                               {tag}
                               <button
                                 type="button"
@@ -539,7 +597,7 @@ export default function CreateProblemPage() {
                         </div>
                       </div>
                     )}
-                    
+
                     {errors.tags && (
                       <div className="flex items-center gap-2 text-red-600">
                         <AlertTriangle className="w-4 h-4" />
@@ -560,7 +618,9 @@ export default function CreateProblemPage() {
                       </div>
                       <div>
                         <CardTitle className="text-xl text-gray-900">Solution</CardTitle>
-                        <p className="text-sm text-gray-600 mt-1">Provide the complete step-by-step solution (optional)</p>
+                        <p className="text-sm text-gray-600 mt-1">
+                          Provide the complete step-by-step solution (optional)
+                        </p>
                       </div>
                     </div>
                     <Badge variant="outline" className="px-3">
@@ -568,7 +628,7 @@ export default function CreateProblemPage() {
                     </Badge>
                   </div>
                 </CardHeader>
-                
+
                 <CardContent className="p-8 space-y-6">
                   <div className="space-y-4">
                     <Label className="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -591,11 +651,15 @@ export default function CreateProblemPage() {
               <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 p-6 rounded-t-2xl shadow-lg">
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Link href="/problems" className="sm:w-auto">
-                    <Button type="button" variant="outline" className="w-full sm:w-auto border-gray-300 text-gray-700 hover:bg-gray-50">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full sm:w-auto border-gray-300 text-gray-700 hover:bg-gray-50"
+                    >
                       Cancel
                     </Button>
                   </Link>
-                  
+
                   <Button
                     type="submit"
                     disabled={submitting}
@@ -638,17 +702,19 @@ export default function CreateProblemPage() {
                 >
                   {showPreview ? 'Hide Preview' : 'Show Preview'}
                 </Button>
-                
+
                 {showPreview && (
                   <div className="space-y-4 p-4 border-2 border-dashed border-indigo-200 rounded-xl bg-gradient-to-br from-indigo-50/50 to-purple-50/50">
                     {title ? (
                       <div>
-                        <h3 className="font-semibold text-lg text-gray-900 line-clamp-2">{title}</h3>
+                        <h3 className="font-semibold text-lg text-gray-900 line-clamp-2">
+                          {title}
+                        </h3>
                       </div>
                     ) : (
                       <div className="h-6 bg-gray-200 rounded animate-pulse"></div>
                     )}
-                    
+
                     <div className="flex gap-2">
                       {category ? (
                         <Badge variant="outline" className="bg-white/80">
@@ -658,12 +724,15 @@ export default function CreateProblemPage() {
                         <div className="h-5 w-16 bg-gray-200 rounded animate-pulse"></div>
                       )}
                       {difficulty && (
-                        <Badge variant="outline" className={`${PROBLEM_DIFFICULTY_INFO[difficulty]?.color} border-current bg-white/80`}>
+                        <Badge
+                          variant="outline"
+                          className={`${PROBLEM_DIFFICULTY_INFO[difficulty]?.color} border-current bg-white/80`}
+                        >
                           {PROBLEM_DIFFICULTY_INFO[difficulty]?.name}
                         </Badge>
                       )}
                     </div>
-                    
+
                     {description && (
                       <div>
                         <div className="text-sm text-gray-600 line-clamp-3">
@@ -671,7 +740,7 @@ export default function CreateProblemPage() {
                         </div>
                       </div>
                     )}
-                    
+
                     {content && (
                       <div className="p-3 bg-white/80 rounded-lg border-l-4 border-blue-500">
                         <div className="text-sm">
@@ -679,11 +748,15 @@ export default function CreateProblemPage() {
                         </div>
                       </div>
                     )}
-                    
+
                     {tags.length > 0 && (
                       <div className="flex flex-wrap gap-1">
                         {tags.slice(0, 3).map((tag) => (
-                          <Badge key={tag} variant="secondary" className="text-xs bg-blue-100 text-blue-700">
+                          <Badge
+                            key={tag}
+                            variant="secondary"
+                            className="text-xs bg-blue-100 text-blue-700"
+                          >
                             {tag}
                           </Badge>
                         ))}
@@ -713,7 +786,9 @@ export default function CreateProblemPage() {
                     <Target className="w-5 h-5 text-blue-600 mt-0.5" />
                     <div className="text-sm">
                       <p className="font-semibold text-blue-900 mb-1">Clear Problem Statement</p>
-                      <p className="text-blue-700">Be specific about what you're asking. Include all necessary information.</p>
+                      <p className="text-blue-700">
+                        Be specific about what you're asking. Include all necessary information.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -723,7 +798,10 @@ export default function CreateProblemPage() {
                     <Calculator className="w-5 h-5 text-green-600 mt-0.5" />
                     <div className="text-sm">
                       <p className="font-semibold text-green-900 mb-1">LaTeX Math Editor</p>
-                      <p className="text-green-700">Use the math editor with shortcuts like Ctrl+/ for division, Ctrl+Shift+6 for powers.</p>
+                      <p className="text-green-700">
+                        Use the math editor with shortcuts like Ctrl+/ for division, Ctrl+Shift+6
+                        for powers.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -733,7 +811,9 @@ export default function CreateProblemPage() {
                     <Star className="w-5 h-5 text-purple-600 mt-0.5" />
                     <div className="text-sm">
                       <p className="font-semibold text-purple-900 mb-1">Preview Feature</p>
-                      <p className="text-purple-700">Always check the preview to see how your math formulas will render.</p>
+                      <p className="text-purple-700">
+                        Always check the preview to see how your math formulas will render.
+                      </p>
                     </div>
                   </div>
                 </div>

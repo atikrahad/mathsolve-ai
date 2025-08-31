@@ -11,11 +11,11 @@ interface MathRendererProps {
   errorColor?: string;
 }
 
-export function MathRenderer({ 
-  math, 
-  displayMode = false, 
-  className = '', 
-  errorColor = '#cc0000' 
+export function MathRenderer({
+  math,
+  displayMode = false,
+  className = '',
+  errorColor = '#cc0000',
 }: MathRendererProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -30,7 +30,7 @@ export function MathRenderer({
         strict: 'warn',
         trust: false, // Don't allow dangerous commands for security
       });
-      
+
       containerRef.current.innerHTML = html;
     } catch (error) {
       // Fallback to plain text if KaTeX fails
@@ -41,7 +41,7 @@ export function MathRenderer({
   }, [math, displayMode, errorColor]);
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className={`katex-container ${displayMode ? 'katex-display' : 'katex-inline'} ${className}`}
     />
@@ -98,17 +98,12 @@ export function MathText({ children, className = '' }: MathTextProps) {
 
   useEffect(() => {
     if (!containerRef.current) return;
-    
+
     const renderedHtml = renderMathInText(children);
     containerRef.current.innerHTML = renderedHtml;
   }, [children]);
 
-  return (
-    <div 
-      ref={containerRef}
-      className={`math-text ${className}`}
-    />
-  );
+  return <div ref={containerRef} className={`math-text ${className}`} />;
 }
 
 // Hook for checking if a string contains math expressions

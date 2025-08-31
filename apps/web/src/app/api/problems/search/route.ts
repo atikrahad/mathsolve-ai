@@ -6,7 +6,7 @@ import { PROBLEM_CATEGORIES, PROBLEM_DIFFICULTY_LEVELS } from '@/types/problem';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    
+
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
     const query = searchParams.get('q');
@@ -33,18 +33,18 @@ export async function GET(request: NextRequest) {
       OR: [
         { title: { contains: query, mode: 'insensitive' } },
         { description: { contains: query, mode: 'insensitive' } },
-        { tags: { contains: query, mode: 'insensitive' } }
+        { tags: { contains: query, mode: 'insensitive' } },
       ],
     };
-    
+
     if (category && PROBLEM_CATEGORIES.includes(category as any)) {
       where.category = category;
     }
-    
+
     if (difficulty && PROBLEM_DIFFICULTY_LEVELS.includes(difficulty as any)) {
       where.difficulty = difficulty;
     }
-    
+
     if (creatorId) {
       where.creatorId = creatorId;
     }
@@ -99,7 +99,8 @@ export async function GET(request: NextRequest) {
         // Parse tags from JSON string
         let parsedTags: string[] = [];
         try {
-          parsedTags = typeof problem.tags === 'string' ? JSON.parse(problem.tags) : problem.tags || [];
+          parsedTags =
+            typeof problem.tags === 'string' ? JSON.parse(problem.tags) : problem.tags || [];
         } catch (e) {
           parsedTags = [];
         }
@@ -109,10 +110,11 @@ export async function GET(request: NextRequest) {
           where: { problemId: problem.id },
           select: { rating: true },
         });
-        
-        const avgRating = ratings.length > 0 
-          ? ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length 
-          : null;
+
+        const avgRating =
+          ratings.length > 0
+            ? ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length
+            : null;
 
         return {
           ...problem,

@@ -3,10 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { UpdateProblemData } from '@/types/problem';
 
 // GET /api/problems/[id] - Get problem by ID
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const problemId = params.id;
 
@@ -65,10 +62,9 @@ export async function GET(
       where: { problemId: problem.id },
       select: { rating: true },
     });
-    
-    const avgRating = ratings.length > 0 
-      ? ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length 
-      : null;
+
+    const avgRating =
+      ratings.length > 0 ? ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length : null;
 
     return NextResponse.json({
       success: true,
@@ -92,10 +88,7 @@ export async function GET(
 }
 
 // PUT /api/problems/[id] - Update problem
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const problemId = params.id;
     const body: UpdateProblemData = await request.json();
@@ -159,7 +152,10 @@ export async function PUT(
     // Parse tags for response
     let parsedTags: string[] = [];
     try {
-      parsedTags = typeof updatedProblem.tags === 'string' ? JSON.parse(updatedProblem.tags) : updatedProblem.tags || [];
+      parsedTags =
+        typeof updatedProblem.tags === 'string'
+          ? JSON.parse(updatedProblem.tags)
+          : updatedProblem.tags || [];
     } catch (e) {
       parsedTags = [];
     }
@@ -169,10 +165,9 @@ export async function PUT(
       where: { problemId: updatedProblem.id },
       select: { rating: true },
     });
-    
-    const avgRating = ratings.length > 0 
-      ? ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length 
-      : null;
+
+    const avgRating =
+      ratings.length > 0 ? ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length : null;
 
     return NextResponse.json({
       success: true,
@@ -196,10 +191,7 @@ export async function PUT(
 }
 
 // DELETE /api/problems/[id] - Delete problem
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const problemId = params.id;
 

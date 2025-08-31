@@ -123,12 +123,12 @@ export const DIFFICULTY_LEVELS: { value: DifficultyLevel; label: string; color: 
 
 // Utility functions
 export const getResourceTypeInfo = (type: ResourceType) => {
-  return RESOURCE_TYPES.find(t => t.value === type) || RESOURCE_TYPES[0];
+  return RESOURCE_TYPES.find((t) => t.value === type) || RESOURCE_TYPES[0];
 };
 
 export const getDifficultyInfo = (difficulty: DifficultyLevel | null) => {
   if (!difficulty) return { label: 'Not specified', color: 'bg-gray-100 text-gray-600' };
-  return DIFFICULTY_LEVELS.find(d => d.value === difficulty) || DIFFICULTY_LEVELS[0];
+  return DIFFICULTY_LEVELS.find((d) => d.value === difficulty) || DIFFICULTY_LEVELS[0];
 };
 
 export const formatResourceType = (type: ResourceType): string => {

@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { 
-  ProblemSearchParams, 
-  CreateProblemData, 
-  PROBLEM_CATEGORIES, 
-  PROBLEM_DIFFICULTY_LEVELS 
+import {
+  ProblemSearchParams,
+  CreateProblemData,
+  PROBLEM_CATEGORIES,
+  PROBLEM_DIFFICULTY_LEVELS,
 } from '@/types/problem';
 
 // GET /api/problems - Get all problems with filtering and pagination
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    
+
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
     const category = searchParams.get('category');
@@ -25,23 +25,23 @@ export async function GET(request: NextRequest) {
 
     // Build where clause
     const where: any = {};
-    
+
     if (category && PROBLEM_CATEGORIES.includes(category as any)) {
       where.category = category;
     }
-    
+
     if (difficulty && PROBLEM_DIFFICULTY_LEVELS.includes(difficulty as any)) {
       where.difficulty = difficulty;
     }
-    
+
     if (search) {
       where.OR = [
         { title: { contains: search, mode: 'insensitive' } },
         { description: { contains: search, mode: 'insensitive' } },
-        { tags: { contains: search, mode: 'insensitive' } }
+        { tags: { contains: search, mode: 'insensitive' } },
       ];
     }
-    
+
     if (creatorId) {
       where.creatorId = creatorId;
     }
@@ -96,7 +96,8 @@ export async function GET(request: NextRequest) {
         // Parse tags from JSON string
         let parsedTags: string[] = [];
         try {
-          parsedTags = typeof problem.tags === 'string' ? JSON.parse(problem.tags) : problem.tags || [];
+          parsedTags =
+            typeof problem.tags === 'string' ? JSON.parse(problem.tags) : problem.tags || [];
         } catch (e) {
           parsedTags = [];
         }
@@ -106,10 +107,11 @@ export async function GET(request: NextRequest) {
           where: { problemId: problem.id },
           select: { rating: true },
         });
-        
-        const avgRating = ratings.length > 0 
-          ? ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length 
-          : null;
+
+        const avgRating =
+          ratings.length > 0
+            ? ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length
+            : null;
 
         return {
           ...problem,
@@ -150,7 +152,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body: CreateProblemData = await request.json();
-    
+
     // Validate required fields
     if (!body.title || !body.description || !body.difficulty || !body.category) {
       return NextResponse.json(
@@ -187,9 +189,9 @@ export async function POST(request: NextRequest) {
     // For now, we'll use a default creator ID - this should come from auth in production
     // Check if a default user exists, create one if not
     let user = await prisma.user.findFirst({
-      where: { username: 'default-user' }
+      where: { username: 'default-user' },
     });
-    
+
     if (!user) {
       user = await prisma.user.create({
         data: {
@@ -201,7 +203,7 @@ export async function POST(request: NextRequest) {
         },
       });
     }
-    
+
     const creatorId = user.id;
 
     // Create the problem

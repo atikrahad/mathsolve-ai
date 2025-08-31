@@ -29,7 +29,7 @@ import {
   AlertCircle,
   Timer,
   Brain,
-  Zap
+  Zap,
 } from 'lucide-react';
 
 interface Step {
@@ -62,9 +62,9 @@ export default function ProblemSolvePage() {
     steps: [],
     timeSpent: 0,
     hintsUsed: 0,
-    attempts: 0
+    attempts: 0,
   });
-  
+
   const [currentWork, setCurrentWork] = useState('');
   const [stepExplanation, setStepExplanation] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -77,12 +77,12 @@ export default function ProblemSolvePage() {
     if (problemId) {
       loadProblemDetails();
     }
-    
+
     // Start timer
     intervalRef.current = setInterval(() => {
-      setSession(prev => ({
+      setSession((prev) => ({
         ...prev,
-        timeSpent: Math.floor((Date.now() - prev.startTime) / 1000)
+        timeSpent: Math.floor((Date.now() - prev.startTime) / 1000),
       }));
     }, 1000);
 
@@ -113,13 +113,13 @@ export default function ProblemSolvePage() {
       id: Date.now().toString(),
       content: currentWork.trim(),
       explanation: stepExplanation.trim() || undefined,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
-    setSession(prev => ({
+    setSession((prev) => ({
       ...prev,
       steps: [...prev.steps, newStep],
-      currentStep: prev.currentStep + 1
+      currentStep: prev.currentStep + 1,
     }));
 
     setCurrentWork('');
@@ -127,21 +127,19 @@ export default function ProblemSolvePage() {
   };
 
   const removeStep = (stepId: string) => {
-    setSession(prev => ({
+    setSession((prev) => ({
       ...prev,
-      steps: prev.steps.filter(step => step.id !== stepId),
-      currentStep: Math.max(0, prev.currentStep - 1)
+      steps: prev.steps.filter((step) => step.id !== stepId),
+      currentStep: Math.max(0, prev.currentStep - 1),
     }));
   };
 
   const editStep = (stepId: string, newContent: string, newExplanation?: string) => {
-    setSession(prev => ({
+    setSession((prev) => ({
       ...prev,
-      steps: prev.steps.map(step => 
-        step.id === stepId 
-          ? { ...step, content: newContent, explanation: newExplanation }
-          : step
-      )
+      steps: prev.steps.map((step) =>
+        step.id === stepId ? { ...step, content: newContent, explanation: newExplanation } : step
+      ),
     }));
   };
 
@@ -149,12 +147,12 @@ export default function ProblemSolvePage() {
     if (!finalAnswer.trim()) return;
 
     setSubmitting(true);
-    setSession(prev => ({ ...prev, attempts: prev.attempts + 1 }));
+    setSession((prev) => ({ ...prev, attempts: prev.attempts + 1 }));
 
     try {
       // Simulate solution checking
       const isCorrect = checkSolution(finalAnswer.trim(), problem?.solution);
-      
+
       if (isCorrect) {
         setIsCompleted(true);
         setShowSolution(true);
@@ -171,29 +169,26 @@ export default function ProblemSolvePage() {
 
   const checkSolution = (userAnswer: string, correctSolution?: string): boolean => {
     if (!correctSolution) return false;
-    
-    const normalize = (str: string) => 
-      str.toLowerCase()
-         .replace(/\s+/g, '')
-         .replace(/[{}]/g, '')
-         .trim();
-    
+
+    const normalize = (str: string) =>
+      str.toLowerCase().replace(/\s+/g, '').replace(/[{}]/g, '').trim();
+
     return normalize(userAnswer) === normalize(correctSolution);
   };
 
   const requestHint = () => {
     setShowHint(true);
-    setSession(prev => ({ ...prev, hintsUsed: prev.hintsUsed + 1 }));
-    
+    setSession((prev) => ({ ...prev, hintsUsed: prev.hintsUsed + 1 }));
+
     // Simulate hint based on current progress
     const hints = [
-      "Start by identifying what the problem is asking for.",
-      "Consider breaking down the problem into smaller parts.",
-      "Look for patterns or relationships in the given information.",
-      "Try working backwards from what you want to find.",
-      "Check if you can use any formulas or theorems you know."
+      'Start by identifying what the problem is asking for.',
+      'Consider breaking down the problem into smaller parts.',
+      'Look for patterns or relationships in the given information.',
+      'Try working backwards from what you want to find.',
+      'Check if you can use any formulas or theorems you know.',
     ];
-    
+
     const currentHint = hints[Math.min(session.hintsUsed, hints.length - 1)];
     setTimeout(() => {
       alert(`Hint: ${currentHint}`);
@@ -207,7 +202,7 @@ export default function ProblemSolvePage() {
       steps: [],
       timeSpent: 0,
       hintsUsed: 0,
-      attempts: 0
+      attempts: 0,
     });
     setCurrentWork('');
     setStepExplanation('');
@@ -229,7 +224,7 @@ export default function ProblemSolvePage() {
       session,
       currentWork,
       stepExplanation,
-      finalAnswer
+      finalAnswer,
     };
     localStorage.setItem(`solve_session_${problemId}`, JSON.stringify(sessionData));
     alert('Progress saved!');
@@ -274,9 +269,7 @@ export default function ProblemSolvePage() {
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Problem not found</h1>
-            <Button onClick={() => router.push('/problems')}>
-              Back to Problems
-            </Button>
+            <Button onClick={() => router.push('/problems')}>Back to Problems</Button>
           </div>
         </div>
       </div>
@@ -285,14 +278,14 @@ export default function ProblemSolvePage() {
 
   const categoryInfo = PROBLEM_CATEGORY_INFO[problem.category];
   const difficultyInfo = PROBLEM_DIFFICULTY_INFO[problem.difficulty];
-  const progressPercentage = problem.solution 
+  const progressPercentage = problem.solution
     ? Math.min((session.steps.length / 5) * 100, 100) // Estimate progress
     : 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      
+
       <div className="container mx-auto px-4 py-6 max-w-7xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -305,9 +298,9 @@ export default function ProblemSolvePage() {
               <ArrowLeft className="w-4 h-4" />
               Back to Problem
             </Button>
-            
+
             <div className="flex items-center gap-3">
-              <div 
+              <div
                 className={`w-3 h-3 rounded-full ${categoryInfo?.color || 'bg-gray-400'}`}
                 title={categoryInfo?.name}
               />
@@ -332,7 +325,7 @@ export default function ProblemSolvePage() {
                 <span>{session.hintsUsed} hints</span>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" onClick={saveProgress}>
                 <Save className="w-4 h-4" />
@@ -363,7 +356,8 @@ export default function ProblemSolvePage() {
           <Alert className="mb-6 border-green-200 bg-green-50">
             <Trophy className="w-4 h-4 text-green-600" />
             <AlertDescription className="text-green-800">
-              🎉 Congratulations! You solved the problem in {formatTime(session.timeSpent)} with {session.attempts} attempt(s)!
+              🎉 Congratulations! You solved the problem in {formatTime(session.timeSpent)} with{' '}
+              {session.attempts} attempt(s)!
             </AlertDescription>
           </Alert>
         )}
@@ -384,7 +378,7 @@ export default function ProblemSolvePage() {
                   <div className="prose max-w-none">
                     <MathText>{problem.description}</MathText>
                   </div>
-                  
+
                   {problem.tags && Array.isArray(problem.tags) && problem.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 pt-3 border-t">
                       {problem.tags.map((tag, index) => (
@@ -397,9 +391,9 @@ export default function ProblemSolvePage() {
 
                   {!isCompleted && (
                     <div className="pt-3 border-t">
-                      <Button 
-                        onClick={requestHint} 
-                        variant="outline" 
+                      <Button
+                        onClick={requestHint}
+                        variant="outline"
                         className="w-full flex items-center gap-2"
                         disabled={session.hintsUsed >= 3}
                       >
@@ -439,7 +433,7 @@ export default function ProblemSolvePage() {
                         rows={4}
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Step Explanation (Optional)
@@ -454,8 +448,8 @@ export default function ProblemSolvePage() {
                       />
                     </div>
 
-                    <Button 
-                      onClick={addStep} 
+                    <Button
+                      onClick={addStep}
                       disabled={!currentWork.trim()}
                       className="flex items-center gap-2"
                     >
@@ -488,12 +482,12 @@ export default function ProblemSolvePage() {
                             <XCircle className="w-4 h-4" />
                           </Button>
                         </div>
-                        
+
                         <div className="space-y-2">
                           <div className="p-3 bg-gray-50 rounded">
                             <MathText>{step.content}</MathText>
                           </div>
-                          
+
                           {step.explanation && (
                             <div className="p-3 bg-blue-50 border border-blue-200 rounded text-sm">
                               <MathText>{step.explanation}</MathText>
@@ -526,8 +520,8 @@ export default function ProblemSolvePage() {
                       showShortcuts={true}
                       rows={3}
                     />
-                    
-                    <Button 
+
+                    <Button
                       onClick={handleSubmitSolution}
                       disabled={submitting || !finalAnswer.trim()}
                       className="flex items-center gap-2"

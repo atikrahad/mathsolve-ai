@@ -57,7 +57,7 @@ export function ProblemRatingComponent({ problemId, currentRating }: ProblemRati
     setHoverRating(0);
   };
 
-  const displayRating = hasRated ? rating : (hoverRating || rating);
+  const displayRating = hasRated ? rating : hoverRating || rating;
 
   return (
     <Card>
@@ -72,16 +72,12 @@ export function ProblemRatingComponent({ problemId, currentRating }: ProblemRati
                 <Star
                   key={star}
                   className={`w-6 h-6 ${
-                    star <= rating
-                      ? 'fill-yellow-400 text-yellow-400'
-                      : 'text-gray-300'
+                    star <= rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
                   }`}
                 />
               ))}
             </div>
-            <p className="text-sm text-gray-600">
-              Thanks for rating this problem!
-            </p>
+            <p className="text-sm text-gray-600">Thanks for rating this problem!</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -105,7 +101,7 @@ export function ProblemRatingComponent({ problemId, currentRating }: ProblemRati
                 </button>
               ))}
             </div>
-            
+
             <div className="text-center text-sm text-gray-600">
               {rating === 0 && 'Click to rate'}
               {rating === 1 && 'Poor - Has significant issues'}
@@ -123,12 +119,8 @@ export function ProblemRatingComponent({ problemId, currentRating }: ProblemRati
                   onChange={(e) => setComment(e.target.value)}
                   className="min-h-[80px] resize-y"
                 />
-                
-                <Button
-                  onClick={handleSubmitRating}
-                  disabled={submitting}
-                  className="w-full"
-                >
+
+                <Button onClick={handleSubmitRating} disabled={submitting} className="w-full">
                   {submitting ? 'Submitting...' : 'Submit Rating'}
                 </Button>
               </>

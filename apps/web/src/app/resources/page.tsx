@@ -6,7 +6,13 @@ import { Search, Filter, BookOpen, GraduationCap, FileText, Plus } from 'lucide-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert } from '@/components/ui/alert';
@@ -56,11 +62,9 @@ export default function ResourcesPage() {
       setLoading(true);
       setError(null);
 
-      const searchParams = searchQuery 
-        ? { ...filters, query: searchQuery }
-        : filters;
+      const searchParams = searchQuery ? { ...filters, query: searchQuery } : filters;
 
-      const result = searchQuery 
+      const result = searchQuery
         ? await resourceService.searchResources(searchParams as any)
         : await resourceService.getResources(searchParams);
 
@@ -185,7 +189,9 @@ export default function ResourcesPage() {
 
               <Select
                 value={filters.difficulty || ''}
-                onValueChange={(value) => handleFilterChange('difficulty', value as DifficultyLevel)}
+                onValueChange={(value) =>
+                  handleFilterChange('difficulty', value as DifficultyLevel)
+                }
               >
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="All Difficulties" />
@@ -216,7 +222,9 @@ export default function ResourcesPage() {
                     <React.Fragment key={option.value}>
                       <SelectItem value={`${option.value}-desc`}>{option.label}</SelectItem>
                       {option.value !== 'createdAt' && (
-                        <SelectItem value={`${option.value}-asc`}>{option.label} (Ascending)</SelectItem>
+                        <SelectItem value={`${option.value}-asc`}>
+                          {option.label} (Ascending)
+                        </SelectItem>
                       )}
                     </React.Fragment>
                   ))}
@@ -275,10 +283,9 @@ export default function ResourcesPage() {
                 {searchQuery ? 'No resources found' : 'No resources available'}
               </h3>
               <p className="text-gray-500 mb-6">
-                {searchQuery 
+                {searchQuery
                   ? 'Try adjusting your search criteria or filters'
-                  : 'Be the first to create a learning resource for the community'
-                }
+                  : 'Be the first to create a learning resource for the community'}
               </p>
               {!searchQuery && (
                 <Link href="/resources/create">
@@ -308,14 +315,14 @@ export default function ResourcesPage() {
             >
               Previous
             </Button>
-            
+
             <div className="flex gap-1">
               {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
                 const pageNum = i + 1;
                 return (
                   <Button
                     key={pageNum}
-                    variant={pagination.page === pageNum ? "default" : "outline"}
+                    variant={pagination.page === pageNum ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => handlePageChange(pageNum)}
                   >
@@ -355,15 +362,11 @@ function ResourceCard({ resource }: { resource: Resource }) {
             </Badge>
           </div>
           {resource.difficulty && (
-            <Badge className={`text-xs ${difficultyInfo.color}`}>
-              {difficultyInfo.label}
-            </Badge>
+            <Badge className={`text-xs ${difficultyInfo.color}`}>{difficultyInfo.label}</Badge>
           )}
         </div>
         <CardTitle className="text-lg group-hover:text-blue-600 transition-colors">
-          <Link href={`/resources/${resource.id}`}>
-            {resource.title}
-          </Link>
+          <Link href={`/resources/${resource.id}`}>{resource.title}</Link>
         </CardTitle>
         <div className="flex items-center gap-4 text-sm text-gray-500">
           <span>By {resource.author.username}</span>
@@ -371,27 +374,25 @@ function ResourceCard({ resource }: { resource: Resource }) {
           <span>{resource.viewCount} views</span>
         </div>
       </CardHeader>
-      
+
       <CardContent className="pt-0">
         <p className="text-gray-600 text-sm mb-4 line-clamp-3">
           {resourceService.getResourceSummary(resource.content, 120)}
         </p>
-        
+
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Badge variant="secondary" className="text-xs">
               {resource.category}
             </Badge>
           </div>
-          
+
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <span>⭐ {resource.rating.toFixed(1)}</span>
-            {resource._count.bookmarks > 0 && (
-              <span>📖 {resource._count.bookmarks}</span>
-            )}
+            {resource._count.bookmarks > 0 && <span>📖 {resource._count.bookmarks}</span>}
           </div>
         </div>
-        
+
         <div className="mt-4">
           <Link href={`/resources/${resource.id}`}>
             <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">

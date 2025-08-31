@@ -8,7 +8,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Alert } from '@/components/ui/alert';
@@ -48,11 +54,11 @@ export default function CreateResourcePage() {
 
   // Handle form input changes
   const handleInputChange = (field: keyof CreateResourceData, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
-    
+
     // Clear errors when user starts typing
     if (errors.length > 0) {
       setErrors([]);
@@ -62,7 +68,7 @@ export default function CreateResourcePage() {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!user) {
       router.push('/auth/login');
       return;
@@ -82,19 +88,16 @@ export default function CreateResourcePage() {
 
       // Create resource
       const resource = await resourceService.createResource(formData);
-      
+
       setSuccess(true);
-      
+
       // Redirect to the created resource after a short delay
       setTimeout(() => {
         router.push(`/resources/${resource.id}`);
       }, 1500);
     } catch (err: any) {
       console.error('Error creating resource:', err);
-      setErrors([
-        err.response?.data?.message || 
-        'Failed to create resource. Please try again.'
-      ]);
+      setErrors([err.response?.data?.message || 'Failed to create resource. Please try again.']);
     } finally {
       setLoading(false);
     }
@@ -138,9 +141,7 @@ export default function CreateResourcePage() {
                 <Button variant="outline" onClick={() => router.push('/resources')}>
                   Browse Resources
                 </Button>
-                <Button onClick={() => router.push('/resources/create')}>
-                  Create Another
-                </Button>
+                <Button onClick={() => router.push('/resources/create')}>Create Another</Button>
               </div>
             </CardContent>
           </Card>
@@ -165,7 +166,8 @@ export default function CreateResourcePage() {
             Create Learning Resource
           </h1>
           <p className="text-gray-600 mt-2">
-            Share your knowledge with the community by creating a tutorial, guide, or reference material
+            Share your knowledge with the community by creating a tutorial, guide, or reference
+            material
           </p>
         </div>
 
@@ -212,9 +214,7 @@ export default function CreateResourcePage() {
 
                   {/* Content */}
                   <div>
-                    <Label className="text-base font-medium">
-                      Content *
-                    </Label>
+                    <Label className="text-base font-medium">Content *</Label>
                     <div className="mt-2">
                       <Textarea
                         value={formData.content}
@@ -261,7 +261,7 @@ export default function CreateResourcePage() {
                       </SelectContent>
                     </Select>
                     <p className="text-sm text-gray-500 mt-1">
-                      {RESOURCE_TYPES.find(t => t.value === formData.type)?.description}
+                      {RESOURCE_TYPES.find((t) => t.value === formData.type)?.description}
                     </p>
                   </div>
 
@@ -294,7 +294,9 @@ export default function CreateResourcePage() {
                     </Label>
                     <Select
                       value={formData.difficulty || ''}
-                      onValueChange={(value) => handleInputChange('difficulty', value as DifficultyLevel || null)}
+                      onValueChange={(value) =>
+                        handleInputChange('difficulty', (value as DifficultyLevel) || null)
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select difficulty" />
@@ -310,8 +312,12 @@ export default function CreateResourcePage() {
                     </Select>
                     {formData.difficulty && (
                       <div className="mt-2">
-                        <Badge className={DIFFICULTY_LEVELS.find(d => d.value === formData.difficulty)?.color}>
-                          {DIFFICULTY_LEVELS.find(d => d.value === formData.difficulty)?.label}
+                        <Badge
+                          className={
+                            DIFFICULTY_LEVELS.find((d) => d.value === formData.difficulty)?.color
+                          }
+                        >
+                          {DIFFICULTY_LEVELS.find((d) => d.value === formData.difficulty)?.label}
                         </Badge>
                       </div>
                     )}
@@ -330,23 +336,29 @@ export default function CreateResourcePage() {
                 <CardContent className="text-sm space-y-3">
                   <div>
                     <h4 className="font-medium">For Tutorials:</h4>
-                    <p className="text-gray-600">Include step-by-step instructions with examples and practice problems.</p>
+                    <p className="text-gray-600">
+                      Include step-by-step instructions with examples and practice problems.
+                    </p>
                   </div>
                   <div>
                     <h4 className="font-medium">For Guides:</h4>
-                    <p className="text-gray-600">Provide comprehensive coverage of a topic with clear explanations and context.</p>
+                    <p className="text-gray-600">
+                      Provide comprehensive coverage of a topic with clear explanations and context.
+                    </p>
                   </div>
                   <div>
                     <h4 className="font-medium">For Reference:</h4>
-                    <p className="text-gray-600">Focus on formulas, definitions, and quick lookup information.</p>
+                    <p className="text-gray-600">
+                      Focus on formulas, definitions, and quick lookup information.
+                    </p>
                   </div>
                 </CardContent>
               </Card>
 
               {/* Actions */}
               <div className="space-y-3">
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   disabled={loading || !formData.title || !formData.content}
                   className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
                 >
@@ -359,10 +371,10 @@ export default function CreateResourcePage() {
                     </>
                   )}
                 </Button>
-                
-                <Button 
-                  type="button" 
-                  variant="outline" 
+
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={() => router.push('/resources')}
                   className="w-full"
                 >
