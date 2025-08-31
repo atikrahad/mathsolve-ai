@@ -1,14 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import prisma from '../config/database';
 
-export interface BaseRepository<T> {
-  findById(id: string): Promise<T | null>;
-  findMany(options?: FindManyOptions): Promise<T[]>;
-  create(data: Partial<T>): Promise<T>;
-  update(id: string, data: Partial<T>): Promise<T>;
-  delete(id: string): Promise<void>;
-}
-
 export interface FindManyOptions {
   skip?: number;
   take?: number;
@@ -18,7 +10,23 @@ export interface FindManyOptions {
   select?: any;
 }
 
-export abstract class AbstractRepository<T> implements BaseRepository<T> {
+export class BaseRepository {
+  protected db: PrismaClient;
+
+  constructor() {
+    this.db = prisma;
+  }
+}
+
+export interface IBaseRepository<T> {
+  findById(id: string): Promise<T | null>;
+  findMany(options?: FindManyOptions): Promise<T[]>;
+  create(data: Partial<T>): Promise<T>;
+  update(id: string, data: Partial<T>): Promise<T>;
+  delete(id: string): Promise<void>;
+}
+
+export abstract class AbstractRepository<T> implements IBaseRepository<T> {
   protected prisma: PrismaClient;
   protected abstract model: any;
 

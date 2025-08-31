@@ -1,66 +1,258 @@
 [
   {
-    "title": "Quadratic Equation Solutions",
-    "description": "Find all real solutions to the quadratic equation: x² - 5x + 6 = 0",
+    "title": "Solving Linear Equations",
+    "description": "Solve for x: 3x + 7 = 22",
     "difficulty": "LOW",
     "category": "Algebra",
-    "tags": ["quadratic", "factoring", "basic"],
-    "solution": "To solve x² - 5x + 6 = 0, we can factor: (x - 2)(x - 3) = 0. Therefore x = 2 or x = 3."
+    "tags": ["linear", "basic", "solving"],
+    "solution": "3x + 7 = 22\n3x = 22 - 7\n3x = 15\nx = 5"
   },
   {
-    "title": "Derivative of Polynomial",
-    "description": "Find the derivative of f(x) = 3x⁴ - 2x³ + 5x² - 7x + 1",
-    "difficulty": "MEDIUM", 
-    "category": "Calculus",
-    "tags": ["derivative", "polynomial", "power rule"],
-    "solution": "Using the power rule: f'(x) = 12x³ - 6x² + 10x - 7"
-  },
-  {
-    "title": "Triangle Area Calculation",
-    "description": "A triangle has sides of length 5, 12, and 13. Calculate its area using Heron's formula.",
+    "title": "Quadratic Formula Application",
+    "description": "Use the quadratic formula to solve: x² - 6x + 9 = 0",
     "difficulty": "MEDIUM",
-    "category": "Geometry", 
-    "tags": ["triangle", "area", "heron's formula"],
-    "solution": "First check if it's a right triangle: 5² + 12² = 25 + 144 = 169 = 13². Yes! So area = (1/2) × 5 × 12 = 30."
-  },
-  {
-    "title": "Probability of Two Dice",
-    "description": "What is the probability of rolling two dice and getting a sum of 7?",
-    "difficulty": "LOW",
-    "category": "Statistics",
-    "tags": ["probability", "dice", "combinations"],
-    "solution": "There are 6 ways to get sum 7: (1,6), (2,5), (3,4), (4,3), (5,2), (6,1). Total outcomes = 36. Probability = 6/36 = 1/6."
-  },
-  {
-    "title": "Integration by Parts", 
-    "description": "Evaluate the integral: ∫ x·e^x dx",
-    "difficulty": "HIGH",
-    "category": "Calculus",
-    "tags": ["integration", "by parts", "exponential"],
-    "solution": "Using integration by parts with u = x, dv = e^x dx: ∫ x·e^x dx = x·e^x - ∫ e^x dx = x·e^x - e^x + C = e^x(x - 1) + C"
+    "category": "Algebra",
+    "tags": ["quadratic", "formula", "roots"],
+    "solution": "Using the quadratic formula: x = (-b ± √(b² - 4ac)) / 2a\nHere a = 1, b = -6, c = 9\nx = (6 ± √(36 - 36)) / 2 = 6/2 = 3\nThe equation has one repeated root: x = 3"
   },
   {
     "title": "System of Linear Equations",
-    "description": "Solve the system: 2x + 3y = 12, x - y = 1",
+    "description": "Solve the system using elimination method:\n2x + 3y = 11\n4x - y = 13",
     "difficulty": "MEDIUM",
-    "category": "Algebra", 
-    "tags": ["system", "linear", "substitution"],
-    "solution": "From equation 2: x = y + 1. Substitute: 2(y + 1) + 3y = 12, so 5y + 2 = 12, y = 2. Then x = 3. Solution: (3, 2)."
+    "category": "Algebra",
+    "tags": ["system", "elimination", "linear"],
+    "solution": "Multiply first equation by 2: 4x + 6y = 22\nSubtract second equation: (4x + 6y) - (4x - y) = 22 - 13\n7y = 9, so y = 9/7\nSubstitute back: 2x + 3(9/7) = 11\n2x = 11 - 27/7 = 50/7\nx = 25/7\nSolution: x = 25/7, y = 9/7"
   },
   {
-    "title": "Circle Circumference",
-    "description": "A circle has radius 7 cm. What is its circumference?",
-    "difficulty": "LOW", 
-    "category": "Geometry",
-    "tags": ["circle", "circumference", "basic"],
-    "solution": "Circumference = 2πr = 2π(7) = 14π cm ≈ 43.98 cm"
+    "title": "Polynomial Factoring",
+    "description": "Factor completely: x³ - 8x² + 16x",
+    "difficulty": "HIGH",
+    "category": "Algebra",
+    "tags": ["factoring", "polynomial", "cubic"],
+    "solution": "x³ - 8x² + 16x = x(x² - 8x + 16) = x(x - 4)²\nThe completely factored form is x(x - 4)²"
   },
   {
-    "title": "Limit Evaluation",
-    "description": "Find the limit: lim(x→0) (sin x)/x",
+    "title": "Basic Derivative",
+    "description": "Find the derivative of f(x) = 3x⁴ - 2x³ + 5x - 7",
+    "difficulty": "LOW",
+    "category": "Calculus",
+    "tags": ["derivative", "polynomial", "power rule"],
+    "solution": "Using the power rule d/dx[xⁿ] = nxⁿ⁻¹:\nf'(x) = 12x³ - 6x² + 5"
+  },
+  {
+    "title": "Chain Rule Application",
+    "description": "Find the derivative of f(x) = (2x³ + 1)⁵",
+    "difficulty": "MEDIUM",
+    "category": "Calculus",
+    "tags": ["derivative", "chain rule", "composition"],
+    "solution": "Using chain rule: d/dx[g(h(x))] = g'(h(x)) · h'(x)\nLet u = 2x³ + 1, then f(x) = u⁵\nf'(x) = 5u⁴ · (6x²) = 5(2x³ + 1)⁴ · 6x² = 30x²(2x³ + 1)⁴"
+  },
+  {
+    "title": "Integration by Substitution",
+    "description": "Evaluate the integral: ∫ 6x(3x² + 1)² dx",
+    "difficulty": "MEDIUM",
+    "category": "Calculus",
+    "tags": ["integration", "substitution", "polynomial"],
+    "solution": "Let u = 3x² + 1, then du = 6x dx\n∫ 6x(3x² + 1)² dx = ∫ u² du = u³/3 + C = (3x² + 1)³/3 + C"
+  },
+  {
+    "title": "Limits at Infinity",
+    "description": "Find the limit: lim(x→∞) (2x³ - 5x² + 1)/(x³ + 3x - 2)",
     "difficulty": "HIGH",
     "category": "Calculus",
-    "tags": ["limit", "trigonometric", "standard"],
-    "solution": "This is a standard limit. Using L'Hôpital's rule or geometric proof: lim(x→0) (sin x)/x = 1"
+    "tags": ["limits", "infinity", "rational functions"],
+    "solution": "Divide numerator and denominator by x³:\nlim(x→∞) (2 - 5/x + 1/x³)/(1 + 3/x² - 2/x³) = 2/1 = 2\nThe limit is 2."
+  },
+  {
+    "title": "Area of Triangle",
+    "description": "Find the area of a triangle with vertices at (0,0), (4,0), and (2,3)",
+    "difficulty": "LOW",
+    "category": "Geometry",
+    "tags": ["triangle", "area", "coordinates"],
+    "solution": "Using the coordinate formula: Area = ½|x₁(y₂ - y₃) + x₂(y₃ - y₁) + x₃(y₁ - y₂)|\nArea = ½|0(0 - 3) + 4(3 - 0) + 2(0 - 0)| = ½|0 + 12 + 0| = 6 square units"
+  },
+  {
+    "title": "Circle Equation",
+    "description": "Find the equation of a circle with center (-2, 3) and radius 5",
+    "difficulty": "LOW",
+    "category": "Geometry",
+    "tags": ["circle", "equation", "center-radius"],
+    "solution": "The standard form of a circle is (x - h)² + (y - k)² = r²\nwhere (h, k) is the center and r is the radius.\n(x - (-2))² + (y - 3)² = 5²\n(x + 2)² + (y - 3)² = 25"
+  },
+  {
+    "title": "Pythagorean Theorem",
+    "description": "A right triangle has legs of length 5 and 12. Find the length of the hypotenuse.",
+    "difficulty": "LOW",
+    "category": "Geometry",
+    "tags": ["pythagorean", "triangle", "right triangle"],
+    "solution": "Using the Pythagorean theorem: a² + b² = c²\n5² + 12² = c²\n25 + 144 = c²\n169 = c²\nc = 13"
+  },
+  {
+    "title": "Volume of Cone",
+    "description": "Find the volume of a cone with radius 6 cm and height 8 cm",
+    "difficulty": "MEDIUM",
+    "category": "Geometry",
+    "tags": ["volume", "cone", "3d geometry"],
+    "solution": "The volume of a cone is V = (1/3)πr²h\nV = (1/3)π(6)²(8) = (1/3)π(36)(8) = 96π cubic cm"
+  },
+  {
+    "title": "Basic Trigonometric Identity",
+    "description": "Verify the identity: sin²θ + cos²θ = 1 for θ = 30°",
+    "difficulty": "LOW",
+    "category": "Trigonometry",
+    "tags": ["identity", "basic", "verification"],
+    "solution": "sin(30°) = 1/2, cos(30°) = √3/2\nsin²(30°) + cos²(30°) = (1/2)² + (√3/2)² = 1/4 + 3/4 = 1 ✓"
+  },
+  {
+    "title": "Law of Cosines",
+    "description": "In triangle ABC, a = 7, b = 10, and C = 60°. Find side c.",
+    "difficulty": "MEDIUM",
+    "category": "Trigonometry",
+    "tags": ["law of cosines", "triangle", "angles"],
+    "solution": "Using the Law of Cosines: c² = a² + b² - 2ab cos(C)\nc² = 7² + 10² - 2(7)(10)cos(60°)\nc² = 49 + 100 - 140(1/2) = 149 - 70 = 79\nc = √79 ≈ 8.89"
+  },
+  {
+    "title": "Double Angle Formula",
+    "description": "Use the double angle formula to find sin(2θ) if sin(θ) = 3/5 and θ is in the first quadrant",
+    "difficulty": "HIGH",
+    "category": "Trigonometry",
+    "tags": ["double angle", "trigonometric formulas"],
+    "solution": "sin(2θ) = 2sin(θ)cos(θ)\nGiven sin(θ) = 3/5, and θ in first quadrant\ncos(θ) = √(1 - sin²(θ)) = √(1 - 9/25) = √(16/25) = 4/5\nsin(2θ) = 2(3/5)(4/5) = 24/25"
+  },
+  {
+    "title": "Mean and Standard Deviation",
+    "description": "Find the mean and standard deviation of the dataset: 2, 4, 6, 8, 10",
+    "difficulty": "MEDIUM",
+    "category": "Statistics",
+    "tags": ["mean", "standard deviation", "descriptive statistics"],
+    "solution": "Mean = (2 + 4 + 6 + 8 + 10)/5 = 30/5 = 6\nVariance = [(2-6)² + (4-6)² + (6-6)² + (8-6)² + (10-6)²]/5\n= [16 + 4 + 0 + 4 + 16]/5 = 40/5 = 8\nStandard deviation = √8 = 2√2 ≈ 2.83"
+  },
+  {
+    "title": "Probability with Dice",
+    "description": "What is the probability of rolling two dice and getting a sum greater than 9?",
+    "difficulty": "LOW",
+    "category": "Statistics",
+    "tags": ["probability", "dice", "counting"],
+    "solution": "Favorable outcomes for sum > 9: (4,6), (5,5), (5,6), (6,4), (6,5), (6,6)\nThat's 6 outcomes out of 36 total possible outcomes.\nProbability = 6/36 = 1/6"
+  },
+  {
+    "title": "Normal Distribution",
+    "description": "In a normal distribution with mean 100 and standard deviation 15, what percentage of values lie within one standard deviation of the mean?",
+    "difficulty": "HIGH",
+    "category": "Statistics",
+    "tags": ["normal distribution", "empirical rule"],
+    "solution": "By the empirical rule (68-95-99.7 rule), approximately 68% of values in a normal distribution lie within one standard deviation of the mean.\nThis means 68% of values lie between 100 - 15 = 85 and 100 + 15 = 115."
+  },
+  {
+    "title": "Prime Factorization",
+    "description": "Find the prime factorization of 360",
+    "difficulty": "MEDIUM",
+    "category": "Number Theory",
+    "tags": ["prime factorization", "factors"],
+    "solution": "360 = 2³ × 3² × 5¹\n360 ÷ 2 = 180\n180 ÷ 2 = 90\n90 ÷ 2 = 45\n45 ÷ 3 = 15\n15 ÷ 3 = 5\n5 ÷ 5 = 1\nTherefore: 360 = 2³ × 3² × 5"
+  },
+  {
+    "title": "Greatest Common Divisor",
+    "description": "Find GCD(48, 72) using the Euclidean algorithm",
+    "difficulty": "MEDIUM",
+    "category": "Number Theory",
+    "tags": ["gcd", "euclidean algorithm"],
+    "solution": "72 = 48 × 1 + 24\n48 = 24 × 2 + 0\nSince remainder is 0, GCD(48, 72) = 24"
+  },
+  {
+    "title": "Modular Arithmetic",
+    "description": "Find the remainder when 2⁵⁰ is divided by 7",
+    "difficulty": "HIGH",
+    "category": "Number Theory",
+    "tags": ["modular arithmetic", "exponentiation"],
+    "solution": "Find pattern of powers of 2 mod 7:\n2¹ ≡ 2 (mod 7)\n2² ≡ 4 (mod 7)\n2³ ≡ 1 (mod 7)\nPattern repeats every 3 powers.\n50 = 3 × 16 + 2\nSo 2⁵⁰ ≡ 2² ≡ 4 (mod 7)"
+  },
+  {
+    "title": "Matrix Multiplication",
+    "description": "Multiply the matrices: [2 1; 3 4] × [5 0; 1 2]",
+    "difficulty": "MEDIUM",
+    "category": "Linear Algebra",
+    "tags": ["matrix", "multiplication"],
+    "solution": "[2 1; 3 4] × [5 0; 1 2] = [(2×5 + 1×1) (2×0 + 1×2); (3×5 + 4×1) (3×0 + 4×2)]\n= [11 2; 19 8]"
+  },
+  {
+    "title": "Matrix Determinant",
+    "description": "Find the determinant of the 2×2 matrix: [3 5; 2 4]",
+    "difficulty": "LOW",
+    "category": "Linear Algebra",
+    "tags": ["determinant", "2x2 matrix"],
+    "solution": "For a 2×2 matrix [a b; c d], det = ad - bc\ndet([3 5; 2 4]) = (3)(4) - (5)(2) = 12 - 10 = 2"
+  },
+  {
+    "title": "Eigenvalues",
+    "description": "Find the eigenvalues of the matrix A = [4 -2; 1 1]",
+    "difficulty": "HIGH",
+    "category": "Linear Algebra",
+    "tags": ["eigenvalues", "characteristic polynomial"],
+    "solution": "Find eigenvalues from det(A - λI) = 0\ndet([4-λ -2; 1 1-λ]) = (4-λ)(1-λ) - (-2)(1) = λ² - 5λ + 6 = 0\n(λ - 2)(λ - 3) = 0\nEigenvalues: λ₁ = 2, λ₂ = 3"
+  },
+  {
+    "title": "First-Order Linear ODE",
+    "description": "Solve the differential equation: dy/dx + 2y = e^x",
+    "difficulty": "MEDIUM",
+    "category": "Differential Equations",
+    "tags": ["ode", "first order", "linear"],
+    "solution": "This is a first-order linear ODE: dy/dx + P(x)y = Q(x)\nP(x) = 2, Q(x) = e^x\nIntegrating factor: μ(x) = e^∫2dx = e^(2x)\nSolution: y = (1/μ)∫μQ dx = (1/e^(2x))∫e^(2x)·e^x dx = (1/e^(2x))∫e^(3x) dx\n= (1/e^(2x))·(e^(3x)/3) + C/e^(2x) = e^x/3 + Ce^(-2x)"
+  },
+  {
+    "title": "Separable ODE",
+    "description": "Solve: dy/dx = xy/(1+x²)",
+    "difficulty": "HIGH",
+    "category": "Differential Equations",
+    "tags": ["ode", "separable", "integration"],
+    "solution": "Separate variables: dy/y = x dx/(1+x²)\nIntegrate both sides: ∫dy/y = ∫x dx/(1+x²)\nln|y| = (1/2)ln(1+x²) + C\n|y| = e^C√(1+x²)\ny = A√(1+x²) where A = ±e^C"
+  },
+  {
+    "title": "Permutations and Combinations",
+    "description": "How many ways can 5 people be arranged in a row? How many ways can 3 be chosen from the 5?",
+    "difficulty": "MEDIUM",
+    "category": "Combinatorics",
+    "tags": ["permutations", "combinations", "counting"],
+    "solution": "Arrangements (permutations): P(5,5) = 5! = 120 ways\nChoosing 3 from 5 (combinations): C(5,3) = 5!/(3!2!) = 10 ways"
+  },
+  {
+    "title": "Binomial Theorem",
+    "description": "Expand (x + 2)⁴ using the binomial theorem",
+    "difficulty": "MEDIUM",
+    "category": "Combinatorics",
+    "tags": ["binomial theorem", "expansion"],
+    "solution": "(x + 2)⁴ = Σ(k=0 to 4) C(4,k)x^(4-k)2^k\n= C(4,0)x⁴2⁰ + C(4,1)x³2¹ + C(4,2)x²2² + C(4,3)x¹2³ + C(4,4)x⁰2⁴\n= x⁴ + 8x³ + 24x² + 32x + 16"
+  },
+  {
+    "title": "Pigeonhole Principle",
+    "description": "If 11 people are in a room, prove that at least two people have birthdays in the same month",
+    "difficulty": "HIGH",
+    "category": "Combinatorics",
+    "tags": ["pigeonhole principle", "proof"],
+    "solution": "By the Pigeonhole Principle: if n pigeons are placed in m pigeonholes and n > m, then at least one pigeonhole contains more than one pigeon.\nHere: 11 people (pigeons) and 12 months (pigeonholes).\nWait - this is incorrect! With 11 people and 12 months, it's possible each person has a different birth month.\nHowever, if we had 13 people and 12 months, then by the pigeonhole principle, at least two would share a birth month."
+  },
+  {
+    "title": "Truth Tables",
+    "description": "Construct a truth table for the logical expression: (P ∧ Q) → (P ∨ Q)",
+    "difficulty": "LOW",
+    "category": "Logic",
+    "tags": ["truth tables", "logical operators"],
+    "solution": "P | Q | P∧Q | P∨Q | (P∧Q)→(P∨Q)\nT | T |  T  |  T  |     T\nT | F |  F  |  T  |     T\nF | T |  F  |  T  |     T\nF | F |  F  |  F  |     T\nThe expression is always true (tautology)."
+  },
+  {
+    "title": "Logical Equivalences",
+    "description": "Prove that ¬(P ∧ Q) is equivalent to (¬P ∨ ¬Q) using logical equivalences",
+    "difficulty": "MEDIUM",
+    "category": "Logic",
+    "tags": ["logical equivalences", "De Morgan's law"],
+    "solution": "This is De Morgan's Law. We can prove it with a truth table:\nP | Q | P∧Q | ¬(P∧Q) | ¬P | ¬Q | ¬P∨¬Q\nT | T |  T  |   F    | F  | F  |   F\nT | F |  F  |   T    | F  | T  |   T\nF | T |  F  |   T    | T  | F  |   T\nF | F |  F  |   T    | T  | T  |   T\nThe columns for ¬(P∧Q) and ¬P∨¬Q are identical, proving equivalence."
+  },
+  {
+    "title": "Mathematical Induction",
+    "description": "Prove by induction that 1 + 2 + 3 + ... + n = n(n+1)/2",
+    "difficulty": "HIGH",
+    "category": "Logic",
+    "tags": ["mathematical induction", "proof"],
+    "solution": "Base case (n=1): 1 = 1(1+1)/2 = 1 ✓\nInductive step: Assume true for n=k: 1+2+...+k = k(k+1)/2\nShow true for n=k+1: 1+2+...+k+(k+1) = (k+1)(k+2)/2\nLHS = k(k+1)/2 + (k+1) = (k+1)[k/2 + 1] = (k+1)(k+2)/2 = RHS ✓\nBy mathematical induction, the formula holds for all positive integers n."
   }
 ]

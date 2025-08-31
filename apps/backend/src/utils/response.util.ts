@@ -219,3 +219,35 @@ export const {
   serviceUnavailable,
   tooManyRequests,
 } = ResponseUtil;
+
+// Helper functions for direct response creation
+export function createSuccessResponse<T>(
+  data: T,
+  message: string = 'Operation successful'
+): ApiResponse<T> {
+  return {
+    success: true,
+    message,
+    data,
+    timestamp: new Date().toISOString(),
+  };
+}
+
+export function createErrorResponse(
+  message: string,
+  statusCode: number = 500,
+  details?: any
+): ApiResponse {
+  const response: ApiResponse = {
+    success: false,
+    message,
+    timestamp: new Date().toISOString(),
+  };
+
+  // Include details only in development
+  if (process.env.NODE_ENV === 'development' && details) {
+    response.data = { details };
+  }
+
+  return response;
+}

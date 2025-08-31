@@ -23,5 +23,6 @@ export {
 } from './dropdown-menu';
 export { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
 export { Skeleton } from './skeleton';
+export { Switch } from './switch';
 export { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs';
 export { Textarea } from './textarea';

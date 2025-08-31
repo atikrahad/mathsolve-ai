@@ -1,4 +1,4 @@
-import { PrismaClient, Difficulty, ResourceType } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -17,7 +17,7 @@ interface SeedUser {
 interface SeedProblem {
   title: string;
   description: string;
-  difficulty: keyof typeof Difficulty;
+  difficulty: string;
   category: string;
   tags: string[];
   solution?: string;
@@ -26,7 +26,7 @@ interface SeedProblem {
 interface SeedResource {
   title: string;
   content: string;
-  type: keyof typeof ResourceType;
+  type: string;
   category: string;
   difficulty?: string | null;
 }
@@ -83,26 +83,62 @@ async function main() {
   // Create problems
   console.log('📚 Creating problems...');
   const createdProblems = [];
+  
+  // Helper function to calculate realistic quality score
+  const calculateQualityScore = (problem: SeedProblem): number => {
+    let score = 20; // Base score
+    
+    // Title quality (5-25 points)
+    if (problem.title.length >= 10 && problem.title.length <= 60) score += 20;
+    else if (problem.title.length >= 5) score += 15;
+    else score += 5;
+    
+    // Description quality (10-25 points)
+    if (problem.description.length >= 50) score += 25;
+    else if (problem.description.length >= 20) score += 15;
+    else score += 10;
+    
+    // Solution quality (0-20 points)
+    if (problem.solution && problem.solution.length > 100) score += 20;
+    else if (problem.solution && problem.solution.length > 50) score += 15;
+    else if (problem.solution) score += 10;
+    
+    // Tags bonus (0-10 points)
+    score += Math.min(problem.tags.length * 2, 10);
+    
+    // Difficulty adjustment
+    if (problem.difficulty === 'HIGH') score += 5;
+    else if (problem.difficulty === 'LOW') score -= 5;
+    
+    return Math.min(score, 100);
+  };
+
   for (let i = 0; i < problemsData.length; i++) {
     const problemData = problemsData[i];
     const randomUser = createdUsers[Math.floor(Math.random() * createdUsers.length)];
+    
+    // Calculate realistic metrics based on difficulty and quality
+    const qualityScore = calculateQualityScore(problemData);
+    const difficultyMultiplier = problemData.difficulty === 'LOW' ? 1.5 : problemData.difficulty === 'HIGH' ? 0.7 : 1.0;
+    const baseViews = Math.floor(qualityScore * 8 * difficultyMultiplier);
+    const baseAttempts = Math.floor(baseViews * 0.3 * difficultyMultiplier);
     
     const problem = await prisma.problem.create({
       data: {
         title: problemData.title,
         description: problemData.description,
-        difficulty: Difficulty[problemData.difficulty],
+        difficulty: problemData.difficulty,
         category: problemData.category,
-        tags: problemData.tags,
+        tags: JSON.stringify(problemData.tags),
         solution: problemData.solution,
         creatorId: randomUser.id,
-        qualityScore: Math.random() * 5, // Random quality score 0-5
-        viewCount: Math.floor(Math.random() * 1000), // Random view count
-        attemptCount: Math.floor(Math.random() * 500), // Random attempt count
+        qualityScore: qualityScore + (Math.random() - 0.5) * 10, // Add some variance
+        viewCount: baseViews + Math.floor(Math.random() * 200), // Add random variance
+        attemptCount: baseAttempts + Math.floor(Math.random() * 100), // Add random variance
       },
     });
     createdProblems.push(problem);
-    console.log(`✅ Created problem: ${problem.title}`);
+    console.log(`✅ Created problem: ${problem.title} (${problem.category}, ${problem.difficulty})`);
   }
 
   // Create resources
@@ -114,7 +150,7 @@ async function main() {
       data: {
         title: resourceData.title,
         content: resourceData.content,
-        type: ResourceType[resourceData.type],
+        type: resourceData.type,
         category: resourceData.category,
         difficulty: resourceData.difficulty,
         authorId: randomUser.id,
@@ -125,9 +161,12 @@ async function main() {
     console.log(`✅ Created resource: ${resource.title}`);
   }
 
-  // Create some solutions
+  // Create solutions for problems
   console.log('💡 Creating solutions...');
-  for (let i = 0; i < 20; i++) {
+  let solutionsCreated = 0;
+  const targetSolutions = Math.min(createdProblems.length * 2, 50); // 2 solutions per problem, max 50
+  
+  for (let attempts = 0; attempts < targetSolutions * 2 && solutionsCreated < targetSolutions; attempts++) {
     const randomUser = createdUsers[Math.floor(Math.random() * createdUsers.length)];
     const randomProblem = createdProblems[Math.floor(Math.random() * createdProblems.length)];
     
@@ -142,24 +181,41 @@ async function main() {
     });
     
     if (!existingSolution) {
-      const isCorrect = Math.random() > 0.3; // 70% chance of correct solution
-      const pointsEarned = isCorrect ? 
-        (randomProblem.difficulty === 'LOW' ? 10 : 
-         randomProblem.difficulty === 'MEDIUM' ? 25 : 50) : 0;
+      // Difficulty affects success rate and time
+      const difficultyFactor = randomProblem.difficulty === 'LOW' ? 0.8 : 
+                              randomProblem.difficulty === 'MEDIUM' ? 0.6 : 0.4;
+      const isCorrect = Math.random() < difficultyFactor;
+      
+      const basePoints = randomProblem.difficulty === 'LOW' ? 15 : 
+                        randomProblem.difficulty === 'MEDIUM' ? 35 : 60;
+      const pointsEarned = isCorrect ? basePoints : Math.floor(basePoints * 0.1);
+      
+      // Time spent based on difficulty and success
+      const baseTime = randomProblem.difficulty === 'LOW' ? 300 : 
+                      randomProblem.difficulty === 'MEDIUM' ? 900 : 1800; // 5, 15, 30 minutes
+      const timeVariance = baseTime * 0.5;
+      const timeSpent = Math.floor(baseTime + (Math.random() - 0.5) * timeVariance);
+      
+      // Hints used more for difficult problems
+      const hintsUsed = Math.floor(Math.random() * (randomProblem.difficulty === 'HIGH' ? 4 : 
+                                                    randomProblem.difficulty === 'MEDIUM' ? 2 : 1));
       
       await prisma.solution.create({
         data: {
           problemId: randomProblem.id,
           userId: randomUser.id,
-          answer: `Sample answer for ${randomProblem.title}`,
+          answer: isCorrect ? 'Correct solution provided' : 'Incorrect attempt',
           isCorrect,
           pointsEarned,
-          timeSpent: Math.floor(Math.random() * 3600), // Random time 0-3600 seconds
-          hintsUsed: Math.floor(Math.random() * 3),
+          timeSpent: Math.max(timeSpent, 30), // Minimum 30 seconds
+          hintsUsed,
         },
       });
+      solutionsCreated++;
     }
   }
+  
+  console.log(`✅ Created ${solutionsCreated} solutions`);
 
   // Create some achievements
   console.log('🏆 Creating achievements...');
@@ -202,31 +258,67 @@ async function main() {
     }
   }
 
-  // Create some ratings
+  // Create problem ratings
   console.log('⭐ Creating problem ratings...');
-  for (let i = 0; i < 15; i++) {
+  let ratingsCreated = 0;
+  const targetRatings = Math.min(createdProblems.length * 3, 75); // 3 ratings per problem, max 75
+  
+  for (let attempts = 0; attempts < targetRatings * 2 && ratingsCreated < targetRatings; attempts++) {
     const randomUser = createdUsers[Math.floor(Math.random() * createdUsers.length)];
     const randomProblem = createdProblems[Math.floor(Math.random() * createdProblems.length)];
     
     try {
+      // Rating influenced by problem quality
+      const qualityBias = randomProblem.qualityScore / 100;
+      const baseRating = Math.random();
+      const adjustedRating = (baseRating + qualityBias * 0.6) / 1.6; // Weighted average
+      const rating = Math.min(Math.max(Math.ceil(adjustedRating * 5), 1), 5);
+      
       await prisma.problemRating.create({
         data: {
           problemId: randomProblem.id,
           userId: randomUser.id,
-          rating: Math.floor(Math.random() * 5) + 1, // 1-5 stars
+          rating,
         },
       });
+      ratingsCreated++;
     } catch (error) {
       // Skip if rating already exists
     }
   }
+  
+  console.log(`✅ Created ${ratingsCreated} problem ratings`);
 
   console.log('✅ Database seeding completed successfully!');
   console.log(`📊 Created:`);
   console.log(`   - ${createdUsers.length} users`);
-  console.log(`   - ${createdProblems.length} problems`);
+  console.log(`   - ${createdProblems.length} problems across ${new Set(problemsData.map(p => p.category)).size} categories`);
   console.log(`   - ${resourcesData.length} resources`);
-  console.log(`   - Various solutions, achievements, follows, and ratings`);
+  console.log(`   - ${solutionsCreated} solutions with realistic difficulty-based success rates`);
+  console.log(`   - ${ratingsCreated} problem ratings with quality-based weighting`);
+  console.log(`   - Various achievements and user follows`);
+  
+  // Display category breakdown
+  const categoryBreakdown = problemsData.reduce((acc: any, problem) => {
+    acc[problem.category] = (acc[problem.category] || 0) + 1;
+    return acc;
+  }, {});
+  
+  console.log(`\n📚 Problems by category:`);
+  Object.entries(categoryBreakdown).forEach(([category, count]) => {
+    console.log(`   - ${category}: ${count} problems`);
+  });
+  
+  // Display difficulty breakdown
+  const difficultyBreakdown = problemsData.reduce((acc: any, problem) => {
+    acc[problem.difficulty] = (acc[problem.difficulty] || 0) + 1;
+    return acc;
+  }, {});
+  
+  console.log(`\n📊 Problems by difficulty:`);
+  Object.entries(difficultyBreakdown).forEach(([difficulty, count]) => {
+    console.log(`   - ${difficulty}: ${count} problems`);
+  });
 }
 
 main()

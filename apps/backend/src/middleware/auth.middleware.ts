@@ -132,3 +132,25 @@ export const authorize = (...roles: string[]) => {
     next();
   };
 };
+
+// Middleware that adds userId to request for convenience
+export const authenticateToken = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // First run the standard authentication
+    await new Promise<void>((resolve, reject) => {
+      authenticate(req, res, (error) => {
+        if (error) reject(error);
+        else resolve();
+      });
+    });
+
+    // Add userId for convenience
+    if (req.user) {
+      (req as any).userId = req.user.userId;
+    }
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
