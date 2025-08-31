@@ -149,10 +149,10 @@ export class ProblemService {
 
     try {
       // Convert tags array to JSON string if provided
-      // let updateData: any = {
-      //   ...data,
-      //   ...(data.tags && { tags: JSON.stringify(data.tags) }),
-      // };
+      let updateData: any = {
+        ...data,
+        ...(data.tags && { tags: JSON.stringify(data.tags) }),
+      };
 
       // Recalculate quality score if content changed
       if (data.title || data.description || data.tags) {
