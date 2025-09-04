@@ -302,7 +302,7 @@ export default function CreateResourcePage() {
                         <SelectValue placeholder="Select difficulty" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Not specified</SelectItem>
+                        <SelectItem value="unspecified">Not specified</SelectItem>
                         {DIFFICULTY_LEVELS.map((difficulty) => (
                           <SelectItem key={difficulty.value} value={difficulty.value}>
                             {difficulty.label}

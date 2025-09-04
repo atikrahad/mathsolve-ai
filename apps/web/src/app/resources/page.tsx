@@ -161,7 +161,7 @@ export default function ResourcesPage() {
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value="all">All Categories</SelectItem>
                   {RESOURCE_CATEGORIES.map((category) => (
                     <SelectItem key={category} value={category}>
                       {category}
@@ -178,7 +178,7 @@ export default function ResourcesPage() {
                   <SelectValue placeholder="All Types" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Types</SelectItem>
+                  <SelectItem value="all">All Types</SelectItem>
                   {RESOURCE_TYPES.map((type) => (
                     <SelectItem key={type.value} value={type.value}>
                       {type.label}
@@ -197,7 +197,7 @@ export default function ResourcesPage() {
                   <SelectValue placeholder="All Difficulties" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Difficulties</SelectItem>
+                  <SelectItem value="all">All Difficulties</SelectItem>
                   {DIFFICULTY_LEVELS.map((difficulty) => (
                     <SelectItem key={difficulty.value} value={difficulty.value}>
                       {difficulty.label}
