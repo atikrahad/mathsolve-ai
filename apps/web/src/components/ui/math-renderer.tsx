@@ -49,13 +49,14 @@ export function MathRenderer({
 }
 
 // Utility function to render math in text
-export function renderMathInText(text: string): string {
+export function renderMathInText(text?: string | null): string {
+  const source = typeof text === 'string' ? text : '';
   // Replace inline math: $...$
   const inlineMathRegex = /\$([^$]+)\$/g;
   // Replace display math: $$...$$
   const displayMathRegex = /\$\$([^$]+)\$\$/g;
 
-  let result = text;
+  let result = source;
 
   // First handle display math ($$...$$)
   result = result.replace(displayMathRegex, (match, mathContent) => {
@@ -89,11 +90,11 @@ export function renderMathInText(text: string): string {
 }
 
 interface MathTextProps {
-  children: string;
+  children?: string | null;
   className?: string;
 }
 
-export function MathText({ children, className = '' }: MathTextProps) {
+export function MathText({ children = '', className = '' }: MathTextProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

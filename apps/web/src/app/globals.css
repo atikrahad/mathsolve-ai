@@ -109,6 +109,15 @@
     color: hsl(var(--primary)) !important;
   }
 
+  /* Force full-width layouts across the app */
+  .container {
+    max-width: 100% !important;
+  }
+
+  [class*='max-w-'] {
+    max-width: 100% !important;
+  }
+
   .hover\\:bg-gray-50:hover,
   .hover\\:bg-gray-100:hover {
     background-color: rgba(148, 163, 184, 0.1) !important;

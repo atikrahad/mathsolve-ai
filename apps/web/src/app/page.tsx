@@ -78,10 +78,10 @@ export default function Home() {
   // const { isAuthenticated, user } = useAuthStore();
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 relative overflow-hidden">
+    <div className="min-h-screen max-w-screen-lg bg-slate-950 text-slate-200 relative overflow-hidden">
       {/* Navigation Header */}
       <header className="absolute top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800">
-        <div className="container mx-auto px-4 py-4">
+        <div className="max-w-[1200px] mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
             <div className="text-2xl font-bold bg-gradient-to-r from-emerald-300 via-cyan-200 to-sky-300 bg-clip-text text-transparent">
               MathSolve AI
@@ -118,9 +118,9 @@ export default function Home() {
       <FloatingMathEquations />
 
       {/* Hero Section */}
-      <section className="relative container mx-auto px-4 py-20 lg:py-32">
+      <section className="relative w-full px-4 py-20 lg:py-32">
         <motion.div
-          className="text-center max-w-6xl mx-auto"
+          className="text-center w-full"
           initial="initial"
           animate="animate"
           variants={staggerContainer}
@@ -153,7 +153,7 @@ export default function Home() {
           </motion.h1>
 
           <motion.p
-            className="text-xl md:text-2xl text-slate-400 mb-8 leading-relaxed max-w-4xl mx-auto"
+            className="text-xl md:text-2xl text-slate-400 mb-8 leading-relaxed w-full"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -190,7 +190,7 @@ export default function Home() {
 
           {/* Math Formulas Preview */}
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto"
+            className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full"
             variants={staggerContainer}
           >
             <motion.div variants={fadeInUp}>
@@ -208,7 +208,7 @@ export default function Home() {
 
       {/* 3D Mathematical Visualizations Section */}
       <section className="py-20 bg-slate-950/60 border-y border-slate-900 backdrop-blur-sm">
-        <div className="container mx-auto px-4">
+        <div className="w-full max-w-[1200px] mx-auto px-6">
           <motion.div
             className="text-center mb-16"
             initial="initial"
@@ -304,7 +304,7 @@ export default function Home() {
 
       {/* Stats Section */}
       <section className="py-16 bg-slate-950/50 backdrop-blur-sm border-y border-slate-900">
-        <div className="container mx-auto px-4">
+        <div className="w-full max-w-[1200px] mx-auto px-6">
           <motion.div
             className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center"
             initial="initial"
@@ -331,7 +331,7 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="container mx-auto px-4 py-20">
+      <section className="w-full max-w-[1200px] mx-auto px-6 py-20">
         <motion.div
           className="text-center mb-16"
           initial="initial"
@@ -433,7 +433,7 @@ export default function Home() {
 
       {/* Math Categories Section */}
       <section className="py-20 bg-slate-950/60 border-y border-slate-900">
-        <div className="container mx-auto px-4">
+        <div className="w-full max-w-[1200px] mx-auto px-6">
           <motion.div
             className="text-center mb-16"
             initial="initial"
@@ -488,7 +488,7 @@ export default function Home() {
       {/* Final CTA Section */}
       <section className="bg-slate-950/80 text-white py-20 relative overflow-hidden border-t border-slate-900">
         <div className="absolute inset-0 bg-slate-950/40"></div>
-        <div className="container mx-auto px-4 text-center relative z-10">
+        <div className="w-full max-w-[1200px] mx-auto px-6 text-center relative z-10">
           <motion.div
             initial="initial"
             whileInView="animate"

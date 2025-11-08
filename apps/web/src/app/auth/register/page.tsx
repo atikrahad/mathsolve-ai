@@ -109,11 +109,11 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 py-8">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4 py-10">
+      <Card className="max-w-md shadow-2xl border border-slate-800 bg-slate-900/90 text-slate-100">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-gray-900">Create Account</CardTitle>
-          <CardDescription className="text-gray-600">
+          <CardTitle className="text-2xl font-bold text-white">Create Account</CardTitle>
+          <CardDescription className="text-slate-400">
             Join MathSolve AI and start your learning journey
           </CardDescription>
         </CardHeader>
@@ -134,7 +134,7 @@ export default function RegisterPage() {
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-gray-500">Or create account with email</span>
+              <span className="bg-slate-900 px-2 text-slate-400">Or create account with email</span>
             </div>
           </div>
 

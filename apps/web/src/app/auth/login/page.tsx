@@ -64,11 +64,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4 py-10">
+      <Card className="max-w-md shadow-2xl border border-slate-800 bg-slate-900/90 text-slate-100">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-gray-900">Welcome Back</CardTitle>
-          <CardDescription className="text-gray-600">
+          <CardTitle className="text-2xl font-bold text-white">Welcome Back</CardTitle>
+          <CardDescription className="text-slate-400">
             Sign in to your MathSolve AI account
           </CardDescription>
         </CardHeader>
@@ -89,7 +89,7 @@ export default function LoginPage() {
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-gray-500">Or continue with email</span>
+              <span className="bg-slate-900 px-2 text-slate-400">Or continue with email</span>
             </div>
           </div>
 
@@ -106,7 +106,7 @@ export default function LoginPage() {
             <div className="space-y-2">
               <label
                 htmlFor="email"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                className="text-sm font-medium leading-none text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
                 Email
               </label>
@@ -120,7 +120,7 @@ export default function LoginPage() {
                 disabled={isLoading}
               />
               {validationErrors.email && (
-                <p className="text-sm text-red-600">{validationErrors.email}</p>
+                <p className="text-sm text-red-400">{validationErrors.email}</p>
               )}
             </div>
 
@@ -128,7 +128,7 @@ export default function LoginPage() {
             <div className="space-y-2">
               <label
                 htmlFor="password"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                className="text-sm font-medium leading-none text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
                 Password
               </label>
