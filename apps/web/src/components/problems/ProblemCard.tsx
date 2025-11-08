@@ -48,9 +48,9 @@ export function ProblemCard({
   const difficultyInfo = PROBLEM_DIFFICULTY_INFO[problem.difficulty];
 
   const difficultyBadgeStyles = {
-    LOW: 'bg-emerald-500/15 text-emerald-200 border border-emerald-500/30',
-    MEDIUM: 'bg-amber-500/15 text-amber-200 border border-amber-500/30',
-    HIGH: 'bg-rose-500/15 text-rose-200 border border-rose-500/30',
+    LOW: 'bg-emerald-500/15 text-emerald-100 border border-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.35)]',
+    MEDIUM: 'bg-amber-500/15 text-amber-50 border border-amber-400 shadow-[0_0_14px_rgba(251,191,36,0.45)]',
+    HIGH: 'bg-rose-600/20 text-rose-100 border border-rose-400 shadow-[0_0_16px_rgba(244,63,94,0.55)]',
   } as const;
 
   const categoryBadgeStyles: Record<string, string> = {
@@ -85,42 +85,26 @@ export function ProblemCard({
   const difficultyBadgeClass =
     difficultyBadgeStyles[problem.difficulty] || difficultyBadgeStyles.MEDIUM;
 
-  // Enhanced difficulty color schemes for professional appearance
   const difficultyColorScheme = {
     LOW: {
-      cardGradient: 'from-emerald-50/80 via-green-50/60 to-teal-50/40',
-      hoverGradient:
-        'group-hover:from-emerald-100/90 group-hover:via-green-100/70 group-hover:to-teal-100/50',
-      borderColor: 'border-emerald-200',
-      headerGradient: 'from-emerald-500 via-green-500 to-teal-500',
-      textAccent: 'text-emerald-700',
-      shadowColor: 'hover:shadow-emerald-500/20',
-      glowColor: 'shadow-emerald-500/10',
+      borderColor: 'border-emerald-500/40',
+      cardBackground: 'bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-950',
+      accentText: 'text-emerald-200',
     },
     MEDIUM: {
-      cardGradient: 'from-amber-50/80 via-yellow-50/60 to-orange-50/40',
-      hoverGradient:
-        'group-hover:from-amber-100/90 group-hover:via-yellow-100/70 group-hover:to-orange-100/50',
-      borderColor: 'border-amber-200',
-      headerGradient: 'from-amber-500 via-yellow-500 to-orange-500',
-      textAccent: 'text-amber-700',
-      shadowColor: 'hover:shadow-amber-500/20',
-      glowColor: 'shadow-amber-500/10',
+      borderColor: 'border-amber-500/40',
+      cardBackground: 'bg-gradient-to-br from-slate-900 via-amber-950 to-slate-950',
+      accentText: 'text-amber-200',
     },
     HIGH: {
-      cardGradient: 'from-red-50/80 via-rose-50/60 to-pink-50/40',
-      hoverGradient:
-        'group-hover:from-red-100/90 group-hover:via-rose-100/70 group-hover:to-pink-100/50',
-      borderColor: 'border-red-200',
-      headerGradient: 'from-red-500 via-rose-500 to-pink-500',
-      textAccent: 'text-red-700',
-      shadowColor: 'hover:shadow-red-500/20',
-      glowColor: 'shadow-red-500/10',
+      borderColor: 'border-rose-500/40',
+      cardBackground: 'bg-gradient-to-br from-slate-900 via-rose-950 to-slate-950',
+      accentText: 'text-rose-200',
     },
-  };
+  } as const;
 
   const currentScheme =
-    difficultyColorScheme[problem.difficulty] || difficultyColorScheme['MEDIUM'];
+    difficultyColorScheme[problem.difficulty] || difficultyColorScheme.MEDIUM;
 
   const problemTags = Array.isArray(problem.tags) ? problem.tags : [];
   const formattedAttempts =
@@ -205,9 +189,9 @@ export function ProblemCard({
                   {categoryInfo?.name || problem.category}
                 </span>
                 <span
-                  className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${difficultyBadgeClass}`}
+                  className={`text-[11px] font-semibold px-2 py-0.5 rounded-full tracking-wide ${difficultyBadgeClass}`}
                 >
-                  {difficultyInfo?.name || problem.difficulty}
+                  {(difficultyInfo?.name || problem.difficulty).toUpperCase()}
                 </span>
               </div>
               <h3 className="font-semibold text-base text-slate-50 truncate">{problem.title}</h3>
@@ -254,55 +238,29 @@ export function ProblemCard({
   return (
     <div className="group relative h-full">
       <Card
-        className={`
-        h-full overflow-hidden transition-all duration-500 ease-out cursor-pointer 
-        border-2 ${currentScheme.borderColor} shadow-sm hover:shadow-2xl ${currentScheme.shadowColor} hover:-translate-y-2
-        bg-gradient-to-br from-white via-white to-white ${currentScheme.cardGradient} ${currentScheme.hoverGradient}
-        hover:scale-[1.02] transform-gpu will-change-transform
-        relative ring-1 ring-gray-200/50 hover:ring-2 hover:ring-current/20
-        ${compact ? 'p-2' : 'p-0'}
-      `}
+        className={`h-full overflow-hidden border ${currentScheme.borderColor} ${currentScheme.cardBackground} transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl shadow-emerald-900/20`}
       >
-        {/* Difficulty-Themed Header Band */}
-        <div
-          className={`
-          h-2 bg-gradient-to-r transition-all duration-500 ease-out
-          ${currentScheme.headerGradient} group-hover:h-4 group-hover:shadow-lg ${currentScheme.glowColor}
-          relative overflow-hidden
-        `}
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-white/40 via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        </div>
-
         <Link href={`/problems/${problem.id}`} className="block h-full">
-          <div className={`p-3 sm:p-4 lg:p-5 h-full flex flex-col ${compact ? 'p-2 sm:p-3' : ''}`}>
+          <div className="p-5 h-full flex flex-col gap-4">
             {/* Header Section */}
             <div className="flex items-start justify-between gap-2 sm:gap-3 mb-2 sm:mb-3">
               <div className="flex-1 min-w-0">
                 {/* Category and Difficulty */}
-                <div className="flex items-center gap-2 flex-wrap mb-2 sm:mb-3">
-                  <span
-                    className={`text-[11px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${categoryBadgeClass}`}
-                  >
-                    {categoryInfo?.name || problem.category}
-                  </span>
-                  <span
-                    className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${difficultyBadgeClass}`}
-                  >
-                    {difficultyInfo?.name || problem.difficulty}
-                  </span>
-                </div>
+            <div className="flex items-center gap-2 flex-wrap mb-2 sm:mb-3">
+              <span
+                className={`text-[11px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${categoryBadgeClass}`}
+              >
+                {categoryInfo?.name || problem.category}
+              </span>
+                <span
+                  className={`text-[11px] font-semibold px-2 py-0.5 rounded-full tracking-wide ${difficultyBadgeClass}`}
+                >
+                  {(difficultyInfo?.name || problem.difficulty).toUpperCase()}
+                </span>
+            </div>
 
                 {/* Title */}
-                <h3
-                  className={`
-                  font-bold text-gray-900 leading-tight mb-2
-                  group-hover:${currentScheme.textAccent} transition-all duration-300
-                  group-hover:translate-x-1 group-hover:drop-shadow-sm
-                  ${compact ? 'text-sm sm:text-base line-clamp-2' : 'text-base sm:text-lg lg:text-xl line-clamp-2'}
-                `}
-                >
+                <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-emerald-200 transition-colors">
                   {problem.title}
                 </h3>
 
@@ -321,7 +279,7 @@ export function ProblemCard({
                         />
                       ))}
                     </div>
-                    <span className="text-xs text-gray-600 font-medium">
+                    <span className="text-xs text-slate-400 font-medium">
                       {problem.avgRating.toFixed(1)} ({problem._count?.ratings || 0})
                     </span>
                   </div>
@@ -366,11 +324,7 @@ export function ProblemCard({
             </div>
 
             {/* Description */}
-            <div
-              className={`text-gray-600 leading-relaxed mb-3 sm:mb-4 flex-1 ${
-                compact ? 'text-xs sm:text-sm' : 'text-sm sm:text-base'
-              }`}
-            >
+            <div className="text-slate-400 text-sm leading-relaxed flex-1">
               <MathText className="line-clamp-3 text-justify sm:text-left">
                 {truncateDescription(
                   problem.description || problem.prompt,
@@ -380,24 +334,20 @@ export function ProblemCard({
             </div>
 
             {/* Tags */}
-            {problem.tags && Array.isArray(problem.tags) && problem.tags.length > 0 && (
-              <div className="flex flex-wrap gap-1 sm:gap-1.5 mb-3 sm:mb-4">
-                {problem.tags.slice(0, compact ? 2 : 3).map((tag, index) => (
-                  <Badge
-                    key={`${tag}-${index}`}
-                    variant="secondary"
-                    className="text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors font-medium border-0 rounded-full"
+            {problemTags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-4">
+                {problemTags.slice(0, 3).map((tag) => (
+                  <span
+                    key={tag}
+                    className="text-xs px-2 py-0.5 rounded-full bg-slate-900/60 border border-slate-800 text-slate-300"
                   >
                     {tag}
-                  </Badge>
+                  </span>
                 ))}
-                {problem.tags.length > (compact ? 2 : 3) && (
-                  <Badge
-                    variant="secondary"
-                    className="text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 bg-blue-100 text-blue-700 font-medium border-0 rounded-full"
-                  >
-                    +{problem.tags.length - (compact ? 2 : 3)}
-                  </Badge>
+                {problemTags.length > 3 && (
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-slate-900/60 border border-slate-800 text-slate-300">
+                    +{problemTags.length - 3}
+                  </span>
                 )}
               </div>
             )}
@@ -457,9 +407,8 @@ export function ProblemCard({
                   <div
                     className={`
                     flex items-center gap-0.5 sm:gap-1 font-semibold text-xs sm:text-sm
-                    ${currentScheme.textAccent} group-hover:scale-105 transition-all duration-200
-                    px-2 py-1 rounded-full bg-white/60 backdrop-blur-sm border border-current/20
-                    hover:bg-current/10 hover:shadow-sm
+                    ${currentScheme.accentText} group-hover:scale-105 transition-all duration-200
+                    px-2 py-1 rounded-full bg-slate-900/70 border border-slate-800 hover:bg-slate-900
                   `}
                   >
                     <Play className="w-3 h-3" />
@@ -471,14 +420,6 @@ export function ProblemCard({
             </div>
           </div>
         </Link>
-
-        {/* Difficulty-Themed Hover Overlay */}
-        <div
-          className={`
-          absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none
-          bg-gradient-to-br ${currentScheme.cardGradient.replace('from-', 'from-').replace('via-', 'via-').replace('to-', 'to-')}
-        `}
-        />
 
         {/* Enhanced Difficulty Indicator */}
         <div

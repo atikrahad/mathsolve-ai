@@ -25,7 +25,7 @@ export const AnimatedCard = ({
       whileHover={whileHover}
       className={className}
     >
-      <Card className="h-full hover:shadow-xl transition-shadow duration-300 backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border border-white/20">
+      <Card className="h-full hover:shadow-2xl transition-shadow duration-300 backdrop-blur-xl bg-slate-950/70 border border-slate-800 text-slate-200">
         {children}
       </Card>
     </motion.div>

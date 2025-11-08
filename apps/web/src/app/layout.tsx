@@ -79,9 +79,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${jetbrainsMono.variable} antialiased min-h-screen bg-background font-sans`}
+        className={`${inter.variable} ${jetbrainsMono.variable} antialiased min-h-screen bg-slate-950 text-slate-200 font-sans`}
       >
-        <AuthProvider>{children}</AuthProvider>
+        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-200">
+          <AuthProvider>{children}</AuthProvider>
+        </div>
       </body>
     </html>
   );
