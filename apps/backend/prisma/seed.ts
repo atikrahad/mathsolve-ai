@@ -119,7 +119,7 @@ async function main() {
         email: userData.email,
         passwordHash: hashedPassword,
         bio: userData.bio,
-        xp: userData.rankPoints,
+        rankPoints: userData.rankPoints,
         currentRank: userData.currentRank,
         streakCount: userData.streakCount,
         lastActiveAt: new Date(),

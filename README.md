@@ -34,7 +34,7 @@ Supporting directories: `docker/` (runtimes + compose), `scripts/` (setup, seedi
    npm run dev:api
    npm run dev:mcp
    ```
-4. Visit `http://localhost:3003` for the frontend, `http://localhost:3001/api` for API routes, and `ws://localhost:5001` for MCP WebSocket during development.
+4. Visit `http://localhost:3000` for the frontend, `http://localhost:3001/api` for API routes, and `ws://localhost:5001` for MCP WebSocket during development.
 
 ### Environment Variables
 - `apps/web/.env.local` – API/MCP URLs, NextAuth + OAuth creds, supported language list

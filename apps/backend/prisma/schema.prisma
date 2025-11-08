@@ -16,7 +16,7 @@ model User {
   passwordHash      String?                  @map("password_hash")
   profileImage      String?                  @map("profile_image")
   bio               String?
-  xp                Int                      @default(0)
+  rankPoints        Int                      @default(0) @map("xp")
   currentRank       String                   @default("Novice") @map("current_rank")
   streakCount       Int                      @default(0) @map("streak_count")
   preferredLanguages String?                 @map("preferred_languages") // JSON string array

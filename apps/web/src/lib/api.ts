@@ -1,9 +1,10 @@
 import axios, { AxiosResponse, AxiosError } from 'axios';
 import Cookies from 'js-cookie';
+import { API_BASE_URL } from './config';
 
 // Create axios instance
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api',
+  baseURL: API_BASE_URL,
   timeout: 10000,
   withCredentials: true, // Important for cookies
 });
