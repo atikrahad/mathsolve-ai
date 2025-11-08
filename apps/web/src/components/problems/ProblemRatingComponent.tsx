@@ -32,7 +32,7 @@ export function ProblemRatingComponent({ problemId, currentRating }: ProblemRati
 
     setSubmitting(true);
     try {
-      await problemService.rateProblem(problemId, rating, comment.trim() || undefined);
+      await problemService.rateProblem(problemId, rating);
       setHasRated(true);
       setComment('');
     } catch (error) {

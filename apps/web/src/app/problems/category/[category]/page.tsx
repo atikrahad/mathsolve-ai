@@ -1,6 +1,5 @@
-'use client';
-
 // @ts-nocheck - Temporary fix for React component type compatibility issues
+'use client';
 import { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import {

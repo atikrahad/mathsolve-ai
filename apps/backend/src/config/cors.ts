@@ -1,8 +1,17 @@
 import { CorsOptions } from 'cors';
 
-const allowedOrigins = process.env.ALLOWED_ORIGINS 
+const defaultOrigins = [
+  process.env.CLIENT_URL,
+  process.env.NEXT_PUBLIC_APP_URL,
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+].filter(Boolean) as string[];
+
+const envOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
   : [];
+
+const allowedOrigins = Array.from(new Set([...envOrigins, ...defaultOrigins]));
 
 export const corsOptions: CorsOptions = {
   origin: (origin, callback) => {
