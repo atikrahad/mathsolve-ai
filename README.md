@@ -1,161 +1,82 @@
-# 🧠 Claude Code – Context Engineering Guide
+# MathSolve AI – Programming Challenge Platform
 
-## 🎯 Objective
+MathSolve AI evolves into a full-stack workspace for solving programming problems with instant feedback, AI guidance, and rich community features. The platform combines a Next.js IDE experience, an Express/Prisma API with sandboxed code evaluation, and an MCP microservice that drives recommendations, hints, and personalization.
 
-This guide outlines the setup of Claude Code with Serena MCP and defines the collaboration process between developer and senior engineer agents using structured project files.
+## 🔍 Key Capabilities
+- **Challenge Library:** Curated problems tagged by language, topic, and difficulty with editorials and stats.
+- **In-Browser IDE:** Monaco-based editor, multi-language runtimes (Python, JS/TS, Java, C++, Go, Rust), custom inputs, autosave, diff view.
+- **Automated Judge:** Containerized execution with per-test verdicts, runtime/memory telemetry, and structured error output.
+- **AI Copilot:** MCP-powered hints, solution critiques, and personalized recommendations based on skill graphs.
+- **Community & Organizations:** Discussions, playlists, cohort assignments, leaderboards, achievements, and org-level analytics.
 
-## 🏗️ System Components
-
-| Component              | Function              | Interactions                         |
-| ---------------------- | --------------------- | ------------------------------------ |
-| **Claude Code CLI**    | Main interface        | Controls terminals, connects to MCP  |
-| **Serena MCP Server**  | Context management    | Stores memory, provides instructions |
-| **Terminal 1 (Algo)**  | Developer agent       | Next.js/Strapi implementation        |
-| **Terminal 2 (Kairo)** | Senior engineer agent | Code review and architecture         |
-
-## 📊 Agent Workflow Overview
-
-```mermaid
-flowchart TD
-    Start([Project Start]) --> Setup[Initial Setup]
-
-    Setup --> PrepDocs[Prepare Documentation]
-    PrepDocs --> RunClaude[Run Claude: /init]
-    RunClaude --> InstallSerena[Install Serena MCP]
-    InstallSerena --> LoadInstructions{Auto-load Success?}
-    LoadInstructions -->|No| ManualLoad[Manual: /mcp*serena*initial_instructions]
-    LoadInstructions -->|Yes| UpdateMemory[Update Serena Memory]
-    ManualLoad --> UpdateMemory
-
-    UpdateMemory --> Split{Split Terminals}
-
-    Split --> Algo[Terminal 1: Algo<br/>Developer Agent]
-    Split --> Kairo[Terminal 2: Kairo<br/>Senior Engineer Agent]
-
-    Algo --> AlgoRead[Read principle.md]
-    AlgoRead --> AlgoTodo[Draft task plan in todo.md]
-    AlgoTodo --> AlgoImpl[Implement Code<br/>Next.js + Strapi]
-    AlgoImpl --> AlgoWait{Wait for<br/>improvement.md}
-
-    Kairo --> KairoRead[Read principle.md]
-    KairoRead --> KairoReview1[Review code & todo.md]
-    KairoReview1 --> KairoWrite[Write improvement.md<br/>Comments & Suggestions]
-
-    KairoWrite --> AlgoWait
-    AlgoWait --> AlgoRefactor[Read improvement.md<br/>Refactor Code]
-    AlgoRefactor --> KairoReview2[Kairo: Final Review]
-    KairoReview2 --> KairoFinal[Update improvement.md<br/>Final Comments]
-    KairoFinal --> End([Project Complete])
-
-    style Algo fill:#4A90E2,stroke:#2E5C8A,color:#fff
-    style Kairo fill:#50C878,stroke:#2F7C4F,color:#fff
-    style AlgoRead fill:#E8F0FE,stroke:#4A90E2
-    style AlgoTodo fill:#E8F0FE,stroke:#4A90E2
-    style AlgoImpl fill:#E8F0FE,stroke:#4A90E2
-    style AlgoRefactor fill:#E8F0FE,stroke:#4A90E2
-    style KairoRead fill:#E8F8F5,stroke:#50C878
-    style KairoReview1 fill:#E8F8F5,stroke:#50C878
-    style KairoWrite fill:#E8F8F5,stroke:#50C878
-    style KairoReview2 fill:#E8F8F5,stroke:#50C878
-    style KairoFinal fill:#E8F8F5,stroke:#50C878
+## 🏗️ Architecture
 ```
-
-## ✅ Initial Setup
-
-### 1. **Prepare Documentation**
-
-- Ensure `PRD.md` is complete and accurate
-- Clean and update `README.md`
-
-### 2. **Run Claude**
-
-```bash
-/init
+apps/
+├── web        # Next.js frontend (App Router + Tailwind + shadcn/ui + Monaco)
+├── backend    # Express + Prisma API, submission queue, runner orchestration
+└── mcp-server # MCP service for hints, recommendations, embeddings
 ```
+Supporting directories: `docker/` (runtimes + compose), `scripts/` (setup, seeding), documentation such as `PRD.md` and `structure.md`.
 
-### 3. **Install Serena MCP**
+## 🚀 Getting Started
+1. **Install dependencies**
+   ```bash
+   npm install
+   ```
+2. **Generate & seed database**
+   ```bash
+   npm run db:migrate
+   npm run db:seed
+   ```
+3. **Start services** (requires Redis + Docker for sandbox jobs)
+   ```bash
+   npm run dev:web
+   npm run dev:api
+   npm run dev:mcp
+   ```
+4. Visit `http://localhost:3003` for the frontend, `http://localhost:3001/api` for API routes, and `ws://localhost:5001` for MCP WebSocket during development.
 
-Add Serena using:
+### Environment Variables
+- `apps/web/.env.local` – API/MCP URLs, NextAuth + OAuth creds, supported language list
+- `apps/backend/.env` – server port, database URL, JWT secrets, Redis URL, runner queue, AI API keys
+- `apps/mcp-server/.env` – MCP port, Redis, embedding + hint models, AI provider keys
 
-```bash
-claude mcp add serena -- <serena-mcp-server> --context ide-assistant --project $(pwd)
-```
+See `structure.md` for the exact variable matrix and file locations.
 
-Example using `uvx`:
+## 📦 Workspace Scripts (root package.json)
+| Script | Description |
+| --- | --- |
+| `npm run dev` | Run web, API, and MCP concurrently |
+| `npm run dev:web` / `dev:api` / `dev:mcp` | Start individual apps |
+| `npm run build:*` | Build artifacts for each app |
+| `npm run start:*` | Run compiled production builds |
+| `npm run test:*` | Execute unit/integration tests per app |
+| `npm run db:migrate` / `db:seed` | Prisma migrations + seed data |
+| `npm run docker:*` | Compose up/down/logs for local infra |
 
-```bash
-claude mcp add serena -- uvx --from git+https://github.com/oraios/serena serena start-mcp-server --context ide-assistant --project $(pwd)
-```
+## 🧪 Submission Pipeline (High Level)
+1. Frontend sends `/run` or `/submit` to backend with code + language.
+2. Backend stores a `PENDING` submission, enqueues a job via BullMQ (Redis).
+3. Runner worker spins up language container, executes tests, streams logs.
+4. Verdict + telemetry stored in Prisma, WebSocket event notifies client, MCP ingests telemetry for recommendations.
 
-### 4. **Load Serena Instructions (if required)**
+## 🤝 Collaboration Workflow (optional)
+Teams can still use dual-agent collaboration (Algo developer + Kairo reviewer) by coordinating through:
+- `todo.md` – implementation plan and status updates
+- `improvement.md` – review notes and refactor guidance
+- `principle.md` – shared engineering principles
 
-If Claude fails to auto-load them:
+These files should now reflect programming-problem goals; see `Todo.md` for current roadmap.
 
-```bash
-/mcp*serena*initial_instructions
-```
+## 📚 Reference Documents
+- `PRD.md` – Programming challenge product requirements (personas, features, metrics)
+- `structure.md` – Updated repo layout, service responsibilities, env expectations
+- `Todo.md` – Phase-by-phase delivery plan and backlog items
 
-Ensure `initial_instructions` is enabled under `included_optional_tools` in the config.
+## 🛣️ Next Steps
+- Implement sandbox runner images + queue consumers for all required languages
+- Build challenge creation/editorial tooling for staff and instructors
+- Flesh out MCP hinting pipelines and run human-in-the-loop review
+- Harden security (resource isolation, plagiarism detection) before opening to cohorts
 
-### 5. **Update Serena's Memory**
-
-After setup, prompt Claude:
-
-> _"Serena, please update your memory with the current project context."_
-
-## 🧪 AI Agent Terminals (2 Required)
-
-### 👨‍💻 Terminal 1 – **Algo** (Developer Agent)
-
-**Tech Stack:** Next.js + Strapi
-
-**Principles:**
-
-- Must follow the **DRY (Don't Repeat Yourself)** principle
-- **🚫 Read-only access to** `improvement.md`
-
-**Tasks:**
-
-1. Read `principle.md`
-2. Draft a task plan in `todo.md`
-3. Begin implementation based on the plan
-4. After `improvement.md` is updated by Kairo, refactor accordingly
-
-### 🧠 Terminal 2 – **Kairo** (Senior Principal Engineer Agent)
-
-**Role:** Reviews and improves architecture and code quality
-
-**Tasks:**
-
-1. Read `principle.md`
-2. Review code and `todo.md`
-3. Write and update `improvement.md` with comments and suggestions
-4. Perform a final review after Algo's refactor
-
-## 💡 Best Practices
-
-1. **Communication:** All inter-agent communication happens through files
-2. **Iteration:** Multiple review cycles may be needed for complex features
-3. **Documentation:** Keep `todo.md` updated with progress
-4. **Code Quality:** Algo must strictly adhere to DRY principles
-5. **Review Depth:** Kairo should provide actionable, specific feedback
-
-## 🚀 Quick Start Commands
-
-```bash
-# Initialize Claude
-/init
-
-# Install Serena MCP
-claude mcp add serena -- uvx --from git+https://github.com/oraios/serena serena start-mcp-server --context ide-assistant --project $(pwd)
-
-# Load instructions if needed
-/mcp*serena*initial_instructions
-
-# Update memory
-"Serena, please update your memory with the current project context."
-```
-
----
-
-_This guide ensures consistent, high-quality development through structured AI agent collaboration._
+Feel free to open issues or pull requests with improvements. Let’s build the best developer practice platform together! 💻✨

@@ -1,26 +1,47 @@
 import { z } from 'zod';
 
-// Problem difficulty levels
-export const DIFFICULTY_LEVELS = ['LOW', 'MEDIUM', 'HIGH'] as const;
+// Programming challenge difficulty levels
+export const DIFFICULTY_LEVELS = ['WARMUP', 'EASY', 'MEDIUM', 'HARD', 'LEGENDARY'] as const;
 
-// Common categories
+// Common programming categories
 export const PROBLEM_CATEGORIES = [
-  'Algebra',
-  'Calculus',
-  'Geometry',
-  'Statistics',
-  'Trigonometry',
-  'Number Theory',
-  'Linear Algebra',
-  'Differential Equations',
-  'Combinatorics',
-  'Logic',
+  'Arrays',
+  'Strings',
+  'Linked Lists',
+  'Stacks & Queues',
+  'Trees',
+  'Graphs',
+  'Dynamic Programming',
+  'Greedy',
+  'Sorting',
+  'Backtracking',
+  'Math',
+  'Bit Manipulation',
+  'SQL',
+  'System Design',
+  'Concurrency',
   'Other',
+] as const;
+
+export const SUPPORTED_LANGUAGES = [
+  'python',
+  'javascript',
+  'typescript',
+  'java',
+  'cpp',
+  'go',
+  'rust',
+  'sql',
 ] as const;
 
 // Create problem schema
 export const createProblemSchema = z.object({
   body: z.object({
+    slug: z
+      .string()
+      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be kebab-case')
+      .max(60, 'Slug must be less than 60 characters')
+      .optional(),
     title: z
       .string()
       .min(1, 'Title is required')
@@ -39,11 +60,23 @@ export const createProblemSchema = z.object({
       .min(1, 'Category is required')
       .max(50, 'Category must be less than 50 characters')
       .trim(),
+    languages: z
+      .array(z.enum(SUPPORTED_LANGUAGES))
+      .min(1, 'Select at least one language')
+      .max(SUPPORTED_LANGUAGES.length, 'Unsupported language provided')
+      .default(['python']),
+    topics: z.array(z.string().trim().min(1).max(40)).max(10, 'Maximum 10 topics allowed').optional(),
     tags: z
       .array(z.string().trim().min(1).max(30))
       .max(10, 'Maximum 10 tags allowed')
       .optional()
       .default([]),
+    constraints: z.string().max(2000, 'Constraints must be less than 2000 characters').optional(),
+    sampleInput: z.string().max(2000).optional(),
+    sampleOutput: z.string().max(2000).optional(),
+    starterCode: z.record(z.string()).optional(),
+    timeLimitMs: z.number().int().positive().max(10000).optional(),
+    memoryLimitKb: z.number().int().positive().max(1048576).optional(),
     solution: z.string().max(5000, 'Solution must be less than 5000 characters').optional(),
   }),
 });
@@ -51,6 +84,11 @@ export const createProblemSchema = z.object({
 // Update problem schema
 export const updateProblemSchema = z.object({
   body: z.object({
+    slug: z
+      .string()
+      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be kebab-case')
+      .max(60, 'Slug must be less than 60 characters')
+      .optional(),
     title: z
       .string()
       .min(1, 'Title is required')
@@ -74,7 +112,19 @@ export const updateProblemSchema = z.object({
       .max(50, 'Category must be less than 50 characters')
       .trim()
       .optional(),
+    languages: z
+      .array(z.enum(SUPPORTED_LANGUAGES))
+      .min(1)
+      .max(SUPPORTED_LANGUAGES.length)
+      .optional(),
+    topics: z.array(z.string().trim().min(1).max(40)).max(10, 'Maximum 10 topics allowed').optional(),
     tags: z.array(z.string().trim().min(1).max(30)).max(10, 'Maximum 10 tags allowed').optional(),
+    constraints: z.string().max(2000).optional(),
+    sampleInput: z.string().max(2000).optional(),
+    sampleOutput: z.string().max(2000).optional(),
+    starterCode: z.record(z.string()).optional(),
+    timeLimitMs: z.number().int().positive().max(10000).optional(),
+    memoryLimitKb: z.number().int().positive().max(1048576).optional(),
     solution: z.string().max(5000, 'Solution must be less than 5000 characters').optional(),
   }),
 });

@@ -1,5 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// Prisma schema for MathSolve AI – Programming Challenge Platform
 
 generator client {
   provider = "prisma-client-js"
@@ -11,100 +10,135 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  username      String    @unique
-  email         String    @unique
-  passwordHash  String?   @map("password_hash") // Optional for OAuth users
-  profileImage  String?   @map("profile_image")
-  bio           String?
-  rankPoints    Int       @default(0) @map("rank_points")
-  currentRank   String    @default("Bronze") @map("current_rank")
-  streakCount   Int       @default(0) @map("streak_count")
-  emailVerified Boolean   @default(false) @map("email_verified")
-  provider      String?   // "local", "google", etc.
-  providerId    String?   @map("provider_id") // OAuth provider user ID
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
-  lastActiveAt  DateTime? @map("last_active_at")
+  id                String                   @id @default(cuid())
+  username          String                   @unique
+  email             String                   @unique
+  passwordHash      String?                  @map("password_hash")
+  profileImage      String?                  @map("profile_image")
+  bio               String?
+  xp                Int                      @default(0)
+  currentRank       String                   @default("Novice") @map("current_rank")
+  streakCount       Int                      @default(0) @map("streak_count")
+  preferredLanguages String?                 @map("preferred_languages") // JSON string array
+  roles             String?                  // JSON string array of roles
+  emailVerified     Boolean                  @default(false) @map("email_verified")
+  provider          String?
+  providerId        String?                  @map("provider_id")
+  createdAt         DateTime                 @default(now()) @map("created_at")
+  updatedAt         DateTime                 @updatedAt @map("updated_at")
+  lastActiveAt      DateTime?                @map("last_active_at")
 
   // Relations
-  problems      Problem[]
-  solutions     Solution[]
-  resources     Resource[]
-  comments      Comment[]
-  achievements  Achievement[]
-  ratings       ProblemRating[]
-  bookmarks     Bookmark[]
-  followers     UserFollow[] @relation("UserFollowers")
-  following     UserFollow[] @relation("UserFollowing")
+  challenges        Challenge[]
+  submissions       Submission[]
+  resources         Resource[]
+  discussions       Discussion[]
+  achievements      Achievement[]
+  ratings           ChallengeRating[] 
+  bookmarks         Bookmark[]
+  orgMemberships    OrganizationMembership[]
+  playlists         Playlist[]
 
   @@map("users")
 }
 
-model Problem {
-  id           String   @id @default(cuid())
-  creatorId    String   @map("creator_id")
-  title        String
-  description  String
-  difficulty   String   // "LOW", "MEDIUM", "HIGH"
-  category     String
-  tags         String   // JSON string for SQLite compatibility
-  solution     String?
-  qualityScore Float    @default(0) @map("quality_score")
-  viewCount    Int      @default(0) @map("view_count")
-  attemptCount Int      @default(0) @map("attempt_count")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+model Challenge {
+  id             String                @id @default(cuid())
+  slug           String                @unique
+  creatorId      String                @map("creator_id")
+  title          String
+  prompt         String                // Markdown statement
+  difficulty     String                // e.g., WARMUP, EASY, MEDIUM, HARD, LEGENDARY
+  category       String                // Primary topic area
+  topics         String                // JSON string array of topics/tags
+  languages      String                // JSON string array of supported languages
+  tags           String                // Legacy field – JSON string array for quick filters
+  constraints    String?
+  sampleInput    String?               @map("sample_input")
+  sampleOutput   String?               @map("sample_output")
+  starterCode    String?               @map("starter_code") // JSON map {lang: code}
+  solutionOutline String?              @map("solution_outline")
+  editorialUrl   String?               @map("editorial_url")
+  timeLimitMs    Int                   @default(2000) @map("time_limit_ms")
+  memoryLimitKb  Int                   @default(256000) @map("memory_limit_kb")
+  qualityScore   Float                 @default(0) @map("quality_score")
+  viewCount      Int                   @default(0) @map("view_count")
+  attemptCount   Int                   @default(0) @map("attempt_count")
+  successRate    Float                 @default(0) @map("success_rate")
+  visibility     String                @default("PUBLIC")
+  createdAt      DateTime              @default(now()) @map("created_at")
+  updatedAt      DateTime              @updatedAt @map("updated_at")
 
   // Relations
-  creator      User      @relation(fields: [creatorId], references: [id])
-  solutions    Solution[]
-  comments     Comment[]
-  ratings      ProblemRating[]
-  bookmarks    Bookmark[]
+  creator        User                  @relation(fields: [creatorId], references: [id])
+  submissions    Submission[]
+  discussions    Discussion[]
+  ratings        ChallengeRating[]
+  bookmarks      Bookmark[]
+  testCases      TestCase[]
+  playlists      PlaylistChallenge[]
 
   @@index([category])
   @@index([difficulty])
   @@index([creatorId])
-  @@map("problems")
+  @@map("challenges")
 }
 
-model Solution {
-  id          String   @id @default(cuid())
-  problemId   String   @map("problem_id")
-  userId      String   @map("user_id")
-  answer      String
-  isCorrect   Boolean  @default(false) @map("is_correct")
-  pointsEarned Int     @default(0) @map("points_earned")
-  timeSpent   Int?     @map("time_spent") // in seconds
-  hintsUsed   Int      @default(0) @map("hints_used")
-  submittedAt DateTime @default(now()) @map("submitted_at")
+model TestCase {
+  id            String    @id @default(cuid())
+  challengeId   String    @map("challenge_id")
+  isSample      Boolean   @default(false) @map("is_sample")
+  inputData     String    @map("input_data")
+  outputData    String    @map("output_data")
+  timeLimitMs   Int?      @map("time_limit_ms")
+  memoryLimitKb Int?      @map("memory_limit_kb")
+  score         Int       @default(0)
+  createdAt     DateTime  @default(now()) @map("created_at")
 
-  // Relations
-  problem     Problem  @relation(fields: [problemId], references: [id])
-  user        User     @relation(fields: [userId], references: [id])
+  challenge     Challenge @relation(fields: [challengeId], references: [id])
 
-  @@unique([problemId, userId])
+  @@index([challengeId])
+  @@map("test_cases")
+}
+
+model Submission {
+  id             String    @id @default(cuid())
+  challengeId    String    @map("challenge_id")
+  userId         String    @map("user_id")
+  language       String
+  code           String
+  status         String    // PENDING, PASS, FAIL, TLE, MLE, RE
+  runtimeMs      Int?      @map("runtime_ms")
+  memoryKb       Int?      @map("memory_kb")
+  testsPassed    Int?      @map("tests_passed")
+  totalTests     Int?      @map("total_tests")
+  verdictDetails String?   @map("verdict_details") // JSON string storing per-test results
+  hintCount      Int       @default(0) @map("hint_count")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  challenge      Challenge @relation(fields: [challengeId], references: [id])
+  user           User      @relation(fields: [userId], references: [id])
+
   @@index([userId])
-  @@index([problemId])
-  @@map("solutions")
+  @@index([challengeId])
+  @@map("submissions")
 }
 
 model Resource {
-  id         String       @id @default(cuid())
+  id         String    @id @default(cuid())
   title      String
   content    String
-  type       String       // "TUTORIAL", "GUIDE", "REFERENCE"
+  type       String    // tutorial, guide, reference, editorial
   category   String
   difficulty String?
-  authorId   String       @map("author_id")
-  viewCount  Int          @default(0) @map("view_count")
-  rating     Float        @default(0)
-  createdAt  DateTime     @default(now()) @map("created_at")
-  updatedAt  DateTime     @updatedAt @map("updated_at")
+  authorId   String    @map("author_id")
+  viewCount  Int       @default(0) @map("view_count")
+  rating     Float     @default(0)
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
 
-  // Relations
-  author     User         @relation(fields: [authorId], references: [id])
+  author     User      @relation(fields: [authorId], references: [id])
   bookmarks  Bookmark[]
 
   @@index([category])
@@ -112,24 +146,24 @@ model Resource {
   @@map("resources")
 }
 
-model Comment {
-  id        String   @id @default(cuid())
-  problemId String   @map("problem_id")
-  userId    String   @map("user_id")
-  content   String
-  parentId  String?  @map("parent_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+model Discussion {
+  id          String      @id @default(cuid())
+  challengeId String      @map("challenge_id")
+  userId      String      @map("user_id")
+  content     String      // Markdown content with optional code blocks
+  parentId    String?     @map("parent_id")
+  isPinned    Boolean     @default(false) @map("is_pinned")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
 
-  // Relations
-  problem   Problem  @relation(fields: [problemId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
-  parent    Comment? @relation("CommentReplies", fields: [parentId], references: [id])
-  replies   Comment[] @relation("CommentReplies")
+  challenge   Challenge   @relation(fields: [challengeId], references: [id])
+  user        User        @relation(fields: [userId], references: [id])
+  parent      Discussion? @relation("DiscussionReplies", fields: [parentId], references: [id])
+  replies     Discussion[] @relation("DiscussionReplies")
 
-  @@index([problemId])
+  @@index([challengeId])
   @@index([userId])
-  @@map("comments")
+  @@map("discussions")
 }
 
 model Achievement {
@@ -140,54 +174,111 @@ model Achievement {
   description String?
   earnedAt    DateTime @default(now()) @map("earned_at")
 
-  // Relations
   user        User     @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@map("achievements")
 }
 
-model UserFollow {
-  followerId  String   @map("follower_id")
-  followingId String   @map("following_id")
-  createdAt   DateTime @default(now()) @map("created_at")
+model Organization {
+  id        String                   @id @default(cuid())
+  name      String
+  slug      String                   @unique
+  logoUrl   String?                  @map("logo_url")
+  planTier  String                   @map("plan_tier")
+  settings  String?                  // JSON blob
+  createdAt DateTime                 @default(now()) @map("created_at")
+  updatedAt DateTime                 @updatedAt @map("updated_at")
 
-  // Relations
-  follower    User     @relation("UserFollowers", fields: [followerId], references: [id])
-  following   User     @relation("UserFollowing", fields: [followingId], references: [id])
+  memberships OrganizationMembership[]
+  assignments Assignment[]
 
-  @@id([followerId, followingId])
-  @@map("user_follows")
+  @@map("organizations")
 }
 
-model ProblemRating {
-  problemId String   @map("problem_id")
-  userId    String   @map("user_id")
-  rating    Int      // 1-5
-  createdAt DateTime @default(now()) @map("created_at")
+model OrganizationMembership {
+  id             String        @id @default(cuid())
+  organizationId String        @map("organization_id")
+  userId         String        @map("user_id")
+  role           String        @default("MEMBER")
+  createdAt      DateTime      @default(now()) @map("created_at")
 
-  // Relations
-  problem   Problem  @relation(fields: [problemId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
+  organization   Organization  @relation(fields: [organizationId], references: [id])
+  user           User          @relation(fields: [userId], references: [id])
 
-  @@id([problemId, userId])
-  @@map("problem_ratings")
+  @@unique([organizationId, userId])
+  @@index([userId])
+  @@map("organization_memberships")
+}
+
+model Playlist {
+  id          String              @id @default(cuid())
+  ownerId     String              @map("owner_id")
+  title       String
+  description String?
+  visibility  String              @default("PRIVATE")
+  tags        String?             // JSON string array
+  createdAt   DateTime            @default(now()) @map("created_at")
+  updatedAt   DateTime            @updatedAt @map("updated_at")
+
+  owner       User                @relation(fields: [ownerId], references: [id])
+  challenges  PlaylistChallenge[]
+  assignments Assignment[]
+
+  @@map("playlists")
+}
+
+model PlaylistChallenge {
+  id          String    @id @default(cuid())
+  playlistId  String    @map("playlist_id")
+  challengeId String    @map("challenge_id")
+  order       Int       @default(0)
+
+  playlist    Playlist  @relation(fields: [playlistId], references: [id])
+  challenge   Challenge @relation(fields: [challengeId], references: [id])
+
+  @@unique([playlistId, challengeId])
+  @@map("playlist_challenges")
+}
+
+model Assignment {
+  id             String        @id @default(cuid())
+  organizationId String        @map("organization_id")
+  playlistId     String        @map("playlist_id")
+  dueDate        DateTime?
+  visibility     String        @default("PRIVATE")
+  createdAt      DateTime      @default(now()) @map("created_at")
+
+  organization   Organization  @relation(fields: [organizationId], references: [id])
+  playlist       Playlist      @relation(fields: [playlistId], references: [id])
+
+  @@map("assignments")
+}
+
+model ChallengeRating {
+  challengeId String   @map("challenge_id")
+  userId      String   @map("user_id")
+  rating      Int
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  challenge   Challenge @relation(fields: [challengeId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@id([challengeId, userId])
+  @@map("challenge_ratings")
 }
 
 model Bookmark {
-  id         String   @id @default(cuid())
-  userId     String   @map("user_id")
-  problemId  String?  @map("problem_id")
-  resourceId String?  @map("resource_id")
-  createdAt  DateTime @default(now()) @map("created_at")
+  id           String     @id @default(cuid())
+  userId       String     @map("user_id")
+  challengeId  String?    @map("challenge_id")
+  resourceId   String?    @map("resource_id")
+  createdAt    DateTime   @default(now()) @map("created_at")
 
-  // Relations
-  user       User      @relation(fields: [userId], references: [id])
-  problem    Problem?  @relation(fields: [problemId], references: [id])
-  resource   Resource? @relation(fields: [resourceId], references: [id])
+  user         User       @relation(fields: [userId], references: [id])
+  challenge    Challenge? @relation(fields: [challengeId], references: [id])
+  resource     Resource?  @relation(fields: [resourceId], references: [id])
 
   @@index([userId])
   @@map("bookmarks")
 }
-
-// Note: SQLite doesn't support enums, so we use String fields with comments indicating valid values

@@ -1,471 +1,249 @@
-# MathSolve AI - Product Requirements Document
+# MathSolve AI – Programming Challenge Platform PRD
 
 ## 1. Product Overview
 
 ### Vision
-Create a comprehensive AI-powered mathematics learning and problem-solving platform that combines intelligent tutoring, community collaboration, and gamified learning experiences.
+Build a full-stack, AI-assisted platform where developers of all levels can practice programming problems, receive instant feedback from automated evaluators, collaborate with peers, and accelerate learning through personalized guidance.
 
 ### Target Users
-- **Primary:** Students (middle school through university)
-- **Secondary:** Educators, math enthusiasts, competitive math participants
-- **Tertiary:** Parents and tutors seeking learning resources
+- **Learners:** Students, bootcamp participants, career switchers needing structured practice
+- **Educators & Coaches:** Instructors who assign challenges, track cohorts, and review submissions
+- **Competitive Coders & Professionals:** Individuals preparing for coding interviews, hackathons, or job-specific skill refreshers
 
 ### Core Value Proposition
-An all-in-one platform where users can solve math problems with AI assistance, share knowledge with a community, track their progress through rankings, and access comprehensive learning resources.
+One workspace for discovering curated challenges, writing/running code in multiple languages, validating against hidden tests, reviewing AI-generated hints, and progressing through gamified ranks and learning paths.
 
 ## 2. User Personas
 
-### Student User
-- **Goals:** Improve math skills, get homework help, prepare for exams
-- **Pain Points:** Difficulty understanding step-by-step solutions, lack of personalized practice
-- **Needs:** Clear explanations, practice problems at appropriate difficulty level
+### Aspiring Developer
+- **Goals:** Learn fundamentals, build confidence, land first role
+- **Pain Points:** Fragmented learning resources, lack of actionable feedback
+- **Needs:** Guided practice, detailed explanations, AI hints tailored to skill level
 
-### Educator User
-- **Goals:** Supplement teaching materials, track student progress, share problems
-- **Pain Points:** Limited time for individual student support, difficulty finding quality problems
-- **Needs:** Problem banks, student analytics, classroom management tools
+### Instructor / Coach
+- **Goals:** Provide structured exercises, monitor progress, surface struggling learners
+- **Pain Points:** Manual grading, limited visibility into student attempts
+- **Needs:** Cohort dashboards, challenge playlists, analytics, plagiarism detection
 
-### Competitive Learner
-- **Goals:** Challenge themselves, compete with others, achieve recognition
-- **Pain Points:** Lack of challenging problems, no competitive environment
-- **Needs:** Ranking system, difficult problems, community engagement
+### Competitive Programmer
+- **Goals:** Sharpen problem-solving speed, explore advanced topics, track ranking
+- **Pain Points:** Limited access to fresh curated sets, no adaptive recommendations
+- **Needs:** Difficulty-scaled ladders, live contests, discussion forums, MCP-powered recommendations
 
 ## 3. Feature Requirements
 
 ### 3.1 Core Features
 
-#### Authentication & User Management
-- **User Registration**
-  - Email and OAuth (Google, GitHub) authentication
-  - Profile creation with avatar and bio
-  - Account settings and preferences
-  - Password reset functionality
+#### Authentication & Profiles
+- Email + OAuth (Google, GitHub) sign-in with MFA option
+- Developer profiles showing languages, streaks, contest history
+- Privacy controls, handle reservation, avatar, social links
+- Organization/team accounts for instructors or companies
 
-- **User Profiles**
-  - Public profile page with achievements
-  - Activity history and statistics
-  - Privacy controls
-  - Following/followers system
+#### Challenge Library
+- Taxonomy by language, topic (DS/Algo, systems, web, ML), difficulty (Warm-up → Legendary)
+- Rich challenge definition: narrative, constraints, sample IO, editorial outline
+- Tags, search filters, curated tracks (Interview 75, Rust Starter, Backend Systems)
+- Bookmarking, playlists, cohort-specific challenge sets
 
-#### Problem Solving Engine
-- **Input Methods**
-  - Text input with math notation support
-  - LaTeX formula editor
-  - Image upload with OCR recognition
-  - Drawing canvas for geometry problems
+#### Code Workspace
+- In-browser IDE (Monaco) with syntax highlighting, AI autocomplete, multi-file tabs
+- Language runtimes (Python, JS/TS, Java, C++, Go, Rust) executed via sandbox service
+- Input/output console, run vs. submit flows, custom testcases, runtime + memory stats
+- Versioned drafts, diff view between attempts
 
-- **AI Solution Generation**
-  - Step-by-step solutions with explanations
-  - Multiple solution methods when applicable
-  - Hints system for guided learning
-  - Solution verification
-  - Mathematical formatting (MathJax/KaTeX)
+#### Evaluation & Feedback
+- Containerized judge that compiles/runs code with time/memory limits
+- Public sample tests + hidden acceptance tests
+- Detailed verdicts (pass/fail, TLE, MLE, RE) with stack traces or logs
+- AI explanation service (Claude/OpenAI) referencing failing testcases and likely bug types
+- Code quality checks (linting hints, complexity estimate)
 
-- **Problem Categories**
-  - Arithmetic & Basic Math
-  - Algebra (Linear, Quadratic, Polynomial)
-  - Geometry & Trigonometry
-  - Calculus (Differential, Integral)
-  - Statistics & Probability
-  - Discrete Mathematics
-  - Number Theory
+#### AI Copilot & MCP Integration
+- Skill graph tracking algorithms/data structures mastery
+- Recommendation engine suggesting next best challenge based on performance and goals
+- Conversational hinting: nudges, partial solutions, alternative approaches
+- Similar-solution clustering for plagiarism detection and community insights
 
-#### Ranking & Gamification
-- **Point System**
-  - XP based on problem difficulty
-  - Bonus points for streaks and achievements
-  - Category-specific rankings
-  - Global and regional leaderboards
+#### Community & Collaboration
+- Discussion threads per challenge with syntax-highlighted code snippets
+- Upvote/downvote, accepted answer markers, moderator tooling
+- Shared workspaces/pairing sessions with live cursors (future)
+- Reporting system for incorrect statements or poor challenge quality
 
-- **Rank Tiers**
-  - Bronze (0-1000 XP)
-  - Silver (1001-5000 XP)
-  - Gold (5001-15000 XP)
-  - Platinum (15001-30000 XP)
-  - Diamond (30001-50000 XP)
-  - Master (50001+ XP)
+#### Gamification & Progression
+- XP system tied to difficulty, first-try solves, contest placement, community contributions
+- Rank tiers: Novice, Apprentice, Developer, Senior, Principal, Architect, Legend
+- Achievement badges (first compile, redundant test coverage, streak milestones, language mastery)
+- Leaderboards: global, friends, organization, language-specific, weekly/monthly
 
-- **Achievements**
-  - Problem solving milestones
-  - Streak achievements
-  - Category mastery badges
-  - Community contribution awards
-
-#### Problem Sharing Platform
-- **Problem Creation**
-  - Rich text editor with math support
-  - Difficulty level assignment
-  - Category and tag system
-  - Solution attachment
-  - Visibility controls (public/private)
-
-- **Community Features**
-  - Problem ratings and reviews
-  - Comments and discussions
-  - Solution sharing
-  - Report system for quality control
-  - Bookmarking and collections
-
-#### MCP Server Integration
-- **Intelligent Matching**
-  - Skill-based problem recommendations
-  - Similar problem detection
-  - Learning path suggestions
-  - Prerequisite identification
-
-- **AI Response Management**
-  - Context-aware solutions
-  - Personalized difficulty adjustment
-  - Solution style preferences
-  - Multi-language support
-
-#### Learning Resources
-- **Documentation Library**
-  - Concept explanations
-  - Video tutorials
-  - Practice problem sets
-  - Formula references
-  - Study guides
-
-- **Learning Paths**
-  - Structured curricula by topic
-  - Progress tracking
-  - Recommended resources
-  - Practice schedules
+#### Learning Paths & Resources
+- Structured tracks per language or goal (e.g., “Python Data Structures”, “System Design Warm-up”)
+- Embedded editorials, annotated reference implementations, video walkthroughs
+- Auto-generated study plans with reminders and due dates
+- Integration hooks for external LMS or company portals (webhooks/API)
 
 ### 3.2 Quality Attributes
-
-#### Performance
-- Page load time < 3 seconds
-- AI response time < 5 seconds
-- Real-time LaTeX rendering
-- Smooth animations and transitions
-
-#### Usability
-- Intuitive navigation
-- Mobile-responsive design
-- Accessibility compliance (WCAG 2.1)
-- Multi-language support (initially English)
-- Dark/light theme toggle
-
-#### Security
-- Secure authentication (JWT)
-- Input sanitization
-- Rate limiting
-- XSS and CSRF protection
-- Data encryption
-
-#### Scalability
-- Horizontal scaling capability
-- Efficient database queries
-- Caching strategy
-- CDN for static assets
+- **Performance:** IDE loads <2s, run feedback <5s (cached) / <15s (fresh execution), websockets <200ms latency
+- **Reliability:** Retries for sandbox jobs, submission idempotency, offline draft persistence
+- **Security:** Isolated execution sandboxes, rate limiting, SSRF mitigation, secret scanning on uploads
+- **Accessibility:** Keyboard shortcuts, screen reader compliant components, configurable themes
+- **Scalability:** Stateless APIs with horizontal scaling, job queue for judge, CDN for static/editor bundles
 
 ## 4. User Journeys
 
-### New User Onboarding
-1. User lands on homepage
-2. Registers via email or OAuth
-3. Completes profile setup
-4. Takes skill assessment quiz
-5. Receives personalized recommendations
-6. Solves first problem with AI assistance
-7. Earns first XP and achievement
+### Onboarding Journey
+1. Visit marketing homepage, learn value props
+2. Register via email/OAuth, optionally join organization or cohort
+3. Pick preferred languages + skill assessment quiz
+4. Receive personalized dashboard with recommended track and first challenge
+5. Solve tutorial challenge with guided hints, earn first badge
 
-### Problem Solving Flow
-1. User selects or searches for problem
-2. Attempts solution
-3. Requests hint if needed
-4. Submits answer
-5. Views AI-generated solution
-6. Earns XP if correct
-7. Can discuss in comments
+### Practice Journey
+1. Filter/select challenge by topic/language/difficulty
+2. Read prompt, open IDE, choose language
+3. Write code, run custom tests
+4. Submit → sandbox executes hidden tests → verdict displayed
+5. If failing, request AI hint or view discussion snippet
+6. Upon success, review editorial, share solution, earn XP
 
-### Problem Creation Flow
-1. User clicks "Create Problem"
-2. Enters problem details
-3. Sets difficulty and category
-4. Adds solution
-5. Publishes to community
-6. Receives quality score
-7. Earns contribution points
+### Instructor Journey
+1. Create organization and invite learners
+2. Assemble playlist from library or upload custom challenge (with testcases & solution)
+3. Assign due dates and difficulty ramp
+4. Monitor submissions dashboard (pass/fail, average attempts, hints used)
+5. Export analytics or trigger re-tests after challenge updates
+
+### Contest Journey (future)
+1. Join scheduled contest or create private contest
+2. Enter live leaderboard, locking solutions until contest end
+3. Automatic tie-breaker rules (penalty, completion order)
+4. Post-contest editorials and rating adjustments
 
 ## 5. Technical Requirements
 
 ### Frontend (Next.js)
-- **Core Technologies**
-  - Next.js 14+ with App Router
-  - TypeScript for type safety
-  - Tailwind CSS for styling
-  - Shadcn/ui components
-  - Zustand for state management
+- Next.js 14 App Router, TypeScript, Tailwind, shadcn/ui
+- Monaco-based CodeEditor component with language mode loading
+- Zustand/TanStack Query for client state + data fetching
+- WebSocket hook for real-time judge status + collaboration features
+- MathJax removed; highlight.js/prism + Markdown with code fences for prompts/editorials
 
-- **Key Libraries**
-  - MathJax/KaTeX for math rendering
-  - React Hook Form for forms
-  - TanStack Query for data fetching
-  - Framer Motion for animations
-  - Next-Auth for authentication
+### Backend (Express + Services)
+- Express + TypeScript, modular routing, Zod validation, Prisma ORM
+- Submission pipeline: API → job queue (BullMQ/Redis) → sandbox runner service (Node worker or external cluster)
+- Authentication via JWT + refresh tokens; OAuth providers maintained
+- Rate limiting per endpoint (stricter on run/submit) and per-organization quotas
+- Telemetry via Winston + OpenTelemetry exporters
 
-### Backend (Express.js)
-- **Core Technologies**
-  - Express.js with TypeScript
-  - JWT for authentication
-  - Bcrypt for password hashing
-  - Joi/Zod for validation
-  - Winston for logging
+### Sandbox / Judge
+- Executes user code inside Firecracker/Docker sandboxes with language-specific images
+- Resource limits configurable per challenge
+- Streams stdout/stderr logs back to API, stores per-test results
+- Supports custom judge scripts for interactive problems or SQL tasks
+- Future: GPU-enabled workers for ML tasks
 
-- **API Design**
-  - RESTful architecture
-  - Versioned endpoints
-  - Consistent error handling
-  - Request rate limiting
-  - CORS configuration
-
-### Database (SQLite/PostgreSQL)
-- **Initial Setup**
-  - SQLite for local development
-  - Migration system (Prisma/Knex)
-  - Seed data for testing
-
-- **Production Ready**
-  - PostgreSQL for production
-  - Connection pooling
-  - Query optimization
-  - Backup strategy
+### Database
+- PostgreSQL primary; SQLite only for local dev
+- Tables: users, challenges, tags, playlists, submissions, testcases, discussions, organizations, achievements, recommendation_state
+- Full-text search indexes on challenge titles/prompts
+- Row-level security for organization-scoped data (optional)
 
 ### MCP Server
-- **Core Functionality**
-  - WebSocket connections
-  - Problem similarity matching
-  - User skill analysis
-  - Recommendation engine
-  - AI model integration
+- Hosts skill graphs, embeddings, recommendation algorithms
+- Consumes submission telemetry to update mastery vectors
+- Provides APIs for AI hint generation, similar challenge lookup, autop-run severity classification
+- Caches results in Redis + vector store (pgvector or Pinecone)
 
-- **AI Integration**
-  - OpenAI/Claude API integration
-  - Prompt engineering for math
-  - Response formatting
-  - Error handling and fallbacks
+### Integrations
+- AI providers (OpenAI, Anthropic) with prompt templates for hints/editorials/responses
+- GitHub/Gist export for sharing accepted solutions
+- Webhooks for LMS/Slack notifications (assignment created, submission failed)
+- Payment gateway (future) for premium tiers
 
-## 6. Data Models
+## 6. Data Models (simplified)
 
-### User Model
-```
-- id (UUID)
-- username (unique)
-- email (unique)
-- passwordHash
-- profileImage
-- bio
-- rankPoints
-- currentRank
-- streakCount
-- joinedAt
-- lastActiveAt
-```
+### User
+- id, email, username, passwordHash, avatar, bio, preferredLanguages[], xp, rank, streak, organizationId?, roles[], createdAt, updatedAt
 
-### Problem Model
-```
-- id (UUID)
-- creatorId (FK)
-- title
-- description
-- difficulty (low/medium/high)
-- category
-- tags[]
-- solution
-- qualityScore
-- viewCount
-- attemptCount
-- createdAt
-- updatedAt
-```
+### Challenge
+- id, slug, title, prompt (Markdown), constraints, difficulty, topics[], languages[], starterCode {lang: code}, solutionOutline, editorialUrl, creatorId, visibility, createdAt, updatedAt
 
-### Solution Model
-```
-- id (UUID)
-- problemId (FK)
-- userId (FK)
-- answer
-- isCorrect
-- pointsEarned
-- timeSpent
-- hintsUsed
-- submittedAt
-```
+### Submission
+- id, challengeId, userId, language, code, status (pending/pass/fail/tle/mle/re), runtimeMs, memoryKb, verdictDetails Json, testsPassed, totalTests, hintCount, createdAt
 
-### Resource Model
-```
-- id (UUID)
-- title
-- content
-- type (tutorial/guide/reference)
-- category
-- difficulty
-- authorId (FK)
-- viewCount
-- rating
-- createdAt
-```
+### TestCase
+- id, challengeId, isSample, inputBlob, expectedOutputBlob, metadata (time limit, scoring)
 
-## 7. API Endpoints
+### Discussion
+- id, challengeId, userId, parentId?, content Markdown, upvotes, createdAt, updatedAt, acceptedAnswer?
 
-### Authentication
-```
-POST   /api/auth/register
-POST   /api/auth/login
-POST   /api/auth/logout
-POST   /api/auth/refresh
-POST   /api/auth/forgot-password
-POST   /api/auth/reset-password
-```
+### Playlist / Track
+- id, ownerId (user/org), title, description, visibility, challengeOrder[], tags, isOfficial
 
-### Users
-```
-GET    /api/users/profile
-PUT    /api/users/profile
-GET    /api/users/:id
-GET    /api/users/:id/stats
-GET    /api/users/:id/achievements
-POST   /api/users/:id/follow
-```
+### Organization
+- id, name, slug, logoUrl, planTier, seats, settings Json, createdAt
 
-### Problems
-```
-GET    /api/problems
-POST   /api/problems
-GET    /api/problems/:id
-PUT    /api/problems/:id
-DELETE /api/problems/:id
-POST   /api/problems/:id/solve
-POST   /api/problems/:id/rate
-GET    /api/problems/recommendations
-```
+### RecommendationState
+- id, userId, skillVector Json, lastAnalyzedAt, preferredGoals[], suggestedChallengeIds[]
 
-### AI Services
-```
-POST   /api/ai/solve
-POST   /api/ai/hint
-POST   /api/ai/verify
-POST   /api/ai/similar-problems
-```
+## 7. API Endpoints (sample)
 
-### Rankings
-```
-GET    /api/rankings/global
-GET    /api/rankings/category/:category
-GET    /api/rankings/weekly
-GET    /api/rankings/monthly
-```
+### Auth & Profile
+- POST /api/auth/register, /login, /logout, /refresh, /oauth/callback
+- GET/PUT /api/users/me, GET /api/users/:id, GET /api/users/:id/stats
 
-### Resources
-```
-GET    /api/resources
-GET    /api/resources/:id
-POST   /api/resources
-PUT    /api/resources/:id
-GET    /api/resources/search
-```
+### Challenges
+- GET /api/challenges (filters), GET /api/challenges/:slug
+- POST /api/challenges (staff/instructors), PUT/PATCH /api/challenges/:slug, DELETE ...
+- GET /api/challenges/:slug/testcases/sample (public) – hides hidden cases
 
-### MCP Server
-```
-WS     /mcp/connect
-POST   /mcp/analyze-skill
-POST   /mcp/get-recommendations
-POST   /mcp/match-problems
-```
+### Submissions & Judge
+- POST /api/challenges/:slug/run (custom input)
+- POST /api/challenges/:slug/submit
+- GET /api/submissions/:id (includes per-test results)
+- GET /api/challenges/:slug/submissions?userId=... (history)
 
-## 8. UI/UX Requirements
+### Community & Resources
+- GET/POST /api/challenges/:slug/discussions
+- POST /api/discussions/:id/upvote, POST /api/discussions/:id/accept
+- GET /api/playlists, POST /api/playlists, POST /api/playlists/:id/assign
 
-### Design Principles
-- Clean and minimal interface
-- Focus on content readability
-- Consistent color scheme
-- Clear visual hierarchy
-- Intuitive navigation patterns
+### Organizations & Analytics
+- POST /api/orgs, GET /api/orgs/:id/learners, GET /api/orgs/:id/analytics
+- POST /api/orgs/:id/invite, POST /api/orgs/:id/challenges
 
-### Key Pages
-- **Homepage**: Hero section, features, problem of the day
-- **Dashboard**: User stats, recent activity, recommendations
-- **Problem Page**: Problem display, solution area, discussions
-- **Profile Page**: User info, achievements, activity history
-- **Rankings Page**: Leaderboards, filters, search
-- **Resources Page**: Categories, search, featured content
-- **Problem Creator**: Rich editor, preview, settings
+### MCP / AI
+- POST /api/ai/hint, /analyze-code, /recommendations
+- WS /mcp/connect for realtime hint sessions + recommendation pushes
 
-### Responsive Design
-- Mobile-first approach
-- Tablet optimization
-- Desktop enhanced features
-- Touch-friendly interactions
-- Optimized images and assets
+## 8. UI / UX Requirements
+- **Dashboard:** Personalized feed (recommended challenges, streak, XP), quick resume
+- **Challenge Detail:** Markdown prompt, constraints table, stats (success rate, attempts), tags, discussion preview
+- **IDE Workspace:** Resizable panels (code editor, console, tests, AI assistant), keyboard shortcuts, auto-save indicator
+- **Playlists & Tracks:** Progress bars, reorderable lists, assignment due dates
+- **Organizations:** Admin console for invites, analytics charts, export buttons
+- **Leaderboards:** Filters (global/org/friends), language toggles, search bar
+- **Responsive Design:** Desktop-first but optimized layouts for tablet/mobile; code editor falls back to full-screen on small screens
 
 ## 9. Success Metrics
+- Weekly active coders, new submissions per user, median attempts to solve
+- Time-to-first-success after onboarding, hint effectiveness (success after hint)
+- Instructor adoption: active cohorts, assignments issued, average completion rate
+- Judge reliability: average job latency, failure rate, sandbox utilization
+- MCP value: recommendation click-through, skill progression delta, AI hint satisfaction rating
 
-### User Engagement
-- Daily Active Users (DAU)
-- Average session duration
-- Problems solved per user
-- User retention rate (7-day, 30-day)
-- Community participation rate
+## 10. Compliance & Security
+- GDPR/CCPA readiness, data export/delete on request
+- Academic integrity: plagiarism detection, IP logging for proctored contests
+- Secure sandboxing with no outbound network by default, scanning uploads for secrets
+- WCAG 2.1 AA compliance, localization-ready copy (start with English)
 
-### Platform Quality
-- AI solution accuracy rate
-- Problem quality scores
-- User satisfaction ratings
-- Response time metrics
-- Error rates
-
-### Growth Metrics
-- New user registrations
-- Problem creation rate
-- Resource usage statistics
-- API usage patterns
-- Feature adoption rates
-
-## 10. Compliance & Standards
-
-### Educational Standards
-- Curriculum alignment options
-- Age-appropriate content
-- Academic integrity guidelines
-
-### Data Protection
-- GDPR compliance
-- COPPA compliance for minors
-- Data retention policies
-- User data export functionality
-
-### Accessibility
-- WCAG 2.1 Level AA compliance
-- Screen reader support
-- Keyboard navigation
-- High contrast mode
-
-## 11. Future Considerations
-
-### Potential Features
-- Mobile applications (iOS/Android)
-- Live tutoring integration
-- Video solution explanations
-- Collaborative problem solving
-- Competition/tournament mode
-- School/classroom management
-- Parent monitoring dashboard
-- API for third-party integration
-- Offline mode support
-- Advanced analytics dashboard
-
-### Monetization Options
-- Premium subscription tiers
-- Ad-supported free tier
-- Institutional licenses
-- Premium resources
-- One-on-one tutoring marketplace
-
-### International Expansion
-- Multi-language support
-- Regional content adaptation
-- Local curriculum alignment
-- Cultural considerations
+## 11. Future Roadmap
+- Mobile companion apps (solve or review editorials on the go)
+- Live pair programming interviews + interviewer dashboards
+- Company-branded portals with ATS integrations
+- Adaptive certifications / badges minted on-chain (optional)
+- AI-generated challenges vetted by human reviewers
+- Offline-first desktop IDE sync
+- Marketplace for premium tracks, mock interviews, mentoring sessions

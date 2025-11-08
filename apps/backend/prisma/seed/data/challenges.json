@@ -1,0 +1,204 @@
+[
+  {
+    "slug": "two-sum",
+    "title": "Two Sum",
+    "prompt": "Given an array of integers `nums` and an integer `target`, return the indices of the two numbers such that they add up to `target`. You may assume that each input would have exactly one solution, and you may not use the same element twice.",
+    "difficulty": "EASY",
+    "category": "Arrays",
+    "topics": ["arrays", "hash-map", "interview"],
+    "languages": ["python", "javascript", "typescript", "cpp", "java"],
+    "tags": ["warmup", "beginner"],
+    "constraints": "2 <= nums.length <= 10^4\n-10^9 <= nums[i] <= 10^9\n-10^9 <= target <= 10^9",
+    "sampleInput": "nums = [2,7,11,15], target = 9",
+    "sampleOutput": "[0,1]",
+    "starterCode": {
+      "python": "class Solution:\n    def twoSum(self, nums: list[int], target: int) -> list[int]:\n        # TODO: implement\n        return []",
+      "javascript": "export function twoSum(nums, target) {\n  // TODO: implement\n  return [];\n}"},
+    "solutionOutline": "Use a hash map to store previously seen numbers and their indices. For each number, check if target - num already exists.",
+    "editorialUrl": null,
+    "timeLimitMs": 1500,
+    "memoryLimitKb": 131072,
+    "testCases": [
+      {
+        "isSample": true,
+        "input": "{\"nums\":[2,7,11,15],\"target\":9}",
+        "output": "[0,1]"
+      },
+      {
+        "isSample": false,
+        "input": "{\"nums\":[3,2,4],\"target\":6}",
+        "output": "[1,2]"
+      },
+      {
+        "isSample": false,
+        "input": "{\"nums\":[3,3],\"target\":6}",
+        "output": "[0,1]"
+      }
+    ]
+  },
+  {
+    "slug": "valid-parentheses",
+    "title": "Valid Parentheses",
+    "prompt": "Given a string `s` containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.\nA string is valid if open brackets are closed by the same type of brackets and in the correct order.",
+    "difficulty": "EASY",
+    "category": "Stacks",
+    "topics": ["stack", "string"],
+    "languages": ["python", "javascript", "typescript", "java"],
+    "tags": ["stack", "simulation"],
+    "constraints": "1 <= s.length <= 10^4",
+    "sampleInput": "s = \"()[]{}\"",
+    "sampleOutput": "true",
+    "starterCode": {
+      "python": "class Solution:\n    def isValid(self, s: str) -> bool:\n        return False",
+      "javascript": "export function isValid(s) {\n  return false;\n}"},
+    "solutionOutline": "Traverse the string and push expected closing brackets on a stack. Pop when encountering a closing bracket and compare.",
+    "editorialUrl": null,
+    "timeLimitMs": 1200,
+    "memoryLimitKb": 131072,
+    "testCases": [
+      {
+        "isSample": true,
+        "input": "{\"s\":\"()[]{}\"}",
+        "output": "true"
+      },
+      {
+        "isSample": false,
+        "input": "{\"s\":\"(]\"}",
+        "output": "false"
+      },
+      {
+        "isSample": false,
+        "input": "{\"s\":\"{[]}\"}",
+        "output": "true"
+      }
+    ]
+  },
+  {
+    "slug": "longest-substring",
+    "title": "Longest Substring Without Repeating Characters",
+    "prompt": "Given a string `s`, find the length of the longest substring without repeating characters.",
+    "difficulty": "MEDIUM",
+    "category": "Sliding Window",
+    "topics": ["hash-map", "sliding-window", "strings"],
+    "languages": ["python", "javascript", "typescript", "go", "java"],
+    "tags": ["interview", "two-pointers"],
+    "constraints": "0 <= s.length <= 5 * 10^4",
+    "sampleInput": "s = \"abcabcbb\"",
+    "sampleOutput": "3",
+    "starterCode": {
+      "python": "class Solution:\n    def lengthOfLongestSubstring(self, s: str) -> int:\n        return 0",
+      "javascript": "export function lengthOfLongestSubstring(s) {\n  return 0;\n}"},
+    "solutionOutline": "Use a sliding window with a map of last seen indices. Move left pointer when duplicates appear.",
+    "editorialUrl": null,
+    "timeLimitMs": 2000,
+    "memoryLimitKb": 196608,
+    "testCases": [
+      {
+        "isSample": true,
+        "input": "{\"s\":\"abcabcbb\"}",
+        "output": "3"
+      },
+      {
+        "isSample": false,
+        "input": "{\"s\":\"bbbbb\"}",
+        "output": "1"
+      },
+      {
+        "isSample": false,
+        "input": "{\"s\":\"pwwkew\"}",
+        "output": "3"
+      }
+    ]
+  },
+  {
+    "slug": "merge-intervals",
+    "title": "Merge Intervals",
+    "prompt": "Given an array of intervals where intervals[i] = [start_i, end_i], merge all overlapping intervals and return an array of the non-overlapping intervals that cover all the intervals in the input.",
+    "difficulty": "MEDIUM",
+    "category": "Sorting",
+    "topics": ["sorting", "intervals"],
+    "languages": ["python", "javascript", "java", "cpp"],
+    "tags": ["arrays", "greedy"],
+    "constraints": "1 <= intervals.length <= 10^4\nintervals[i].length == 2",
+    "sampleInput": "intervals = [[1,3],[2,6],[8,10],[15,18]]",
+    "sampleOutput": "[[1,6],[8,10],[15,18]]",
+    "starterCode": {
+      "python": "class Solution:\n    def merge(self, intervals: list[list[int]]) -> list[list[int]]:\n        return []",
+      "javascript": "export function merge(intervals) {\n  return [];\n}"},
+    "solutionOutline": "Sort intervals by start time, then iterate and merge if overlapping.",
+    "editorialUrl": null,
+    "timeLimitMs": 2000,
+    "memoryLimitKb": 196608,
+    "testCases": [
+      {
+        "isSample": true,
+        "input": "{\"intervals\":[[1,3],[2,6],[8,10],[15,18]]}",
+        "output": "[[1,6],[8,10],[15,18]]"
+      },
+      {
+        "isSample": false,
+        "input": "{\"intervals\":[[1,4],[4,5]]}",
+        "output": "[[1,5]]"
+      }
+    ]
+  },
+  {
+    "slug": "kth-largest-heap",
+    "title": "Kth Largest Element in a Stream",
+    "prompt": "Design a class that finds the kth largest element in a stream. Implement the `KthLargest(int k, int[] nums)` constructor which initializes the object with the integer k and the stream of integers nums.\nImplement the `int add(int val)` method that returns the element representing the kth largest element in the stream.",
+    "difficulty": "MEDIUM",
+    "category": "Heaps",
+    "topics": ["heap", "priority-queue", "design"],
+    "languages": ["python", "javascript", "java", "go"],
+    "tags": ["data-structures"],
+    "constraints": "1 <= k <= 10^4\n-10^4 <= nums[i] <= 10^4",
+    "sampleInput": "k = 3, nums = [4,5,8,2]",
+    "sampleOutput": "add(3) -> 4",
+    "starterCode": {
+      "python": "class KthLargest:\n    def __init__(self, k: int, nums: list[int]):\n        pass\n    def add(self, val: int) -> int:\n        return 0",
+      "javascript": "export class KthLargest {\n  constructor(k, nums) {}\n  add(val) { return 0; }\n}"},
+    "solutionOutline": "Maintain a min-heap of size k. When adding, push the value and pop if heap size exceeds k.",
+    "editorialUrl": null,
+    "timeLimitMs": 2000,
+    "memoryLimitKb": 196608,
+    "testCases": [
+      {
+        "isSample": true,
+        "input": "{\"k\":3,\"nums\":[4,5,8,2],\"ops\": [3,5,10,9,4]}",
+        "output": "[4,5,5,8,8]"
+      }
+    ]
+  },
+  {
+    "slug": "sql-second-highest-salary",
+    "title": "SQL: Second Highest Salary",
+    "prompt": "Write an SQL query to report the second highest salary from the Employee table. If there is no second highest salary, the query should report null.",
+    "difficulty": "EASY",
+    "category": "SQL",
+    "topics": ["sql", "window-functions"],
+    "languages": ["sql"],
+    "tags": ["database"],
+    "constraints": "Employee(id INT, salary INT)",
+    "sampleInput": "id | salary\\n1  | 100\\n2  | 200\\n3  | 300",
+    "sampleOutput": "200",
+    "starterCode": {
+      "sql": "SELECT NULL AS SecondHighestSalary;"
+    },
+    "solutionOutline": "Use `SELECT DISTINCT salary ... ORDER BY salary DESC LIMIT 1 OFFSET 1` or a window function.",
+    "editorialUrl": null,
+    "timeLimitMs": 1000,
+    "memoryLimitKb": 65536,
+    "testCases": [
+      {
+        "isSample": true,
+        "input": "{\"salaries\":[100,200,300]}",
+        "output": "200"
+      },
+      {
+        "isSample": false,
+        "input": "{\"salaries\":[100]}",
+        "output": "null"
+      }
+    ]
+  }
+]

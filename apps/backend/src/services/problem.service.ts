@@ -1,4 +1,4 @@
-import { Problem, ProblemRating } from '@prisma/client';
+import { Challenge as Problem, ChallengeRating as ProblemRating } from '@prisma/client';
 import {
   ProblemRepository,
   ProblemWithDetails,
@@ -31,17 +31,32 @@ export class ProblemService {
 
   async createProblem(userId: string, data: CreateProblemInput): Promise<Problem> {
     try {
-      // Convert tags array to JSON string for SQLite storage
       const tagsJson = JSON.stringify(data.tags || []);
+      const topicsJson = JSON.stringify(data.topics || []);
+      const languagesJson = JSON.stringify(data.languages || []);
+      const starterCodeJson = data.starterCode ? JSON.stringify(data.starterCode) : null;
+      const slug = data.slug || this.generateSlug(data.title);
 
       const problemData = {
-        ...data,
+        slug,
+        title: data.title,
+        prompt: data.description,
+        difficulty: data.difficulty,
+        category: data.category,
         creatorId: userId,
         tags: tagsJson,
+        topics: topicsJson,
+        languages: languagesJson,
+        constraints: data.constraints,
+        sampleInput: data.sampleInput,
+        sampleOutput: data.sampleOutput,
+        starterCode: starterCodeJson,
+        timeLimitMs: data.timeLimitMs ?? 2000,
+        memoryLimitKb: data.memoryLimitKb ?? 256000,
         qualityScore: this.calculateInitialQualityScore(data),
         viewCount: 0,
         attemptCount: 0,
-        solution: data.solution || null,
+        solutionOutline: data.solution || null,
       };
 
       const problem = await this.problemRepository.create(problemData);
@@ -71,26 +86,20 @@ export class ProblemService {
       logger.warn('Failed to increment view count', { problemId: id, error });
     });
 
-    // Parse tags from JSON string
-    try {
-      const tags = JSON.parse(problem.tags);
-      (problem as any).parsedTags = Array.isArray(tags) ? tags : [];
-    } catch {
-      (problem as any).parsedTags = [];
-    }
+    const enrichedProblem = this.enrichProblem(problem);
 
     // If user is provided, get their rating for this problem
     if (userId) {
       try {
         const userRating = await this.problemRepository.getUserRating(id, userId);
-        (problem as any).userRating = userRating?.rating || null;
+        (enrichedProblem as any).userRating = userRating?.rating || null;
       } catch (error) {
         logger.warn('Failed to get user rating', { problemId: id, userId, error });
-        (problem as any).userRating = null;
+        (enrichedProblem as any).userRating = null;
       }
     }
 
-    return problem;
+    return enrichedProblem;
   }
 
   async getProblems(
@@ -102,20 +111,7 @@ export class ProblemService {
       const { problems, total } = await this.problemRepository.findMany(filters, pagination, sort);
 
       // Parse tags for each problem
-      const problemsWithParsedTags = problems.map((problem) => {
-        try {
-          const tags = JSON.parse(problem.tags);
-          return {
-            ...problem,
-            parsedTags: Array.isArray(tags) ? tags : [],
-          };
-        } catch {
-          return {
-            ...problem,
-            parsedTags: [],
-          };
-        }
-      });
+      const problemsWithParsedTags = problems.map((problem) => this.enrichProblem(problem));
 
       const totalPages = Math.ceil(total / pagination.limit);
 
@@ -150,16 +146,32 @@ export class ProblemService {
     try {
       // Convert tags array to JSON string if provided
       let updateData: any = {
-        ...data,
+        ...(data.slug && { slug: data.slug }),
+        ...(data.title && { title: data.title }),
+        ...(data.description && { prompt: data.description }),
+        ...(data.difficulty && { difficulty: data.difficulty }),
+        ...(data.category && { category: data.category }),
         ...(data.tags && { tags: JSON.stringify(data.tags) }),
+        ...(data.topics && { topics: JSON.stringify(data.topics) }),
+        ...(data.languages && { languages: JSON.stringify(data.languages) }),
+        ...(data.constraints && { constraints: data.constraints }),
+        ...(data.sampleInput && { sampleInput: data.sampleInput }),
+        ...(data.sampleOutput && { sampleOutput: data.sampleOutput }),
+        ...(data.starterCode && { starterCode: JSON.stringify(data.starterCode) }),
+        ...(typeof data.timeLimitMs === 'number' && { timeLimitMs: data.timeLimitMs }),
+        ...(typeof data.memoryLimitKb === 'number' && { memoryLimitKb: data.memoryLimitKb }),
+        ...(data.solution && { solutionOutline: data.solution }),
       };
 
       // Recalculate quality score if content changed
-      if (data.title || data.description || data.tags) {
+      if (data.title || data.description || data.tags || data.topics || data.languages || data.solution) {
         const newData = {
           title: data.title || existingProblem.title,
-          description: data.description || existingProblem.description,
+          description: data.description || existingProblem.prompt,
           tags: data.tags || JSON.parse(existingProblem.tags || '[]'),
+          topics: data.topics || this.parseJsonField(existingProblem.topics, []),
+          languages: data.languages || this.parseJsonField(existingProblem.languages, []),
+          solution: data.solution || existingProblem.solutionOutline,
         };
         updateData.qualityScore = this.calculateQualityScore(newData, existingProblem);
       }
@@ -337,6 +349,14 @@ export class ProblemService {
       score += Math.min(data.tags.length * 5, 15); // Max 15 points for tags
     }
 
+    if (data.topics && data.topics.length > 0) {
+      score += Math.min(data.topics.length * 2, 10);
+    }
+
+    if (data.languages && data.languages.length > 0) {
+      score += 10;
+    }
+
     // Solution bonus
     if (data.solution && data.solution.length > 0) {
       score += 20;
@@ -359,6 +379,35 @@ export class ProblemService {
     return Math.min(score, 100);
   }
 
+  private enrichProblem(problem: any) {
+    return {
+      ...problem,
+      parsedTags: this.parseJsonField<string[]>(problem.tags, []),
+      parsedTopics: this.parseJsonField<string[]>(problem.topics, []),
+      supportedLanguages: this.parseJsonField<string[]>(problem.languages, []),
+      starterCodeMap: this.parseJsonField<Record<string, string>>(problem.starterCode, {}),
+    };
+  }
+
+  private parseJsonField<T>(value: string | null | undefined, fallback: T): T {
+    if (!value) return fallback;
+    try {
+      const parsed = JSON.parse(value);
+      return (parsed ?? fallback) as T;
+    } catch {
+      return fallback;
+    }
+  }
+
+  private generateSlug(title: string): string {
+    const base = title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 60);
+    return base || `challenge-${Date.now()}`;
+  }
+
   private async updateProblemQualityScore(problemId: string): Promise<void> {
     try {
       const problem = await this.problemRepository.findById(problemId);
@@ -368,9 +417,11 @@ export class ProblemService {
       const newScore = this.calculateQualityScore(
         {
           title: problem.title,
-          description: problem.description,
+          description: problem.prompt,
           tags: parsedTags,
-          solution: problem.solution,
+          topics: this.parseJsonField(problem.topics, []),
+          languages: this.parseJsonField(problem.languages, []),
+          solution: problem.solutionOutline,
         },
         {
           viewCount: problem.viewCount,

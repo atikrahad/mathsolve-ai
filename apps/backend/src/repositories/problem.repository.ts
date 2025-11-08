@@ -1,4 +1,4 @@
-import { Prisma, Problem, ProblemRating } from '@prisma/client';
+import { Prisma, Challenge as Problem, ChallengeRating as ProblemRating } from '@prisma/client';
 import { BaseRepository } from './base.repository';
 
 export interface ProblemWithDetails extends Problem {
@@ -9,8 +9,8 @@ export interface ProblemWithDetails extends Problem {
   };
   _count: {
     ratings: number;
-    solutions: number;
-    comments: number;
+    submissions: number;
+    discussions: number;
   };
   avgRating: number;
 }
@@ -30,13 +30,13 @@ export interface ProblemSort {
 
 export class ProblemRepository extends BaseRepository {
   async create(data: Omit<Problem, 'id' | 'createdAt' | 'updatedAt'>): Promise<Problem> {
-    return this.db.problem.create({
+    return this.db.challenge.create({
       data,
     });
   }
 
   async findById(id: string): Promise<ProblemWithDetails | null> {
-    const problem = await this.db.problem.findUnique({
+    const problem = await this.db.challenge.findUnique({
       where: { id },
       include: {
         creator: {
@@ -49,8 +49,8 @@ export class ProblemRepository extends BaseRepository {
         _count: {
           select: {
             ratings: true,
-            solutions: true,
-            comments: true,
+            submissions: true,
+            discussions: true,
           },
         },
         ratings: {
@@ -88,7 +88,7 @@ export class ProblemRepository extends BaseRepository {
     const offset = (page - 1) * limit;
 
     // Build where clause
-    const where: Prisma.ProblemWhereInput = {
+    const where: Prisma.ChallengeWhereInput = {
       ...(category && { category }),
       ...(difficulty && { difficulty }),
       ...(creatorId && { creatorId }),
@@ -99,18 +99,18 @@ export class ProblemRepository extends BaseRepository {
           },
         }),
       ...(search && {
-        OR: [{ title: { contains: search } }, { description: { contains: search } }],
+        OR: [{ title: { contains: search } }, { prompt: { contains: search } }],
       }),
     };
 
     // Build order clause
-    const orderBy: Prisma.ProblemOrderByWithRelationInput = {
+    const orderBy: Prisma.ChallengeOrderByWithRelationInput = {
       [sort.field]: sort.order,
     };
 
     // Get problems with details
     const [problems, total] = await Promise.all([
-      this.db.problem.findMany({
+      this.db.challenge.findMany({
         where,
         skip: offset,
         take: limit,
@@ -126,8 +126,8 @@ export class ProblemRepository extends BaseRepository {
           _count: {
             select: {
               ratings: true,
-              solutions: true,
-              comments: true,
+              submissions: true,
+              discussions: true,
             },
           },
           ratings: {
@@ -137,7 +137,7 @@ export class ProblemRepository extends BaseRepository {
           },
         },
       }),
-      this.db.problem.count({ where }),
+      this.db.challenge.count({ where }),
     ]);
 
     // Calculate average ratings
@@ -166,7 +166,7 @@ export class ProblemRepository extends BaseRepository {
     data: Partial<Omit<Problem, 'id' | 'createdAt' | 'updatedAt'>>
   ): Promise<Problem | null> {
     try {
-      return await this.db.problem.update({
+      return await this.db.challenge.update({
         where: { id },
         data,
       });
@@ -180,7 +180,7 @@ export class ProblemRepository extends BaseRepository {
 
   async delete(id: string): Promise<boolean> {
     try {
-      await this.db.problem.delete({
+      await this.db.challenge.delete({
         where: { id },
       });
       return true;
@@ -193,7 +193,7 @@ export class ProblemRepository extends BaseRepository {
   }
 
   async incrementViewCount(id: string): Promise<void> {
-    await this.db.problem.update({
+    await this.db.challenge.update({
       where: { id },
       data: {
         viewCount: {
@@ -204,7 +204,7 @@ export class ProblemRepository extends BaseRepository {
   }
 
   async incrementAttemptCount(id: string): Promise<void> {
-    await this.db.problem.update({
+    await this.db.challenge.update({
       where: { id },
       data: {
         attemptCount: {
@@ -215,10 +215,10 @@ export class ProblemRepository extends BaseRepository {
   }
 
   async rateProblem(problemId: string, userId: string, rating: number): Promise<ProblemRating> {
-    return this.db.problemRating.upsert({
+    return this.db.challengeRating.upsert({
       where: {
-        problemId_userId: {
-          problemId,
+        challengeId_userId: {
+          challengeId: problemId,
           userId,
         },
       },
@@ -226,7 +226,7 @@ export class ProblemRepository extends BaseRepository {
         rating,
       },
       create: {
-        problemId,
+        challengeId: problemId,
         userId,
         rating,
       },
@@ -234,10 +234,10 @@ export class ProblemRepository extends BaseRepository {
   }
 
   async getUserRating(problemId: string, userId: string): Promise<ProblemRating | null> {
-    return this.db.problemRating.findUnique({
+    return this.db.challengeRating.findUnique({
       where: {
-        problemId_userId: {
-          problemId,
+        challengeId_userId: {
+          challengeId: problemId,
           userId,
         },
       },
@@ -245,7 +245,7 @@ export class ProblemRepository extends BaseRepository {
   }
 
   async updateQualityScore(id: string, score: number): Promise<void> {
-    await this.db.problem.update({
+    await this.db.challenge.update({
       where: { id },
       data: {
         qualityScore: score,
@@ -261,20 +261,20 @@ export class ProblemRepository extends BaseRepository {
     const offset = (page - 1) * limit;
 
     const [problems, total] = await Promise.all([
-      this.db.problem.findMany({
+      this.db.challenge.findMany({
         where: { creatorId },
         skip: offset,
         take: limit,
         orderBy: { createdAt: 'desc' },
       }),
-      this.db.problem.count({ where: { creatorId } }),
+      this.db.challenge.count({ where: { creatorId } }),
     ]);
 
     return { problems, total };
   }
 
   async getCategories(): Promise<string[]> {
-    const categories = await this.db.problem.findMany({
+    const categories = await this.db.challenge.findMany({
       select: {
         category: true,
       },
@@ -288,7 +288,7 @@ export class ProblemRepository extends BaseRepository {
   }
 
   async getCategoryStats(): Promise<Array<{ category: string; count: number }>> {
-    const stats = await this.db.problem.groupBy({
+    const stats = await this.db.challenge.groupBy({
       by: ['category'],
       _count: {
         _all: true,

@@ -377,13 +377,13 @@ export class UserService {
     // Update rank based on points (simple rank system)
     let newRank = updatedUser.currentRank;
 
-    if (updatedUser.rankPoints >= 10000) {
+    if (updatedUser?.rankPoints >= 10000) {
       newRank = 'Diamond';
-    } else if (updatedUser.rankPoints >= 5000) {
+    } else if (updatedUser?.rankPoints >= 5000) {
       newRank = 'Platinum';
-    } else if (updatedUser.rankPoints >= 2500) {
+    } else if (updatedUser?.rankPoints >= 2500) {
       newRank = 'Gold';
-    } else if (updatedUser.rankPoints >= 1000) {
+    } else if (updatedUser?.rankPoints >= 1000) {
       newRank = 'Silver';
     } else {
       newRank = 'Bronze';
