@@ -243,8 +243,8 @@ export class ResourceRepository extends BaseRepository {
     ]);
 
     const resources = bookmarks
-      .filter((bookmark) => bookmark.resource)
-      .map((bookmark) => ({
+      .filter((bookmark: any) => bookmark.resource)
+      .map((bookmark: any) => ({
         ...bookmark.resource!,
         isBookmarked: true,
       }));
@@ -275,15 +275,15 @@ export class ResourceRepository extends BaseRepository {
 
     return {
       totalResources,
-      byCategory: categoryStats.map((stat) => ({
+      byCategory: categoryStats.map((stat: any) => ({
         category: stat.category,
         count: stat._count.category,
       })),
-      byType: typeStats.map((stat) => ({
+      byType: typeStats.map((stat: any) => ({
         type: stat.type,
         count: stat._count.type,
       })),
-      byDifficulty: difficultyStats.map((stat) => ({
+      byDifficulty: difficultyStats.map((stat: any) => ({
         difficulty: stat.difficulty || 'Not specified',
         count: stat._count.difficulty,
       })),

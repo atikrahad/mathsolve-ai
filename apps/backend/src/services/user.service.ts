@@ -286,7 +286,7 @@ export class UserService {
       });
 
       // Convert to public profiles
-      const publicProfiles: UserPublicProfile[] = users.map((user) => ({
+      const publicProfiles: UserPublicProfile[] = (users as any[]).map((user: any) => ({
         id: user.id,
         username: user.username,
         bio: user.bio,

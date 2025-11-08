@@ -75,7 +75,11 @@ export class AuthService {
       });
 
       // Generate tokens
-      const tokens = JWTUtils.generateTokenPair(user);
+      const tokens = JWTUtils.generateTokenPair({
+        id: user.id,
+        email: user.email,
+        username: user.username,
+      });
 
       // Format user response
       const userResponse = this.formatUserResponse(user);
@@ -122,7 +126,11 @@ export class AuthService {
       await this.userRepository.updateLastActive(user.id);
 
       // Generate tokens
-      const tokens = JWTUtils.generateTokenPair(user);
+      const tokens = JWTUtils.generateTokenPair({
+        id: user.id,
+        email: user.email,
+        username: user.username,
+      });
 
       // Format user response
       const userResponse = this.formatUserResponse(user);
@@ -157,7 +165,11 @@ export class AuthService {
       }
 
       // Generate new tokens
-      const tokens = JWTUtils.generateTokenPair(user);
+      const tokens = JWTUtils.generateTokenPair({
+        id: user.id,
+        email: user.email,
+        username: user.username,
+      });
 
       logger.info(`Token refreshed for user: ${user.id}`);
 
