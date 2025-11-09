@@ -33,19 +33,7 @@ const MathScene3D = dynamic(() => import('@/components/3d/MathScene3D'), {
     <div className="w-full h-96 bg-gradient-to-br from-slate-900 via-slate-950 to-black flex items-center justify-center rounded-xl">
       <div className="text-emerald-300 text-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-300 mx-auto mb-4"></div>
-        <p>Loading 3D Math Visualization...</p>
-      </div>
-    </div>
-  ),
-});
-
-const AdvancedMath3D = dynamic(() => import('@/components/3d/AdvancedMath3D'), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-80 bg-gradient-to-br from-slate-900 via-slate-950 to-black flex items-center justify-center rounded-xl">
-      <div className="text-emerald-300 text-center">
-        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-300 mx-auto mb-2"></div>
-        <p className="text-sm">Loading Advanced Visualizations...</p>
+        <p>Loading 3D Code Simulation...</p>
       </div>
     </div>
   ),
@@ -84,7 +72,7 @@ export default function Home() {
         <div className="max-w-[1200px] mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
             <div className="text-2xl font-bold bg-gradient-to-r from-emerald-300 via-cyan-200 to-sky-300 bg-clip-text text-transparent">
-              MathSolve AI
+              CodeSolve AI
             </div>
 
             <div className="flex items-center gap-4">
@@ -114,7 +102,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Floating Math Equations Background */}
+      {/* Floating Code Stream Background */}
       <FloatingMathEquations />
 
       {/* Hero Section */}
@@ -131,7 +119,7 @@ export default function Home() {
             transition={{ duration: 0.6 }}
           >
             <div className={`${theme.highlightPill} inline-flex items-center gap-2 mb-4`}>
-              🚀 Powered by Advanced AI Technology
+              🚀 Built for Elite Problem Solvers
             </div>
           </motion.div>
 
@@ -144,7 +132,7 @@ export default function Home() {
             <span
               className={`bg-gradient-to-r ${theme.accentGradient} bg-clip-text text-transparent drop-shadow-2xl`}
             >
-              MathSolve
+              CodeSolve
             </span>
             <br />
             <span className="bg-gradient-to-r from-amber-300 via-orange-300 to-rose-400 bg-clip-text text-transparent">
@@ -158,9 +146,9 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            Transform your mathematics learning with AI-powered solutions, interactive 3D
-            visualizations, and a vibrant community of learners. From basic arithmetic to advanced
-            calculus, master math at your own pace.
+            Ship production-ready code faster with AI copilots, interactive debugging visualizers,
+            and a thriving developer community. Practice algorithms, crush coding interviews, and
+            automate workflows across every major programming language.
           </motion.p>
 
           <motion.div
@@ -174,7 +162,7 @@ export default function Home() {
                 size="lg"
                 className="text-lg px-12 py-4 bg-gradient-to-r from-emerald-400 via-cyan-300 to-teal-400 hover:opacity-90 text-slate-950 font-bold transform hover:scale-105 transition-all duration-200 shadow-xl shadow-emerald-500/40"
               >
-                Start Learning Now
+                Start Solving Now
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
@@ -188,116 +176,82 @@ export default function Home() {
             </Button>
           </motion.div>
 
-          {/* Math Formulas Preview */}
+          {/* Code Snippets Preview */}
           <motion.div
             className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full"
             variants={staggerContainer}
           >
             <motion.div variants={fadeInUp}>
-              <MathFormula formula="∫ x² dx = x³/3 + C" delay={0.2} />
+              <MathFormula formula="function quickSort(arr) { ... }" delay={0.2} />
             </motion.div>
             <motion.div variants={fadeInUp}>
-              <MathFormula formula="e^(iπ) + 1 = 0" delay={0.4} />
+              <MathFormula formula="const dp = new Array(n).fill(0);" delay={0.4} />
             </motion.div>
             <motion.div variants={fadeInUp}>
-              <MathFormula formula="lim(x→0) sin(x)/x = 1" delay={0.6} />
+              <MathFormula formula="for (let bit of bitmask) { ... }" delay={0.6} />
             </motion.div>
           </motion.div>
         </motion.div>
       </section>
 
-      {/* 3D Mathematical Visualizations Section */}
-      <section className="py-20 bg-slate-950/60 border-y border-slate-900 backdrop-blur-sm">
-        <div className="w-full max-w-[1200px] mx-auto px-6">
+      {/* Immersive Problem Visualizer */}
+      <section className="relative w-full h-screen bg-slate-950/60 border-y border-slate-900 backdrop-blur-sm py-16 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-teal-500/5 via-slate-950/30 to-slate-950 pointer-events-none" />
+        <div className="relative z-10 w-full max-w-[1200px] mx-auto px-6 flex flex-col gap-10 h-full">
           <motion.div
-            className="text-center mb-16"
+            className="text-center max-w-3xl mx-auto"
             initial="initial"
             whileInView="animate"
             viewport={{ once: true }}
             variants={fadeInUp}
           >
-            <div
-              className={`${theme.highlightPill} inline-flex items-center gap-2 px-6 py-3 mb-4 shadow-sm`}
-            >
-              🎯 Interactive 3D Mathematics
+            <div className={`${theme.highlightPill} inline-flex items-center gap-2 px-6 py-3 mb-4 shadow-sm`}>
+              🎯 Immersive Problem Visualizer
             </div>
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Experience Mathematics in
+              Watch AI orchestrate complex coding challenges in
               <span className={`bg-gradient-to-r ${theme.accentGradient} bg-clip-text text-transparent`}>
                 {' '}
-                Three Dimensions
+                real time
               </span>
             </h2>
-            <p className="text-xl text-slate-400 max-w-3xl mx-auto mb-4">
-              Explore stunning 3D mathematical visualizations with professional animations and
-              vibrant colors. Each visualization demonstrates complex mathematical concepts through
-              interactive and engaging displays.
+            <p className="text-xl text-slate-400">
+              Trace every decision, optimization, and test run across your entire challenge stack from a single, cinematic control center.
             </p>
           </motion.div>
 
-          {/* Main 3D Scene */}
-          <motion.div
-            className="mb-16 rounded-2xl overflow-hidden shadow-2xl border border-emerald-400/20"
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <MathScene3D />
-          </motion.div>
+          <div className="flex-1 h-full">
+            <div className="h-full">
+              <MathScene3D />
+            </div>
+          </div>
 
-          {/* Advanced Math Visualizations Grid */}
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 gap-8"
+            className="grid grid-cols-1 md:grid-cols-3 gap-6"
             initial="initial"
             whileInView="animate"
             viewport={{ once: true }}
             variants={staggerContainer}
           >
-            <motion.div className={`${theme.panelBackground} backdrop-blur-xl p-6 rounded-2xl`} variants={fadeInUp}>
-              <h3 className="text-2xl font-bold text-emerald-300 mb-4 text-center">
-                Advanced Mathematical Surfaces
-              </h3>
-              <div className="h-80 rounded-xl overflow-hidden">
-                <AdvancedMath3D />
-              </div>
-              <p className="text-sm text-slate-400 text-center mt-4">
-                Interactive 3D surfaces demonstrating complex mathematical functions with real-time
-                manipulation capabilities.
-              </p>
-            </motion.div>
-
-            <motion.div
-              className={`${theme.panelBackground} backdrop-blur-xl p-6 rounded-2xl border border-rose-500/30`}
-              variants={fadeInUp}
-            >
-              <h3 className="text-2xl font-bold text-rose-300 mb-4 text-center">
-                AI Learning Analytics
-              </h3>
-              <div className="space-y-4">
-                <div className="bg-slate-900/60 p-4 rounded-lg border border-rose-500/20">
-                  <h4 className="text-amber-200 font-semibold mb-2">Real-time Progress Tracking</h4>
-                  <p className="text-slate-400 text-sm">
-                    AI analyzes your learning patterns and provides personalized recommendations for
-                    optimal mathematical growth.
-                  </p>
-                </div>
-                <div className="bg-slate-900/60 p-4 rounded-lg border border-rose-500/20">
-                  <h4 className="text-amber-200 font-semibold mb-2">Adaptive Difficulty Matching</h4>
-                  <p className="text-slate-400 text-sm">
-                    Dynamic problem selection ensures you&apos;re always challenged at the perfect
-                    level for maximum learning efficiency.
-                  </p>
-                </div>
-                <div className="bg-slate-900/60 p-4 rounded-lg border border-rose-500/20">
-                  <h4 className="text-amber-200 font-semibold mb-2">Predictive Performance Modeling</h4>
-                  <p className="text-slate-400 text-sm">
-                    Advanced algorithms predict your mathematical mastery timeline and suggest
-                    optimal study strategies.
-                  </p>
-                </div>
-              </div>
-            </motion.div>
+            {[
+              {
+                title: 'Adaptive Playbooks',
+                description: 'AI converts every unsolved prompt into a decomposed battle plan, then updates it live as you iterate.',
+              },
+              {
+                title: 'Confidence Heatmaps',
+                description: 'Visual overlays show coverage, edge cases, and stress points for each submission before you hit ship.',
+              },
+              {
+                title: 'Team-wide Telemetry',
+                description: 'Replay collaborative attempts with synchronized logs, code, and commentary in a single stream.',
+              },
+            ].map((card, index) => (
+              <motion.div key={card.title} className={`${theme.panelBackground} p-6 rounded-2xl`} variants={fadeInUp}>
+                <h4 className="text-xl font-semibold text-white mb-2">{card.title}</h4>
+                <p className="text-sm text-slate-400 leading-relaxed">{card.description}</p>
+              </motion.div>
+            ))}
           </motion.div>
         </div>
       </section>
@@ -313,10 +267,10 @@ export default function Home() {
             variants={staggerContainer}
           >
             {[
-              { number: 500000, label: 'Problems Solved', suffix: '+', colorClass: 'text-emerald-300' },
-              { number: 100000, label: 'Active Students', suffix: '+', colorClass: 'text-sky-300' },
-              { number: 50, label: 'Math Categories', suffix: '+', colorClass: 'text-amber-300' },
-              { number: 98, label: 'Success Rate', suffix: '%', colorClass: 'text-teal-300' },
+              { number: 850000, label: 'Bugs Squashed', suffix: '+', colorClass: 'text-emerald-300' },
+              { number: 120000, label: 'Active Developers', suffix: '+', colorClass: 'text-sky-300' },
+              { number: 75, label: 'Programming Stacks', suffix: '+', colorClass: 'text-amber-300' },
+              { number: 99, label: 'Resolution Rate', suffix: '%', colorClass: 'text-teal-300' },
             ].map((stat, index) => (
               <motion.div key={index} variants={fadeInUp}>
                 <div className={`text-4xl md:text-5xl font-bold mb-2 ${stat.colorClass}`}>
@@ -340,18 +294,18 @@ export default function Home() {
           variants={fadeInUp}
         >
           <div className={`${theme.highlightPill} inline-flex items-center gap-2 mb-4`}>
-            ✨ Revolutionary Features
+            ✨ Ship Faster Features
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Why Students Choose
+            Why Builders Choose
             <span className={`bg-gradient-to-r ${theme.accentGradient} bg-clip-text text-transparent`}>
               {' '}
-              MathSolve AI
+              CodeSolve AI
             </span>
           </h2>
           <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-            Experience the next generation of mathematics education with cutting-edge AI technology
-            and innovative 3D learning methods.
+            Experience the next generation of software development with AI copilots, instant code
+            reviews, and immersive debugging flows.
           </p>
         </motion.div>
 
@@ -365,49 +319,49 @@ export default function Home() {
           {[
             {
               icon: <Brain className="h-8 w-8" />,
-              title: 'AI-Powered Solutions',
+              title: 'AI Pair-Programming',
               description:
-                'Get instant, step-by-step solutions with detailed explanations powered by advanced neural networks. Our AI understands context and provides personalized learning experiences.',
+                'Autocomplete complex functions, refactor legacy code, and generate tests with copilots tuned for your stack and coding style.',
               color: 'from-emerald-400 to-cyan-300',
               delay: 0,
             },
             {
               icon: <Trophy className="h-8 w-8" />,
-              title: '3D Gamified Learning',
+              title: 'Quest-Based Upskilling',
               description:
-                'Earn XP, climb rankings, and unlock achievements while exploring 3D mathematical worlds. Track your progress from Bronze to Master level with immersive visualizations.',
+                'Earn badges, climb engineering ladders, and unlock interview tiers while conquering scenario-driven incident drills.',
               color: 'from-amber-300 to-rose-300',
               delay: 0.1,
             },
             {
               icon: <Users className="h-8 w-8" />,
-              title: 'Global Community',
+              title: 'Global Dev Community',
               description:
-                'Connect with thousands of math enthusiasts worldwide. Share 3D mathematical models, discuss solutions, and learn from peers in our vibrant learning ecosystem.',
+                'Pair with senior engineers, swap snippets, review code, and crowdsource debugging tactics from 150+ countries.',
               color: 'from-sky-300 to-emerald-300',
               delay: 0.2,
             },
             {
               icon: <BookOpen className="h-8 w-8" />,
-              title: 'Comprehensive 3D Library',
+              title: 'Scenario Library',
               description:
-                'Access over 50,000+ problems with interactive 3D visualizations covering topics from basic arithmetic to advanced multivariable calculus and beyond.',
+                'Access 50,000+ real-world incidents across microservices, mobile, and data infra with annotated solutions and postmortems.',
               color: 'from-rose-300 to-amber-300',
               delay: 0.3,
             },
             {
               icon: <Target className="h-8 w-8" />,
-              title: 'Adaptive 3D Learning',
+              title: 'Adaptive Coaching',
               description:
-                'Our AI analyzes your 3D interaction patterns and provides personalized recommendations. Experience mathematics through immersive visual learning paths.',
+                'Our AI studies your commit history and IDE habits to deliver hyper-personalized drills that target blind spots.',
               color: 'from-amber-300 to-emerald-300',
               delay: 0.4,
             },
             {
               icon: <Smartphone className="h-8 w-8" />,
-              title: 'Cross-Platform 3D',
+              title: 'Cross-Platform Tooling',
               description:
-                'Enjoy seamless 3D mathematical visualizations across all devices. Our responsive platform delivers consistent experiences on desktop, tablet, and mobile.',
+                'Enjoy lightning-fast experiences on desktop, terminal, or mobile. Start a kata on your phone and finish the deployment fix on your laptop.',
               color: 'from-cyan-300 to-sky-400',
               delay: 0.5,
             },
@@ -431,7 +385,7 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* Math Categories Section */}
+      {/* Programming Categories Section */}
       <section className="py-20 bg-slate-950/60 border-y border-slate-900">
         <div className="w-full max-w-[1200px] mx-auto px-6">
           <motion.div
@@ -442,11 +396,11 @@ export default function Home() {
             variants={fadeInUp}
           >
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Master Every Branch of Mathematics
+              Master Every Programming Stack
             </h2>
             <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-              From fundamental concepts to advanced theories, explore our comprehensive curriculum
-              with interactive 3D visualizations for each mathematical domain.
+              From embedded systems to cloud-native platforms, explore curated tracks with
+              interactive simulations for each language and framework.
             </p>
           </motion.div>
 
@@ -458,14 +412,14 @@ export default function Home() {
             variants={staggerContainer}
           >
             {[
-              { name: 'Calculus', icon: '∫', problems: 5250, color: 'text-emerald-300' },
-              { name: 'Algebra', icon: '📐', problems: 4100, color: 'text-sky-300' },
-              { name: 'Geometry', icon: '📊', problems: 3890, color: 'text-amber-300' },
-              { name: 'Trigonometry', icon: '📈', problems: 2950, color: 'text-teal-300' },
-              { name: 'Statistics', icon: '📊', problems: 2750, color: 'text-purple-300' },
-              { name: 'Probability', icon: '🎲', problems: 1800, color: 'text-rose-300' },
-              { name: 'Linear Algebra', icon: '🔢', problems: 1600, color: 'text-lime-300' },
-              { name: 'Discrete Math', icon: '∂', problems: 1200, color: 'text-cyan-300' },
+              { name: 'JavaScript', icon: '</>', problems: 6800, color: 'text-emerald-300' },
+              { name: 'Python', icon: '🐍', problems: 7200, color: 'text-sky-300' },
+              { name: 'Go', icon: '🐹', problems: 3400, color: 'text-amber-300' },
+              { name: 'Rust', icon: '🦀', problems: 2750, color: 'text-teal-300' },
+              { name: 'Java', icon: '☕', problems: 5100, color: 'text-purple-300' },
+              { name: 'C++', icon: '{}', problems: 4600, color: 'text-rose-300' },
+              { name: 'Kotlin', icon: 'λ', problems: 1900, color: 'text-lime-300' },
+              { name: 'Swift', icon: '🕊️', problems: 1600, color: 'text-cyan-300' },
             ].map((category, index) => (
               <motion.div key={index} variants={fadeInUp}>
                 <AnimatedCard delay={index * 0.1}>
@@ -475,7 +429,7 @@ export default function Home() {
                     </div>
                     <h3 className="font-bold text-white mb-2">{category.name}</h3>
                     <p className="text-sm text-slate-400">
-                      {category.problems.toLocaleString()} problems
+                      {category.problems.toLocaleString()} challenges
                     </p>
                   </CardContent>
                 </AnimatedCard>
@@ -497,17 +451,17 @@ export default function Home() {
           >
             <motion.div variants={fadeInUp}>
               <div className={`${theme.highlightPill} inline-flex items-center gap-2 mb-4`}>
-                🎉 Join Over 500,000+ Students
+                🎉 Join 500,000+ Engineers
               </div>
             </motion.div>
 
             <motion.h2 className="text-4xl md:text-6xl font-bold mb-6" variants={fadeInUp}>
-              Ready to Master Mathematics in 3D?
+              Ready to Ship Better Software?
             </motion.h2>
 
             <motion.p className="text-xl md:text-2xl mb-8 opacity-90 max-w-3xl mx-auto text-slate-400" variants={fadeInUp}>
-              Start your journey today with personalized AI tutoring, immersive 3D visualizations,
-              and a supportive community of learners.
+              Build unstoppable velocity with personalized AI coaching, immersive debugging sims,
+              and a supportive engineering community.
             </motion.p>
 
             <motion.div
@@ -529,7 +483,7 @@ export default function Home() {
                 variant="outline"
                 className="text-lg px-12 py-4 border-2 border-emerald-400/60 text-emerald-200 hover:bg-emerald-400/10 transform hover:scale-105 transition-all duration-200"
               >
-                Explore 3D Demo
+                Explore Product Tour
               </Button>
             </motion.div>
 
@@ -538,9 +492,9 @@ export default function Home() {
               variants={staggerContainer}
             >
               {[
-                '✨ Free forever for basic features',
+                '✨ Free forever for personal repos',
                 '🚀 No credit card required',
-                '📚 Access to 50,000+ 3D problems instantly',
+                '📚 Access to 50,000+ engineering scenarios instantly',
               ].map((feature, index) => (
                 <motion.div
                   key={index}
