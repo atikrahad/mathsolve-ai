@@ -60,6 +60,7 @@
     "tailwind-merge": "^2.x",
     "tailwindcss": "^3.x",
     "three": "^0.158.0",
+    "socket.io-client": "^4.7.5",
     "zod": "^3.x",
     "zustand": "^4.x"
   },

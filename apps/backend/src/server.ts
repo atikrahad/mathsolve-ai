@@ -4,6 +4,7 @@ import { Server } from 'socket.io';
 import app from './app';
 import { logger } from './config/logger';
 import { corsOptions } from './config/cors';
+import { setSocketInstance } from './lib/socket';
 
 // Load environment variables
 dotenv.config();
@@ -12,6 +13,7 @@ const server = createServer(app);
 const io = new Server(server, {
   cors: corsOptions,
 });
+setSocketInstance(io);
 
 const PORT = process.env.PORT || 3001;
 const NODE_ENV = process.env.NODE_ENV || 'development';

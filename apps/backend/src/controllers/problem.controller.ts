@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { ProblemService } from '../services/problem.service';
+import { realtimeService } from '../services/realtime.service';
 import { ProblemRepository } from '../repositories/problem.repository';
 import {
   createProblemSchema,
@@ -45,6 +46,8 @@ export class ProblemController {
         userId: req.userId,
         ip: req.ip,
       });
+
+      realtimeService.emitProblemCreated(problem);
 
       res.status(201).json(createSuccessResponse(problem, 'Problem created successfully'));
     } catch (error) {
@@ -160,6 +163,10 @@ export class ProblemController {
         updates: Object.keys(updateData),
       });
 
+      if (updatedProblem) {
+        realtimeService.emitProblemUpdated(updatedProblem as any);
+      }
+
       res.json(createSuccessResponse(updatedProblem, 'Problem updated successfully'));
     } catch (error) {
       logger.error('Update problem error', { error, problemId: req.params.id, userId: req.userId });
@@ -198,6 +205,8 @@ export class ProblemController {
         problemId: id,
         userId: req.userId,
       });
+
+      realtimeService.emitProblemDeleted(id);
 
       res.json(createSuccessResponse(null, 'Problem deleted successfully'));
     } catch (error) {

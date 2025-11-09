@@ -1,9 +1,8 @@
 // @ts-nocheck - Temporary fix for React component type compatibility issues
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
-  Problem,
   ProblemSearchParams,
   ProblemSearchResult,
   ProblemCategory,
@@ -29,138 +28,169 @@ import problemService from '@/services/problemService';
 import Header from '@/components/layout/Header';
 import Link from 'next/link';
 import { Search, Filter, Plus, Grid, List, SortAsc, SortDesc, X, BookOpen } from 'lucide-react';
+import { getRealtimeSocket } from '@/lib/socket';
 
-export default function ProblemsPage() {
-  const [searchResult, setSearchResult] = useState<ProblemSearchResult | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<ProblemCategory | 'all'>('all');
-  const [selectedDifficulty, setSelectedDifficulty] = useState<ProblemDifficulty | 'all'>('all');
+const PAGE_SIZE = 24;
+const EMPTY_RESULT: ProblemSearchResult = {
+  problems: [],
+  pagination: {
+    page: 1,
+    limit: PAGE_SIZE,
+    total: 0,
+    totalPages: 0,
+    hasNext: false,
+    hasPrev: false,
+  },
+};
+
+const createEmptyResult = (): ProblemSearchResult => ({
+  problems: [],
+  pagination: { ...EMPTY_RESULT.pagination },
+});
+
+interface ProblemsClientProps {
+  initialData: ProblemSearchResult | null;
+  initialQuery: {
+    searchTerm: string;
+    category: ProblemCategory | 'all';
+    difficulty: ProblemDifficulty | 'all';
+    sortBy: string;
+    sortOrder: 'asc' | 'desc';
+    page: number;
+  };
+}
+
+export default function ProblemsClient({ initialData, initialQuery }: ProblemsClientProps) {
+  const [searchResult, setSearchResult] = useState<ProblemSearchResult>(
+    initialData ?? createEmptyResult()
+  );
+  const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(initialQuery.searchTerm ?? '');
+  const [selectedCategory, setSelectedCategory] = useState<ProblemCategory | 'all'>(
+    initialQuery.category ?? 'all'
+  );
+  const [selectedDifficulty, setSelectedDifficulty] = useState<ProblemDifficulty | 'all'>(
+    initialQuery.difficulty ?? 'all'
+  );
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState<string>('createdAt');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [sortBy, setSortBy] = useState<string>(initialQuery.sortBy ?? 'createdAt');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(initialQuery.sortOrder ?? 'desc');
+  const [currentPage, setCurrentPage] = useState(initialQuery.page ?? 1);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
-  const [filtersInitialized, setFiltersInitialized] = useState(false);
-
-  const PAGE_SIZE = 24;
   const activeRequest = useRef<AbortController | null>(null);
+  const skipFirstFetch = useRef(true);
 
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // Load initial search params from URL
   useEffect(() => {
-    const category = searchParams.get('category');
-    const difficulty = searchParams.get('difficulty');
-    const search = searchParams.get('search');
-    const page = searchParams.get('page');
-    const sort = searchParams.get('sort');
-    const order = searchParams.get('order');
+    return () => {
+      activeRequest.current?.abort();
+    };
+  }, []);
 
-    if (category && category in ProblemCategory) {
-      setSelectedCategory(category as ProblemCategory);
-    }
-    if (difficulty && difficulty in ProblemDifficulty) {
-      setSelectedDifficulty(difficulty as ProblemDifficulty);
-    }
-    if (search) {
-      setSearchTerm(search);
-    }
-    if (page) {
-      setCurrentPage(parseInt(page) || 1);
-    }
-    if (sort) {
-      setSortBy(sort);
-    }
-    if (order && (order === 'asc' || order === 'desc')) {
-      setSortOrder(order);
-    }
-
-    setFiltersInitialized(true);
-  }, [searchParams]);
-
-  // Search problems when filters change
   useEffect(() => {
-    if (!filtersInitialized) return;
+    if (skipFirstFetch.current) {
+      skipFirstFetch.current = false;
+      return;
+    }
     searchProblems();
-  }, [selectedCategory, selectedDifficulty, selectedTags, sortBy, sortOrder, currentPage, filtersInitialized]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCategory, selectedDifficulty, selectedTags, sortBy, sortOrder, currentPage]);
 
-  const searchProblems = async (searchTermParam?: string) => {
-    if (!filtersInitialized) return;
-    activeRequest.current?.abort();
-    const controller = new AbortController();
-    activeRequest.current = controller;
-    setLoading(true);
-    try {
-      const currentSearchTerm = searchTermParam !== undefined ? searchTermParam : searchTerm;
-      const params: ProblemSearchParams = {
-        page: currentPage,
-        limit: PAGE_SIZE,
-        sortBy: sortBy as any,
-        sortOrder,
-        ...(selectedCategory !== 'all' && { category: selectedCategory as string }),
-        ...(selectedDifficulty !== 'all' && {
-          difficulty: selectedDifficulty as ProblemDifficulty,
-        }),
-        ...(selectedTags.length > 0 && { tags: selectedTags }),
-      };
-
+  const searchProblems = useCallback(
+    async (searchTermParam?: string) => {
+      activeRequest.current?.abort();
+      const controller = new AbortController();
+      activeRequest.current = controller;
+      setLoading(true);
       try {
-        let result: ProblemSearchResult;
-        if (currentSearchTerm && currentSearchTerm.trim()) {
-          result = await problemService.searchProblems(
-            { ...params, q: currentSearchTerm.trim() },
-            { signal: controller.signal }
-          );
-        } else {
-          result = await problemService.getProblems(params, { signal: controller.signal });
+        const currentSearchTerm = searchTermParam !== undefined ? searchTermParam : searchTerm;
+        const params: ProblemSearchParams = {
+          page: currentPage,
+          limit: PAGE_SIZE,
+          sortBy: sortBy as any,
+          sortOrder,
+          ...(selectedCategory !== 'all' && { category: selectedCategory as string }),
+          ...(selectedDifficulty !== 'all' && {
+            difficulty: selectedDifficulty as ProblemDifficulty,
+          }),
+          ...(selectedTags.length > 0 && { tags: selectedTags }),
+        };
+
+        try {
+          let result: ProblemSearchResult;
+          if (currentSearchTerm && currentSearchTerm.trim()) {
+            result = await problemService.searchProblems(
+              { ...params, q: currentSearchTerm.trim() },
+              { signal: controller.signal }
+            );
+          } else {
+            result = await problemService.getProblems(params, { signal: controller.signal });
+          }
+          if (controller.signal.aborted) return;
+          setSearchResult(result);
+        } catch (error) {
+          if (controller.signal.aborted) return;
+          console.error('Failed to load problems:', error);
+          setSearchResult(createEmptyResult());
         }
-        if (controller.signal.aborted) return;
-        setSearchResult(result);
-      } catch (error) {
-        if (controller.signal.aborted) return;
-        console.error('Failed to load problems:', error);
-        // Set empty result to show "no problems found" state
-        setSearchResult({
-          problems: [],
-          pagination: {
-            page: 1,
-            limit: PAGE_SIZE,
-            total: 0,
-            totalPages: 0,
-            hasNext: false,
-            hasPrev: false,
-          },
-        });
-      }
 
-      // Update URL with search params
-      const urlParams = new URLSearchParams();
-      if (currentSearchTerm) urlParams.set('search', currentSearchTerm);
-      if (selectedCategory !== 'all') urlParams.set('category', selectedCategory);
-      if (selectedDifficulty !== 'all') urlParams.set('difficulty', selectedDifficulty);
-      if (currentPage > 1) urlParams.set('page', currentPage.toString());
-      if (sortBy !== 'createdAt') urlParams.set('sort', sortBy);
-      if (sortOrder !== 'desc') urlParams.set('order', sortOrder);
+        const urlParams = new URLSearchParams();
+        if (currentSearchTerm) urlParams.set('search', currentSearchTerm);
+        if (selectedCategory !== 'all') urlParams.set('category', selectedCategory);
+        if (selectedDifficulty !== 'all') urlParams.set('difficulty', selectedDifficulty);
+        if (currentPage > 1) urlParams.set('page', currentPage.toString());
+        if (sortBy !== 'createdAt') urlParams.set('sort', sortBy);
+        if (sortOrder !== 'desc') urlParams.set('order', sortOrder);
 
-      const newUrl = `?${urlParams.toString()}`;
-      if (newUrl !== `?${searchParams.toString()}`) {
-        router.replace(newUrl, { scroll: false });
+        const newUrl = `?${urlParams.toString()}`;
+        const currentUrl = typeof window !== 'undefined' ? window.location.search : `?${searchParams.toString()}`;
+        if (newUrl !== currentUrl) {
+          router.replace(newUrl, { scroll: false });
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
-    } finally {
-      if (!controller.signal.aborted) {
-        setLoading(false);
-      }
-    }
-  };
+    },
+    [
+      currentPage,
+      router,
+      searchParams,
+      searchTerm,
+      selectedCategory,
+      selectedDifficulty,
+      selectedTags,
+      sortBy,
+      sortOrder,
+    ]
+  );
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setCurrentPage(1);
     searchProblems(searchTerm);
   };
+
+  useEffect(() => {
+    const socket = getRealtimeSocket();
+    const handleRealtime = () => {
+      searchProblems();
+    };
+
+    socket.on('problem:created', handleRealtime);
+    socket.on('problem:updated', handleRealtime);
+    socket.on('problem:deleted', handleRealtime);
+
+    return () => {
+      socket.off('problem:created', handleRealtime);
+      socket.off('problem:updated', handleRealtime);
+      socket.off('problem:deleted', handleRealtime);
+    };
+  }, [searchProblems]);
 
   const handleTagToggle = (tag: string) => {
     const newTags = selectedTags.includes(tag)
