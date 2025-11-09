@@ -14,16 +14,22 @@ class ProblemService {
   /**
    * Get all problems with pagination, filtering, and sorting
    */
-  async getProblems(params: ProblemSearchParams = {}): Promise<ProblemSearchResult> {
-    const response = await api.get('/problems', { params });
+  async getProblems(
+    params: ProblemSearchParams = {},
+    options: { signal?: AbortSignal } = {}
+  ): Promise<ProblemSearchResult> {
+    const response = await api.get('/problems', { params, signal: options.signal });
     return response.data.data;
   }
 
   /**
    * Search problems with query string
    */
-  async searchProblems(params: ProblemSearchParams & { q: string }): Promise<ProblemSearchResult> {
-    const response = await api.get('/problems/search', { params });
+  async searchProblems(
+    params: ProblemSearchParams & { q: string },
+    options: { signal?: AbortSignal } = {}
+  ): Promise<ProblemSearchResult> {
+    const response = await api.get('/problems/search', { params, signal: options.signal });
     return response.data.data;
   }
 
