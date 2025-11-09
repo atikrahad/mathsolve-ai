@@ -303,4 +303,21 @@ export class ProblemRepository extends BaseRepository {
       count: stat._count._all,
     }));
   }
+
+  async getDifficultyStats(): Promise<Array<{ difficulty: string; count: number }>> {
+    const stats = await this.db.challenge.groupBy({
+      by: ['difficulty'],
+      _count: {
+        _all: true,
+      },
+      orderBy: {
+        difficulty: 'asc',
+      },
+    });
+
+    return stats.map((stat: any) => ({
+      difficulty: (stat.difficulty || '').toUpperCase(),
+      count: stat._count._all,
+    }));
+  }
 }

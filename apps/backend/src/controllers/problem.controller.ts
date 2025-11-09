@@ -270,6 +270,20 @@ export class ProblemController {
   };
 
   /**
+   * Get aggregated stats for dashboard
+   * GET /api/problems/stats
+   */
+  getDashboardStats = async (_req: Request, res: Response): Promise<void> => {
+    try {
+      const stats = await this.problemService.getDashboardStats();
+      res.json(createSuccessResponse(stats, 'Problem stats retrieved successfully'));
+    } catch (error) {
+      logger.error('Get dashboard stats error', { error });
+      res.status(500).json(createErrorResponse('Failed to retrieve problem stats', 500));
+    }
+  };
+
+  /**
    * Rate a problem
    * POST /api/problems/:id/rate
    */

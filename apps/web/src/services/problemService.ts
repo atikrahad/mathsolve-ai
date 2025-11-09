@@ -7,6 +7,7 @@ import {
   UpdateProblemData,
   ProblemAttempt,
   ProblemRating,
+  ProblemDifficulty,
 } from '@/types/problem';
 
 class ProblemService {
@@ -97,6 +98,14 @@ class ProblemService {
     const response = await api.get('/problems/categories', {
       params: { includeCount: includeCount.toString() },
     });
+    return response.data.data;
+  }
+
+  async getDashboardStats(): Promise<{
+    categories: Array<{ category: string; count: number }>;
+    difficulties: Array<{ difficulty: ProblemDifficulty; count: number }>;
+  }> {
+    const response = await api.get('/problems/stats');
     return response.data.data;
   }
 

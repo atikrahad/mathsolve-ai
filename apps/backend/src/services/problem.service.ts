@@ -26,6 +26,11 @@ export interface CategoryStats {
   count: number;
 }
 
+export interface DifficultyStats {
+  difficulty: string;
+  count: number;
+}
+
 export class ProblemService {
   constructor(private problemRepository: ProblemRepository) {}
 
@@ -309,6 +314,20 @@ export class ProblemService {
         'ProblemService',
         'getCategoryStats'
       );
+    }
+  }
+
+  async getDashboardStats(): Promise<{ categories: CategoryStats[]; difficulties: DifficultyStats[] }> {
+    try {
+      const [categories, difficulties] = await Promise.all([
+        this.problemRepository.getCategoryStats(),
+        this.problemRepository.getDifficultyStats(),
+      ]);
+
+      return { categories, difficulties };
+    } catch (error) {
+      logger.error('Failed to get dashboard stats', { error });
+      throw new ServiceError(500, 'Failed to retrieve dashboard stats', 'ProblemService', 'getDashboardStats');
     }
   }
 

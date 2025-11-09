@@ -68,6 +68,7 @@ router.get('/search', searchLimiter, problemController.searchProblems);
  * @query   {boolean} [includeCount=false] - Include problem count for each category
  */
 router.get('/categories', generalLimiter, problemController.getCategories);
+router.get('/stats', generalLimiter, problemController.getDashboardStats);
 
 /**
  * @route   GET /api/problems/:id
@@ -75,8 +76,6 @@ router.get('/categories', generalLimiter, problemController.getCategories);
  * @access  Public (but shows user-specific data if authenticated)
  * @param   {string} id - Problem ID (CUID format)
  */
-router.get('/:id', generalLimiter, problemController.getProblem);
-
 // Protected routes (authentication required)
 
 /**
@@ -100,6 +99,8 @@ router.post('/', createLimiter, authenticateToken, problemController.createProbl
  * @query   {number} [limit=20] - Number of problems per page
  */
 router.get('/my', generalLimiter, authenticateToken, problemController.getMyProblems);
+
+router.get('/:id', generalLimiter, problemController.getProblem);
 
 /**
  * @route   PUT /api/problems/:id
